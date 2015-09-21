@@ -1,0 +1,63 @@
+apply plugin: 'com.android.model.application'
+
+model {
+    android {
+        compileSdkVersion = 22
+        buildToolsVersion = "22.0.1"
+
+        defaultConfig.with {
+            applicationId = "com.example.hellojni"
+            minSdkVersion.apiLevel = 4
+            targetSdkVersion.apiLevel = 22
+        }
+
+	
+    }
+/*
+    android.sources {
+        main {
+	    jni {
+                source {
+		    srcDir 'libs'
+		}
+	    }
+	}
+    }
+*/
+    compileOptions.with {
+        sourceCompatibility=JavaVersion.VERSION_1_7
+        targetCompatibility=JavaVersion.VERSION_1_7
+    }
+
+    /*
+     * native build settings
+     */
+    android.ndk {
+        moduleName = "wrapper"
+        //jniLibs.srcDirs = ['libs']
+	ldFlags += "-L/home/wavewave/repo/srcc/android-haskell-activity/test"
+	ldLibs = ["test11"]
+        /*
+         * Other ndk flags configurable here are
+         * cppFlags += "-fno-rtti"
+         * cppFlags += "-fno-exceptions"
+         * ldLibs    = ["android", "log"]
+         * stl       = "system"
+         */
+    }
+    android.buildTypes {
+        release {
+            minifyEnabled = false
+            proguardFiles  += file('proguard-rules.txt')
+        }
+    }
+    android.productFlavors {
+        // for detailed abiFilter descriptions, refer to "Supported ABIs" @
+        // https://developer.android.com/ndk/guides/abis.html#sa
+        create("arm") {
+            ndk.abiFilters = ["armeabi"]
+        }
+    }
+}
+
+
