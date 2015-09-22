@@ -7,11 +7,11 @@
 //  return 0;
 //}
 
-/* 
+ 
 jstring
 Java_com_example_hellojni_HelloJni_stringFromJNI(JNIEnv *env, jobject this)
 {
-  int a = secretfunction();
+  int a = 300; // secretfunction();
   
   char* str;
 
@@ -20,4 +20,4 @@ Java_com_example_hellojni_HelloJni_stringFromJNI(JNIEnv *env, jobject this)
   
   return (*env)->NewStringUTF(env, str); 
 }
-*/
+

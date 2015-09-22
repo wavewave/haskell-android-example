@@ -34,6 +34,7 @@ public class HelloJni extends Activity
          */
         TextView  tv = new TextView(this);
         tv.setText( stringFromJNI() );
+	//stringFromJNI();
         setContentView(tv);
     }
 
@@ -41,7 +42,7 @@ public class HelloJni extends Activity
      * 'hello-jni' native library, which is packaged
      * with this application.
      */
-    public native String  stringFromJNI();
+    public native String stringFromJNI();
 
     /* This is another native method declaration that is *not*
      * implemented by 'hello-jni'. This is simply to show that
