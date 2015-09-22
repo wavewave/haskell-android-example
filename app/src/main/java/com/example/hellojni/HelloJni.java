@@ -27,22 +27,24 @@ public class HelloJni extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        onCreateHS(savedInstanceState);
 
         /* Create a TextView and set its content.
          * the text is retrieved by calling a native
          * function.
          */
-        TextView  tv = new TextView(this);
-        tv.setText( stringFromJNI() );
+        // TextView  tv = new TextView(this);
+        //tv.setText( stringFromJNI() );
 	//stringFromJNI();
-        setContentView(tv);
+        //setContentView(tv);
     }
 
     /* A native method that is implemented by the
      * 'hello-jni' native library, which is packaged
      * with this application.
      */
-    public native String stringFromJNI();
+    //public native String stringFromJNI();
+    public native void onCreateHS(Bundle savedInstanceState);
 
     /* This is another native method declaration that is *not*
      * implemented by 'hello-jni'. This is simply to show that
@@ -62,6 +64,6 @@ public class HelloJni extends Activity
      * installation time by the package manager.
      */
     static {
-        System.loadLibrary("wrapper");
+        System.loadLibrary("haskell");
     }
 }

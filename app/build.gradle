@@ -21,7 +21,7 @@ model {
 
    repositories {
        libs(PrebuildLibraries) { 
-           wrapper {  
+           haskell {  
                binaries.withType(SharedLibraryBinary) {
                    sharedLibraryFile = file("/home/wavewave/repo/src/haskell-android-example/test/libs/armeabi/libwrapper.so")
                }    
