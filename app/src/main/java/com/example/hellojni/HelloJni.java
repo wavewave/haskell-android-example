@@ -27,16 +27,18 @@ public class HelloJni extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        onCreateHS(savedInstanceState);
+        // onCreateHS(savedInstanceState);
 
         /* Create a TextView and set its content.
          * the text is retrieved by calling a native
          * function.
          */
-        // TextView  tv = new TextView(this);
-        //tv.setText( stringFromJNI() );
+        TextView  tv = new TextView(this);
+        tv.setText( stringFromJNI() );
+	//onCreateHS(tv);
+
 	//stringFromJNI();
-        //setContentView(tv);
+        setContentView(tv);
     }
 
     /* A native method that is implemented by the
@@ -44,7 +46,7 @@ public class HelloJni extends Activity
      * with this application.
      */
     //public native String stringFromJNI();
-    public native void onCreateHS(Bundle savedInstanceState);
+    public native void onCreateHS(TextView tv); // (Bundle savedInstanceState);
 
     /* This is another native method declaration that is *not*
      * implemented by 'hello-jni'. This is simply to show that
@@ -56,6 +58,8 @@ public class HelloJni extends Activity
      * Trying to call this function will result in a
      * java.lang.UnsatisfiedLinkError exception !
      */
+    public native String  stringFromJNI(); // (Bundle savedInstanceState);
+
     public native String  unimplementedStringFromJNI();
 
     /* this is used to load the 'hello-jni' library on application
