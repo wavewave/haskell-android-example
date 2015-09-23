@@ -18,8 +18,24 @@ void shout ( JNIEnv* env,  char* cmsg ) {
       }
     }
   }
-  
 }
+
+
+// static int Log.D(String tag, String msg)
+void c_textView_setText ( JNIEnv* env,  jobject tv, char* cmsg ) { 
+  jclass cls = (*env)->FindClass(env, "android/widget/TextView");
+  if( cls ) {
+    jmethodID mid = (*env)->GetMethodID(env, cls, "setText", "(Ljava/lang/CharSequence;)V");
+    if( mid ) {
+      jstring jmsg = (*env)->NewStringUTF(env,cmsg);
+      if( jmsg ) { 
+        (*env)->CallVoidMethod(env,tv,mid,jmsg);
+      }
+    }
+  }
+}
+
+
 
 
 JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {

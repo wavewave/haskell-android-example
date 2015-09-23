@@ -7,4 +7,6 @@ arm-unknown-linux-androideabi-ghc -shared -no-hs-main  HaskellActivity.o init.o 
 
 cp libhaskell.so ../app/src/main/jniLibs/armeabi/libhaskell.so
 
+cd .. ; gradle installArmDebug ; cd hs
+
 

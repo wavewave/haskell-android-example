@@ -10,6 +10,8 @@ import qualified Data.Text.IO as TIO
 import GHC.Conc
 
 import System.IO
+import Control.Concurrent
+import Control.Monad
 {- 
 -}
 
@@ -37,8 +39,16 @@ onCreate env activity tv {- _bundle -} = runJNISafe () env $ do
     -- putStrLn " HIHIHIHIH"
     cstr <- newCString "MESSAGE FROM HASKELL : YEAH"
     shout env cstr
+
+    textViewSetText env tv cstr 
+    {- 
+    forkIO $ forever $ do
+      threadDelay 1000000
+      return () -}
     return txt
-   
+
+
+    
   -- activityClass <- getObjectClass activity
 
   {- tv <- textView_new activity -}
@@ -54,6 +64,8 @@ foreign export ccall
   onCreate :: JNIEnv -> JObject -> JObject -> IO ()
 
 foreign import ccall "shout" shout :: JNIEnv -> CString -> IO ()
+
+foreign import ccall "c_textView_setText" textViewSetText :: JNIEnv -> JObject -> CString -> IO ()
 
 
 

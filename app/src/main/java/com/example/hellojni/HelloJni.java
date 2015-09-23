@@ -34,7 +34,7 @@ public class HelloJni extends Activity
          * function.
          */
         TextView  tv = new TextView(this);
-        tv.setText( stringFromJNI() );
+        //tv.setText( stringFromJNI() );
 	onCreateHS(tv);
 
 	//stringFromJNI();
