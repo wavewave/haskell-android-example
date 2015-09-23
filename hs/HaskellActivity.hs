@@ -3,6 +3,7 @@ module HaskellActivity where
 
 import Foreign.JNI
 import Foreign.JNI.Lookup
+import Foreign.C.String
 import Control.Monad.IO.Class
 import Data.Text (Text, append, pack)
 import qualified Data.Text.IO as TIO
@@ -33,13 +34,15 @@ onCreate env activity tv {- _bundle -} = runJNISafe () env $ do
     caps <- getNumCapabilities
     let txt  = "Hello World!\nRunning on " `append` pack (show caps) `append` " CPUs!"
     -- TIO.writeFile "/data/local/tmp/mytmp.txt" txt
-    putStrLn " HIHIHIHIH" 
+    -- putStrLn " HIHIHIHIH"
+    cstr <- newCString "MESSAGE FROM HASKELL : YEAH"
+    shout env cstr
     return txt
    
   -- activityClass <- getObjectClass activity
 
   {- tv <- textView_new activity -}
-  textView_setText tv msg
+  -- textView_setText tv msg
 
   {- 
   activity_setContentView <- getMethodID activityClass "setContentView" "(Landroid/view/View;)V"
@@ -49,6 +52,9 @@ onCreate env activity tv {- _bundle -} = runJNISafe () env $ do
 foreign export ccall
   "Java_com_example_hellojni_HelloJni_onCreateHS"
   onCreate :: JNIEnv -> JObject -> JObject -> IO ()
+
+foreign import ccall "shout" shout :: JNIEnv -> CString -> IO ()
+
 
 
 {-                              
