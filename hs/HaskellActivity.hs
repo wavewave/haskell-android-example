@@ -33,6 +33,8 @@ textView_setText tv txt = do
   jtxt <- newString txt
   callVoidMethod tv (jmethodid textView_class "setText" "(Ljava/lang/CharSequence;)V") [jv jtxt]
 -}
+
+
 data JObjectObj
 type JObject = Ptr JObjectObj
 
@@ -64,8 +66,6 @@ onCreate env activity tv =  do
     cstr1 <- newCString str
     shout env cstr1
 
-
-    
     textViewSetText env tv cstr1
 
 
@@ -73,6 +73,19 @@ onCreate env activity tv =  do
 foreign export ccall
   "Java_com_example_hellojni_HelloJni_onCreateHS"
   onCreate :: JNIEnv -> JObject -> JObject -> IO ()
+
+onClick :: JNIEnv -> JObject -> JObject -> IO ()
+onClick env activity tv = do
+  cstr <- newCString "CLICKED"
+  shout env cstr
+  
+  textViewSetText env tv cstr
+  
+
+foreign export ccall
+  "Java_com_example_hellojni_HelloJni_onClickHS"
+  onClick :: JNIEnv -> JObject -> JObject -> IO ()
+
 
 foreign import ccall "shout" shout :: JNIEnv -> CString -> IO ()
 

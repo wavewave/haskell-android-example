@@ -18,35 +18,62 @@ package com.example.hellojni;
 import android.app.Activity;
 import android.widget.TextView;
 import android.os.Bundle;
-
+import android.widget.Button;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.util.Log;
 
 public class HelloJni extends Activity
 {
+    
+    Button button;
+    TextView  tv; 
+    
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+	setContentView(R.layout.main);
         // onCreateHS(savedInstanceState);
 
         /* Create a TextView and set its content.
          * the text is retrieved by calling a native
          * function.
          */
-        TextView  tv = new TextView(this);
         //tv.setText( stringFromJNI() );
+	tv = (TextView) findViewById(R.id.textview1);
 	onCreateHS(tv);
 
+	addListenerOnButton();
 	//stringFromJNI();
-        setContentView(tv);
+        //setContentView(tv);
     }
 
+    public void addListenerOnButton() {
+        button = (Button) findViewById(R.id.button1);
+	button.setOnClickListener(new OnClickListener() {
+            @Override
+	    public void onClick(View arg0) {
+
+                // Log.d("HELLOJNI", "button clicked");
+		onClickHS(tv);
+
+		
+	    }
+	});
+							
+
+    }
+       
     /* A native method that is implemented by the
      * 'hello-jni' native library, which is packaged
      * with this application.
      */
     //public native String stringFromJNI();
     public native void onCreateHS(TextView tv); // (Bundle savedInstanceState);
+
+    public native void onClickHS(TextView tv); // (Bundle savedInstanceState);
 
     /* This is another native method declaration that is *not*
      * implemented by 'hello-jni'. This is simply to show that
