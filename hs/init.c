@@ -1,8 +1,18 @@
+#include <stdio.h>
 #include <jni.h>
 #include <HsFFI.h>
 
 //extern void hs_set_java_vm(HsPtr a1);
 extern void __stginit_HaskellActivity(void);
+
+void (*fptr_onclick)(JNIEnv*,jobject,jobject) ;
+
+void c_register_on_click_fptr( void (*v)(JNIEnv*,jobject,jobject) ) {
+
+  fptr_onclick = v;
+  
+}
+
 
 
 // static int Log.D(String tag, String msg)
@@ -70,3 +80,13 @@ Java_com_example_hellojni_HelloJni_stringFromJNI(JNIEnv *env, jobject this)
   return (*env)->NewStringUTF(env, str); 
 }
 
+void
+Java_com_example_hellojni_HelloJni_onClickHS( JNIEnv* env, jobject this, jobject that)
+{
+  //int c = fptr();
+  //  char str[15];
+  //  sprintf(str, "%d", c);
+   
+  //  shout(env, str) ; //"NEWMESSAGE :HERE ");
+  fptr_onclick (env, this, that);
+}

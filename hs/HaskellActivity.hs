@@ -40,7 +40,15 @@ type JObject = Ptr JObjectObj
 
 data JNINativeInterface_
 type JNIEnv = Ptr (Ptr JNINativeInterface_)
-  
+
+
+{- testfun :: IORef Int -> IO Int
+testfun ref = do
+    n <- readIORef ref
+    writeIORef ref (n+1)
+    return n
+-}
+              
 onCreate :: JNIEnv -> JObject -> JObject -> IO ()
 onCreate env activity tv =  do
     getNumProcessors >>= setNumCapabilities
@@ -49,6 +57,12 @@ onCreate env activity tv =  do
     cstr <- newCString txt
     -- tid <- myThreadId
     -- forkIO $
+    iref <- newIORef 0
+     
+    -- fptr <- sampleFunPtr (testfun iref)
+    -- saveFptr fptr
+    mkOnClickFPtr (onClick iref) >>= registerOnClickFPtr
+    
     ref <- newIORef []
 
     forkIO . sequenceA_ . replicate 100 $ do
@@ -74,23 +88,33 @@ foreign export ccall
   "Java_com_example_hellojni_HelloJni_onCreateHS"
   onCreate :: JNIEnv -> JObject -> JObject -> IO ()
 
-onClick :: JNIEnv -> JObject -> JObject -> IO ()
-onClick env activity tv = do
-  cstr <- newCString "CLICKED"
+onClick :: IORef Int -> JNIEnv -> JObject -> JObject -> IO ()
+onClick ref env activity tv = do
+  n <- readIORef ref
+  writeIORef ref (n+1)
+  cstr <- newCString (show n) -- "CLICKED"
   shout env cstr
-  
   textViewSetText env tv cstr
   
-
+{- 
 foreign export ccall
-  "Java_com_example_hellojni_HelloJni_onClickHS"
+  "blah_Java_com_example_hellojni_HelloJni_onClickHS"
   onClick :: JNIEnv -> JObject -> JObject -> IO ()
+-}
+
+
+foreign import ccall "wrapper" mkOnClickFPtr
+  :: (JNIEnv -> JObject -> JObject -> IO ()) 
+  -> IO (FunPtr (JNIEnv -> JObject -> JObject -> IO ()))
+
+foreign import ccall "c_register_on_click_fptr"
+   registerOnClickFPtr :: FunPtr (JNIEnv -> JObject -> JObject -> IO ()) -> IO ()
+
 
 
 foreign import ccall "shout" shout :: JNIEnv -> CString -> IO ()
 
 foreign import ccall "c_textView_setText" textViewSetText :: JNIEnv -> JObject -> CString -> IO ()
-
 
 
 {-                              
