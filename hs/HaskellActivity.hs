@@ -13,6 +13,9 @@ import Foreign.C.String
 import Foreign.Ptr
 import GHC.Conc
 
+import Data.Foldable
+import Data.IORef
+
 import System.IO
 import Control.Concurrent
 import Control.Monad
@@ -42,8 +45,28 @@ onCreate env activity tv =  do
     caps <- getNumCapabilities
     let txt  = "MESSAGE FROM HASKELL:\n\nRunning on " ++ show caps ++ " CPUs!"
     cstr <- newCString txt
-    shout env cstr
-    textViewSetText env tv cstr
+    -- tid <- myThreadId
+    -- forkIO $
+    ref <- newIORef []
+
+    forkIO . sequenceA_ . replicate 100 $ do
+      threadDelay 10000
+      modifyIORef' ref ('a':)
+
+    -- threadDelay 1000000
+    sequenceA_ . replicate 100 $ do
+      threadDelay 10000
+      modifyIORef' ref ('b':)       
+
+    str <- readIORef ref 
+      
+      -- threadDelay 1000000
+    cstr1 <- newCString str
+    shout env cstr1
+
+
+    
+    textViewSetText env tv cstr1
 
 
 
