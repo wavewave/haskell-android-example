@@ -42,7 +42,7 @@ public class HelloJni extends Activity
 	toolbar = (Toolbar)findViewById(R.id.toolbar);
 	toolbar.setTitle("My toolbar");
 	toolbar.setSubtitle("Subtitle");
-	setActionBar(toolbar);
+	//setActionBar(toolbar);
 	toolbar.inflateMenu(R.menu.toolbar);
 
 

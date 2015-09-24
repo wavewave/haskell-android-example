@@ -1,8 +1,14 @@
+//apply plugin: 'java'
+
 apply plugin: 'com.android.model.application'
 //apply plugin: 'android-native-dependencies'
 
 //native_dependencies {
 //    artifact 'com.example:wrapper:0.0+:armeabi'
+//}
+
+//dependencies { 
+//    compile 'com.android.support:design:22.2.1'
 //}
 
 model {

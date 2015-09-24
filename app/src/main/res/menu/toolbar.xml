@@ -3,15 +3,15 @@
       tools:context="com.example.hellojni.HelloJni" >
 
 
+  <item android:id="@+id/action_search"
+	android:title="@string/action_search"
+	android:icon="@drawable/ic_menu_search"
+	android:showAsAction="ifRoom" />
+
 
 </menu>
 
 <!--
-
-  <item android:id="@+id/action_search"
-	android:title="@string/action_search"
-	android:icon="@drawable/ic_search"
-	android:showAsAction="ifRoom" />
 
 
   <item android:id="@+id/action_settings"
