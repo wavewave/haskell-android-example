@@ -5,24 +5,27 @@
 
   <item android:id="@+id/action_search"
 	android:title="@string/action_search"
-	android:icon="@drawable/ic_menu_search"
+	android:icon="@drawable/ic_menu_search_holo_light"
 	android:showAsAction="ifRoom" />
 
-
-</menu>
-
-<!--
-
+  <item android:id="@+id/action_share"
+	android:title="@string/action_share"
+	android:icon="@drawable/ic_menu_share_holo_light"
+	android:showAsAction="ifRoom" />
 
   <item android:id="@+id/action_settings"
 	android:title="@string/action_settings"
 	android:orderInCategory="100"
 	android:showAsAction="never" />
 
-  <item android:id="@+id/action_share"
-	android:title="@string/action_share"
-	android:icon="@drawable/ic_share"
-	android:showAsAction="ifRoom" />
+
+</menu>
+
+<!--
+
+ 	android:icon="@drawable/ic_menu_settings_holo_light"	
+
+
 
 
 -->
