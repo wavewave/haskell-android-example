@@ -19,6 +19,7 @@ import android.app.Activity;
 import android.widget.TextView;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.Toolbar;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.util.Log;
@@ -28,7 +29,8 @@ public class HelloJni extends Activity
     
     Button button;
     TextView  tv; 
-    
+
+    Toolbar toolbar;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -37,13 +39,19 @@ public class HelloJni extends Activity
 	setContentView(R.layout.main);
         // onCreateHS(savedInstanceState);
 
-        /* Create a TextView and set its content.
-         * the text is retrieved by calling a native
-         * function.
-         */
+	toolbar = (Toolbar)findViewById(R.id.toolbar);
+	toolbar.setTitle("My toolbar");
+	toolbar.setSubtitle("Subtitle");
+	setActionBar(toolbar);
+	toolbar.inflateMenu(R.menu.toolbar);
+
+
+	
         //tv.setText( stringFromJNI() );
 	tv = (TextView) findViewById(R.id.textview1);
 	onCreateHS(tv);
+
+	
 
 	addListenerOnButton();
 	//stringFromJNI();

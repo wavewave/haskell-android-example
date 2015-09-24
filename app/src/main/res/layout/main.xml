@@ -3,7 +3,12 @@
 	      android:layout_width="fill_parent"
 	      android:layout_height="fill_parent"
 	      android:orientation="vertical" >
-
+  <Toolbar
+      android:id="@+id/toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="56dp">
+  </Toolbar>
+  
   <Button
       android:id="@+id/button1"
       android:layout_width="wrap_content"
@@ -13,6 +18,7 @@
       android:id="@+id/textview1"      
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-  />
+      />
+  
 </LinearLayout>
 

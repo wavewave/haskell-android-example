@@ -12,23 +12,23 @@ model {
 
         defaultConfig.with {
             applicationId = "com.example.hellojni"
-            minSdkVersion.apiLevel = 4
+            minSdkVersion.apiLevel = 22
             targetSdkVersion.apiLevel = 22
         }
 
 	
     }
 
-   repositories {
-       libs(PrebuildLibraries) { 
-           haskell {  
-               binaries.withType(SharedLibraryBinary) {
-                   sharedLibraryFile = file("/home/wavewave/repo/src/haskell-android-example/test/libs/armeabi/libwrapper.so")
-               }    
-           }
-       }
+   //repositories {
+   //    libs(PrebuildLibraries) { 
+   //        haskell {  
+   //           binaries.withType(SharedLibraryBinary) {
+   //                sharedLibraryFile = file("/home/wavewave/repo/src/haskell-android-example/test/libs/armeabi/libwrapper.so")
+   //            }    
+   //        }
+   //    }
 
-   }
+   //}
 
     compileOptions.with {
         sourceCompatibility=JavaVersion.VERSION_1_7
