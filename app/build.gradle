@@ -7,9 +7,9 @@ apply plugin: 'com.android.model.application'
 //    artifact 'com.example:wrapper:0.0+:armeabi'
 //}
 
-//dependencies { 
-//    compile 'com.android.support:design:22.2.1'
-//}
+dependencies { 
+    compile 'com.android.support:design:22.2.1'
+}
 
 model {
     android {

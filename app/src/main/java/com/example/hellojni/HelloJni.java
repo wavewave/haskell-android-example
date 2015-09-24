@@ -19,17 +19,23 @@ import android.app.Activity;
 import android.widget.TextView;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toolbar;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.CoordinatorLayout;
 import android.util.Log;
 
 public class HelloJni extends Activity
 {
     
     Button button;
-    TextView  tv; 
+    TextView  tv;
+    ListView lv;
+    FloatingActionButton fab;
 
+    
     Toolbar toolbar;
     /** Called when the activity is first created. */
     @Override
@@ -37,13 +43,14 @@ public class HelloJni extends Activity
     {
         super.onCreate(savedInstanceState);
 	setContentView(R.layout.main);
-        // onCreateHS(savedInstanceState);
-
 	toolbar = (Toolbar)findViewById(R.id.toolbar);
 	toolbar.setTitle("My toolbar");
 	toolbar.setSubtitle("Subtitle");
 	//setActionBar(toolbar);
-	toolbar.inflateMenu(R.menu.toolbar);
+	toolbar.inflateMenu(R.menu.toolbar); 
+	
+        // onCreateHS(savedInstanceState);
+        /*
 
 
 	
@@ -53,11 +60,12 @@ public class HelloJni extends Activity
 
 	
 
-	addListenerOnButton();
+	addListenerOnButton(); 
 	//stringFromJNI();
-        //setContentView(tv);
+        //setContentView(tv); */
     }
 
+    /*
     public void addListenerOnButton() {
         button = (Button) findViewById(R.id.button1);
 	button.setOnClickListener(new OnClickListener() {
@@ -72,7 +80,7 @@ public class HelloJni extends Activity
 	});
 							
 
-    }
+	} */
        
     /* A native method that is implemented by the
      * 'hello-jni' native library, which is packaged

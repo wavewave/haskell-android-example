@@ -62,9 +62,11 @@ onCreate env activity tv =  do
     -- fptr <- sampleFunPtr (testfun iref)
     -- saveFptr fptr
     mkOnClickFPtr (onClick iref) >>= registerOnClickFPtr
-    
+    return ()
+{-    
     ref <- newIORef []
 
+ 
     forkIO . sequenceA_ . replicate 100 $ do
       threadDelay 10000
       modifyIORef' ref ('a':)
@@ -81,7 +83,7 @@ onCreate env activity tv =  do
     shout env cstr1
 
     textViewSetText env tv cstr1
-
+-}
 
 
 foreign export ccall
