@@ -16,19 +16,19 @@
       >
   </Toolbar>
 
-  <ListView
-      android:id="@+id/listview"
-      android:layout_below="@+id/toolbar"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent" />
-
+  <TextView
+      android:id="@+id/textview1"
+      android:layout_below="@+id/toolbar"      
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      />
   
   <android.support.design.widget.FloatingActionButton
 
       android:id="@+id/favorite"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:src="@drawable/ic_menu_search_holo_light"
+      android:src="@drawable/ic_cab_done_holo"
  
       android:layout_alignBottom="@+id/toolbar"
       android:layout_alignParentRight="true"
@@ -47,6 +47,13 @@
 </RelativeLayout>
 
 <!-- 
+
+  <ListView
+      android:id="@+id/listview"
+      android:layout_below="@+id/toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent" />
+
 
      android:layout_gravity="bottom|end"
       android:layout_margin="16dp"
@@ -82,9 +89,4 @@ android:id="@+id/button1"
       android:layout_height="wrap_content"
       android:text="Counter Button" />
 
-<TextView
-      android:id="@+id/textview1"      
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      />
 -->

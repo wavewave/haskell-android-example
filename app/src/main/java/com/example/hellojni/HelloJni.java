@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 
 public class HelloJni extends Activity
@@ -37,7 +38,7 @@ public class HelloJni extends Activity
 
     
     Toolbar toolbar;
-    /** Called when the activity is first created. */
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -49,38 +50,29 @@ public class HelloJni extends Activity
 	//setActionBar(toolbar);
 	toolbar.inflateMenu(R.menu.toolbar); 
 	
-        // onCreateHS(savedInstanceState);
-        /*
+        fab = (FloatingActionButton) findViewById(R.id.favorite);
 
-
-	
-        //tv.setText( stringFromJNI() );
 	tv = (TextView) findViewById(R.id.textview1);
 	onCreateHS(tv);
-
-	
-
 	addListenerOnButton(); 
+
 	//stringFromJNI();
         //setContentView(tv); */
     }
 
-    /*
+    
     public void addListenerOnButton() {
-        button = (Button) findViewById(R.id.button1);
-	button.setOnClickListener(new OnClickListener() {
+        //fab = (FloatingActionButton) findViewById(R.id.favorite);
+	fab.setOnClickListener(new OnClickListener() {
             @Override
-	    public void onClick(View arg0) {
-
-                // Log.d("HELLOJNI", "button clicked");
+	    public void onClick(View view) {
 		onClickHS(tv);
-
-		
+		//Snackbar.make(tv, "hello", Snackbar.LENGTH_LONG).show();
 	    }
 	});
 							
 
-	} */
+    } 
        
     /* A native method that is implemented by the
      * 'hello-jni' native library, which is packaged
