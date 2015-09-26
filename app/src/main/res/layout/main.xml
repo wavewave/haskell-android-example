@@ -23,6 +23,12 @@
       android:layout_height="wrap_content"
       />
   
+  <VideoView
+      android:id="@+id/myvideo"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:layout_centerInParent="true" />
+  
   <android.support.design.widget.FloatingActionButton
 
       android:id="@+id/favorite"
@@ -43,7 +49,7 @@
       app:rippleColor="#ff3893"
      />
 
-    
+     
 </RelativeLayout>
 
 <!-- 

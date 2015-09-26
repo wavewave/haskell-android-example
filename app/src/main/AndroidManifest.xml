@@ -5,6 +5,7 @@
           android:versionName="1.0">
 <!--        android:fullBackupContent="false" -->
       <!--     -->
+  <uses-permission android:name="android.permission.INTERNET" />
 
   <application
       android:allowBackup="false"

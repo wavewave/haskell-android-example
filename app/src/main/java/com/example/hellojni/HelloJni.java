@@ -16,11 +16,13 @@
 package com.example.hellojni;
 
 import android.app.Activity;
-import android.widget.TextView;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toolbar;
+import android.widget.VideoView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.support.design.widget.FloatingActionButton;
@@ -35,6 +37,7 @@ public class HelloJni extends Activity
     TextView  tv;
     ListView lv;
     FloatingActionButton fab;
+    VideoView vv; 
 
     
     Toolbar toolbar;
@@ -56,6 +59,13 @@ public class HelloJni extends Activity
 	onCreateHS(tv);
 	addListenerOnButton(); 
 
+        vv = (VideoView) findViewById(R.id.myvideo);
+	String vaddr = "http://ianwookim.org/video/test.mp4";
+	Uri vuri= Uri.parse(vaddr);
+	vv.setVideoURI(vuri);
+	vv.start();
+	
+	
 	//stringFromJNI();
         //setContentView(tv); */
     }
