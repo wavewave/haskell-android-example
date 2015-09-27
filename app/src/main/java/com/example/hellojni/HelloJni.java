@@ -17,8 +17,8 @@ package com.example.hellojni;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Camera;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -117,9 +117,10 @@ public class HelloJni extends Activity
 	fab.setOnClickListener(new OnClickListener() {
             @Override
 	    public void onClick(View view) {
-		onClickHS(tv);
-		//Snackbar.make(tv, "hello", Snackbar.LENGTH_LONG).show();
-	    }
+		//onClickHS(tv);
+                Intent act2 = new Intent(view.getContext(),Sub.class);
+		startActivity(act2);
+ 	    }
 	});
 							
 

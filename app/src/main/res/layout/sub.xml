@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+  <Toolbar
+      android:id="@+id/toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="56dp"
+      android:elevation="4dp"
+      android:background="#dddddd"
+      >
+  </Toolbar>
+
+  <TextView
+      android:id="@+id/textview1"
+      android:layout_below="@+id/toolbar"      
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignBottom="@+id/toolbar"
+      android:layout_alignParentLeft="true"
+      android:layout_alignParentEnd="true"
+      android:layout_marginLeft="8dp"
+      android:layout_marginEnd="8dp"
+      />
+  
+  <VideoView
+      android:id="@+id/myvideo"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:layout_centerInParent="true" />
+  
+  <android.support.design.widget.FloatingActionButton
+
+      android:id="@+id/favorite2"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:src="@drawable/ic_cab_done_holo"
+ 
+      android:layout_alignBottom="@+id/toolbar"
+      android:layout_alignParentRight="true"
+      android:layout_alignParentEnd="true"
+      android:layout_marginRight="8dp"
+      android:layout_marginEnd="8dp"
+      android:elevation="8dp"
+      android:layout_marginBottom="-32dp"
+      app:fabSize="mini"
+      app:borderWidth="0dp"
+      app:backgroundTint="#efefef"
+      app:rippleColor="#ff3893"
+     />
+
+     
+</RelativeLayout>
+
