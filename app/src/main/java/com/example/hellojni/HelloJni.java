@@ -221,6 +221,8 @@ public class HelloJni extends Activity
 		Camera.Parameters parameters = mCamera.getParameters();
 		parameters.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
 		mCamera.setParameters(parameters);
+		mCamera.setDisplayOrientation(90);
+		
 	    }
 	    requestLayout();
 	}

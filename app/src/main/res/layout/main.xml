@@ -8,6 +8,7 @@
     android:layout_height="match_parent">
 
 
+
   <FrameLayout
       android:id="@+id/camera_preview"
       android:layout_width="fill_parent"
@@ -29,6 +30,11 @@
       android:layout_below="@+id/toolbar"      
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:layout_alignBottom="@+id/toolbar"
+      android:layout_alignParentLeft="true"
+      android:layout_alignParentEnd="true"
+      android:layout_marginLeft="8dp"
+      android:layout_marginEnd="8dp"
       />
   
   <VideoView
