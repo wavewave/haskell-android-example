@@ -57,8 +57,8 @@ addLog logvar msgs = atomically $ do
                        writeTVar logvar (log ++ msgs) 
  
 
-clientReceiver :: TVar [Message] -> String -> String -> IO ()
-clientReceiver logvar ipaddrstr username = 
+clientReceiver :: TVar [Message] -> String -> IO ()
+clientReceiver logvar ipaddrstr = 
   connect ipaddrstr "5002" $ \(sock,addr) -> do 
     putStrLn $ "Connection established to " ++ show addr
     flip evalStateT 0 $ whileJust_  (lift (recvAndUnpack sock)) $ \xs -> 
@@ -71,10 +71,17 @@ clientReceiver logvar ipaddrstr username =
                 put n'
                               
 
-clientSender :: String -> String -> IO ()
-clientSender ipaddrstr username = 
+clientSender :: TVar (Maybe String) -> String -> String -> IO ()
+clientSender tvar ipaddrstr username = 
   connect ipaddrstr "5003" $ \(sock,_addr) -> forever $ do
-    str <- getLine :: IO String
+    str <- atomically $ do
+      m <- readTVar tvar
+      case m of
+        Nothing -> retry
+        Just x -> do
+          writeTVar tvar Nothing
+          return x
+    -- str <- getLine :: IO String
     packAndSend sock (T.pack username, T.pack str)
 
 
@@ -100,11 +107,13 @@ onCreate env activity tv =  do
     cstr <- newCString txt
     iref <- newIORef 0
     
-    mkOnClickFPtr (onClick iref) >>= registerOnClickFPtr
 
 
     logvar <- atomically $ newTVar []
-    forkIO $ clientReceiver logvar "ianwookim.org" "wavewave"
+    sndvar <- atomically $ newTVar Nothing
+    forkIO $ clientReceiver logvar "ianwookim.org" 
+    forkIO $ clientSender sndvar "ianwookim.org" "wavewave"
+    mkOnClickFPtr (onClick (iref,sndvar)) >>= registerOnClickFPtr
 
     return ()
 
@@ -114,20 +123,17 @@ foreign export ccall
   "Java_com_example_hellojni_HelloJni_onCreateHS"
   onCreate :: JNIEnv -> JObject -> JObject -> IO ()
 
-onClick :: IORef Int -> JNIEnv -> JObject -> JObject -> IO ()
-onClick ref env activity tv = do
+onClick :: (IORef Int, TVar (Maybe String)) -> JNIEnv -> JObject -> JObject -> IO ()
+onClick (ref,tvar) env activity tv = do
   n <- readIORef ref
   writeIORef ref (n+1)
   cstr <- newCString (show n) -- "CLICKED"
   shout env cstr
   -- textViewSetText env tv cstr
 
-  
-  let ipaddrstr = "ianwookim.org" 
-  connect ipaddrstr "5003" $ \(sock,_addr) -> do
-    -- str <- getLine :: IO String
-    let str = "Hi THERE"
-    packAndSend sock ("wavewave" :: T.Text, T.pack str)
+  atomically $ do
+    writeTVar tvar (Just ("Hi There " ++ show n))
+  return ()
   
 
 
