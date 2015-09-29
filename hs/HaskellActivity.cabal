@@ -12,14 +12,10 @@ build-type: Simple
 cabal-version: >=1.8
 
 executable libhaskell.so
-  build-depends: base, text, transformers
-  -- hs-source-dirs: src
+  build-depends: base, text, transformers, monad-loops, text-binary, network-simple, bytestring, stm, binary
   ghc-options: -fPIC -threaded -no-hs-main
-  main-is: HaskellActivity.hs
+  main-is: Client.hs
   c-sources: init.c
-  -- include-dirs: src
   exposed-modules: HaskellActivity
   cc-options: -shared
   ld-options: -shared
--- -optl-shared
---   -fPIC 

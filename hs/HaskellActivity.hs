@@ -53,6 +53,7 @@ onCreate :: JNIEnv -> JObject -> JObject -> IO ()
 onCreate env activity tv =  do
     getNumProcessors >>= setNumCapabilities
     caps <- getNumCapabilities
+    putStrLn "hello there"
     let txt  = "MESSAGE FROM HASKELL:\n\nRunning on " ++ show caps ++ " CPUs!"
     cstr <- newCString txt
     -- tid <- myThreadId
