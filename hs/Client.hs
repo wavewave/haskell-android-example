@@ -76,7 +76,6 @@ clientSender :: TMVar String -> String -> String -> IO ()
 clientSender tvar ipaddrstr username = 
   connect ipaddrstr "5003" $ \(sock,_addr) -> forever $ do
     str <- atomically $ takeTMVar tvar
-    -- str <- getLine :: IO String
     packAndSend sock (T.pack username, T.pack str)
 
 
@@ -122,24 +121,13 @@ onClick :: (IORef Int, TMVar String) -> JNIEnv -> JObject -> JObject -> IO ()
 onClick (ref,tvar) env activity tv = do
   n <- readIORef ref
   writeIORef ref (n+1)
-  cstr <- newCString (show n) -- "CLICKED"
+  cstr <- newCString (show n) 
   shout env cstr
   -- textViewSetText env tv cstr
 
   atomically $ putTMVar tvar ("Hi There " ++ show n)
+  runInBoundThread (shout env cstr)
   return ()
   
 
-
-{-
-main :: IO ()
-main = do 
-  args <- getArgs
-  guard (length args == 2)
-  putStrLn " i am client " 
-  logvar <- atomically $ newTVar []
-
-  forkIO $ clientReceiver logvar (args !! 0) (args !! 1)
-  clientSender (args !! 0) (args !! 1)
--}
         
