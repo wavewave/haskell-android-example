@@ -7,6 +7,7 @@ module Client where
 
 import           Control.Concurrent
 import           Control.Concurrent.STM
+import           Control.Concurrent.STM.TMVar
 import           Control.Monad (forever,guard)
 import           Control.Monad.IO.Class
 import           Control.Monad.Loops 
@@ -71,16 +72,10 @@ clientReceiver logvar ipaddrstr =
                 put n'
                               
 
-clientSender :: TVar (Maybe String) -> String -> String -> IO ()
+clientSender :: TMVar String -> String -> String -> IO ()
 clientSender tvar ipaddrstr username = 
   connect ipaddrstr "5003" $ \(sock,_addr) -> forever $ do
-    str <- atomically $ do
-      m <- readTVar tvar
-      case m of
-        Nothing -> retry
-        Just x -> do
-          writeTVar tvar Nothing
-          return x
+    str <- atomically $ takeTMVar tvar
     -- str <- getLine :: IO String
     packAndSend sock (T.pack username, T.pack str)
 
@@ -110,7 +105,7 @@ onCreate env activity tv =  do
 
 
     logvar <- atomically $ newTVar []
-    sndvar <- atomically $ newTVar Nothing
+    sndvar <- atomically $ newEmptyTMVar 
     forkIO $ clientReceiver logvar "ianwookim.org" 
     forkIO $ clientSender sndvar "ianwookim.org" "wavewave"
     mkOnClickFPtr (onClick (iref,sndvar)) >>= registerOnClickFPtr
@@ -123,7 +118,7 @@ foreign export ccall
   "Java_com_example_hellojni_HelloJni_onCreateHS"
   onCreate :: JNIEnv -> JObject -> JObject -> IO ()
 
-onClick :: (IORef Int, TVar (Maybe String)) -> JNIEnv -> JObject -> JObject -> IO ()
+onClick :: (IORef Int, TMVar String) -> JNIEnv -> JObject -> JObject -> IO ()
 onClick (ref,tvar) env activity tv = do
   n <- readIORef ref
   writeIORef ref (n+1)
@@ -131,8 +126,7 @@ onClick (ref,tvar) env activity tv = do
   shout env cstr
   -- textViewSetText env tv cstr
 
-  atomically $ do
-    writeTVar tvar (Just ("Hi There " ++ show n))
+  atomically $ putTMVar tvar ("Hi There " ++ show n)
   return ()
   
 
