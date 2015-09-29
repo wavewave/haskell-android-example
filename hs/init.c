@@ -3,7 +3,7 @@
 #include <HsFFI.h>
 
 //extern void hs_set_java_vm(HsPtr a1);
-extern void __stginit_HaskellActivity(void);
+extern void __stginit_Client(void);
 
 void (*fptr_onclick)(JNIEnv*,jobject,jobject) ;
 
@@ -54,7 +54,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
 
     hs_init(&argc, &argv_);
     //hs_init( 0, 0);
-    hs_add_root(__stginit_HaskellActivity);
+    hs_add_root(__stginit_Client);
     //hs_set_java_vm(vm);
     return JNI_VERSION_1_2;
 }
@@ -81,7 +81,7 @@ Java_com_example_hellojni_HelloJni_stringFromJNI(JNIEnv *env, jobject this)
 }
 
 void
-Java_com_example_hellojni_HelloJni_onClickHS( JNIEnv* env, jobject this, jobject that)
+Java_com_example_hellojni_Sub_onClickHS( JNIEnv* env, jobject this, jobject that)
 {
   //int c = fptr();
   //  char str[15];

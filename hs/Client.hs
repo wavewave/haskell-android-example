@@ -101,6 +101,11 @@ onCreate env activity tv =  do
     iref <- newIORef 0
     
     mkOnClickFPtr (onClick iref) >>= registerOnClickFPtr
+
+
+    logvar <- atomically $ newTVar []
+    forkIO $ clientReceiver logvar "ianwookim.org" "wavewave"
+
     return ()
 
 
@@ -115,7 +120,15 @@ onClick ref env activity tv = do
   writeIORef ref (n+1)
   cstr <- newCString (show n) -- "CLICKED"
   shout env cstr
-  textViewSetText env tv cstr
+  -- textViewSetText env tv cstr
+
+  
+  let ipaddrstr = "ianwookim.org" 
+  connect ipaddrstr "5003" $ \(sock,_addr) -> do
+    -- str <- getLine :: IO String
+    let str = "Hi THERE"
+    packAndSend sock ("wavewave" :: T.Text, T.pack str)
+  
 
 
 {-

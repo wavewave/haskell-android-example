@@ -84,11 +84,11 @@ public class HelloJni extends Activity
         mCameraView = (View) findViewById(R.id.camera_preview);
   
 	
-	boolean opened = safeCameraOpenInView( mCameraView );
+	//boolean opened = safeCameraOpenInView( mCameraView );
 
-	if(opened == false ) {
-	    Log.d("CameraGuide", "Error, Camera failed to open");
-	}
+	//if(opened == false ) {
+	//    Log.d("CameraGuide", "Error, Camera failed to open");
+	//}
 
 
 

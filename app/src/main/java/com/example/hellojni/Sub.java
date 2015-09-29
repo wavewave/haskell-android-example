@@ -54,17 +54,17 @@ public class Sub extends Activity
     {
         super.onCreate(savedInstanceState);
 	setContentView(R.layout.sub);
-	toolbar = (Toolbar)findViewById(R.id.toolbar);
-	toolbar.setTitle("My toolbar");
-	toolbar.setSubtitle("Subtitle");
-	//setActionBar(toolbar);
-	toolbar.inflateMenu(R.menu.toolbar); 
+	//toolbar = (Toolbar)findViewById(R.id.toolbar);
+	//toolbar.setTitle("My toolbar");
+	//toolbar.setSubtitle("Subtitle");
+	////setActionBar(toolbar);
+	//toolbar.inflateMenu(R.menu.toolbar); 
 
-        vv = (VideoView) findViewById(R.id.myvideo);
-	String vaddr = "http://ianwookim.org/video/test.mp4";
-	Uri vuri= Uri.parse(vaddr);
-	vv.setVideoURI(vuri);
-	vv.start();
+        //vv = (VideoView) findViewById(R.id.myvideo);
+	//String vaddr = "http://ianwookim.org/video/test.mp4";
+	//Uri vuri= Uri.parse(vaddr);
+	//vv.setVideoURI(vuri);
+	//vv.start();
 
 
 	
@@ -72,8 +72,9 @@ public class Sub extends Activity
         fab.setOnClickListener( new View.OnClickListener() {
 		@Override
 		public void onClick(View view) {
-		    Intent act1 = new Intent(view.getContext(),HelloJni.class);
-		    startActivity(act1);
+		    onClickHS(tv);
+		    //		    Intent act1 = new Intent(view.getContext(),HelloJni.class);
+		    // startActivity(act1);
 		}
 
 	    });
