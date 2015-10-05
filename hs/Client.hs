@@ -29,6 +29,7 @@ import GHC.Conc
 import Data.Foldable
 import Data.IORef
 
+import System.Exit
 import System.IO
 
 --
@@ -58,10 +59,22 @@ addLog logvar msgs = atomically $ do
                        writeTVar logvar (log ++ msgs) 
  
 
-clientReceiver :: TVar [Message] -> String -> IO ()
-clientReceiver logvar ipaddrstr = 
-  connect ipaddrstr "5002" $ \(sock,addr) -> do 
-    putStrLn $ "Connection established to " ++ show addr
+addJavaLog :: TVar [JavaMessage] -> String -> IO ()
+addJavaLog msgvar str = atomically $ do
+                          msgs <- readTVar msgvar
+                          writeTVar msgvar (Msg str : msgs)
+
+
+clientReceiver :: TVar [JavaMessage] -> TVar [Message] -> String -> IO ()
+clientReceiver msgvar logvar ipaddrstr = do
+  
+  connect ipaddrstr "5002" $ \(sock,addr) -> do
+
+    -- cstr <- newCString "sorry"
+    --  shout env cstr
+
+    addJavaLog msgvar ("Connection established to " ++ show addr)
+      
     flip evalStateT 0 $ whileJust_  (lift (recvAndUnpack sock)) $ \xs -> 
       if null xs 
         then return ()
@@ -108,13 +121,10 @@ onCreate env activity tv =  do
     logvar <- atomically $ newTVar []
     sndvar <- atomically $ newEmptyTMVar
     msgvar <- atomically $ newTVar []
-    forkIO $ clientReceiver logvar "ianwookim.org" 
+    forkIO $ clientReceiver msgvar logvar "ianwookim.org" 
     forkIO $ clientSender sndvar "ianwookim.org" "wavewave"
-    mkOnClickFPtr (onClick (iref,sndvar,msgvar)) >>= registerOnClickFPtr
-
-    mkOnIdleFPtr (onIdle msgvar) >>= registerOnIdleFPtr
-
-
+    mkOnClickFPtr (onClick (iref,sndvar,logvar)) >>= registerOnClickFPtr
+    mkOnIdleFPtr (onIdle (msgvar,logvar)) >>= registerOnIdleFPtr
     return ()
 
 
@@ -125,8 +135,8 @@ foreign export ccall
 
 data JavaMessage = Msg String
 
-onClick :: (IORef Int, TMVar String, TVar [JavaMessage]) -> JNIEnv -> JObject -> JObject -> IO ()
-onClick (ref,tvar,msgvar) env activity tv = do
+onClick :: (IORef Int, TMVar String, TVar [Message]) -> JNIEnv -> JObject -> JObject -> IO ()
+onClick (ref,tvar,logvar) env activity tv = do
   n <- readIORef ref
   writeIORef ref (n+1)
   cstr <- newCString (show n) 
@@ -134,25 +144,31 @@ onClick (ref,tvar,msgvar) env activity tv = do
 
   forkIO $ do 
     atomically $ putTMVar tvar ("Hi There " ++ show n)
-    atomically $ do
-      msgs <- readTVar msgvar
-      writeTVar msgvar (Msg ("message recorded: " ++ show n) : msgs)
+    -- atomically $ do
+    --   msgs <- readTVar logvar
+    --   writeTVar msgvar (Msg ("message recorded: " ++ show n) : msgs)
   return ()
   
 
-onIdle :: TVar [JavaMessage] -> JNIEnv -> JObject -> JObject -> IO ()
-onIdle msgvar env _a tv = do
+onIdle :: (TVar [JavaMessage], TVar [Message]) -> JNIEnv -> JObject -> JObject -> IO ()
+onIdle (msgvar,logvar) env _a tv = do
   msgs <- atomically $ do
     msgs <- readTVar msgvar
     writeTVar msgvar []
     return msgs
-  mapM_ (printMsg env tv) . reverse $ msgs
+  -- mapM_ (textViewMsg env tv) . reverse $ msgs
+
+  mapM_ (printMsg env) . reverse $ msgs
+  -- msg' <- atomically 
 
 
-printMsg :: JNIEnv -> JObject -> JavaMessage -> IO ()
-printMsg env tv (Msg msg) = do
-  cstr <- newCString (msg ++ "\n")
+textViewMsg :: JNIEnv -> JObject -> Message -> IO ()
+textViewMsg env tv msg = do
+  cstr <- newCString (prettyPrintMessage msg) 
   textViewAppend env tv cstr
+
+printMsg :: JNIEnv -> JavaMessage -> IO ()
+printMsg env (Msg msg) = newCString msg >>= shout env
 
 foreign import ccall "wrapper" mkOnIdleFPtr
   :: (JNIEnv -> JObject -> JObject -> IO ())
