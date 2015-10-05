@@ -47,44 +47,24 @@ public class Sub extends Activity
 {
     private class IdleHandler implements MessageQueue.IdleHandler {
 	private Looper _looper;
+	private int count;
 	protected IdleHandler(Looper looper) {
 	    _looper = looper;
+	    count = 0;
 	}
 	public boolean queueIdle() {
-	    _uiEventsHandler = new Handler(_looper);
-	    _uiEventsHandler.post(_uiEventsTask);
-	    return(false);
+	    Log.d("HELLOJNI", "queueIdle called : " + count);
+	    count++;
+	    return(true);
 	}
        
     }
-    private boolean _processEventsf = false;
-    private Handler _uiEventsHandler = null;
-
-    private Runnable _uiEventsTask = new Runnable() {
-	    public void run() {
-		Looper looper = Looper.myLooper();
-		Log.d("HELLOJNI", "I AM HERE"); 
-		//looper.quit();
-		//_uiEventsHandler.removeCallbacks(this);
-		//_uiEventsHandler = null;
-	    }
-	};
 
     public void ProcessEvents()
     {
 	Log.d("HELLOJNI", "ProcessEvents");
- 	if(!_processEventsf) {
-	    Looper looper = Looper.myLooper();
-	    looper.myQueue().addIdleHandler(new IdleHandler(looper));
-	    _processEventsf = true;
-       	    try {
-	        looper.loop();
-            } catch (RuntimeException re) {
-                Log.d("HELLOJNI", "ProcessEvents : EXCEPTION" + re.getMessage());
-            }
-            _processEventsf = false;
-	}
-	
+        Looper looper = Looper.myLooper();
+        looper.myQueue().addIdleHandler(new IdleHandler(looper));	
     }
     
     Button button;
