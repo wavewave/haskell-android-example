@@ -16,8 +16,13 @@
 package com.example.hellojni;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,6 +51,21 @@ import java.util.List;
     
 public class Sub extends Activity
 {
+    private class NicknameDialogFragment extends DialogFragment {
+	@Override
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
+	    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+	    builder.setMessage("Set your nickname")
+		.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+			    Log.d("HELLOJNI", "button clicked"); 
+			}
+		    });
+	    return builder.create();
+	}
+	
+    }
+
     private class IdleHandler implements MessageQueue.IdleHandler {
 	private Looper _looper;
 	private int count;
@@ -54,8 +74,6 @@ public class Sub extends Activity
 	    count = 0;
 	}
 	public boolean queueIdle() {
-	    // Log.d("HELLOJNI", "queueIdle called : " + count);
-	    // count++;
 	    onIdleHS(tv);
 	    return(true);
 	}
@@ -83,61 +101,37 @@ public class Sub extends Activity
     {
         super.onCreate(savedInstanceState);
 	setContentView(R.layout.sub);
-	//toolbar = (Toolbar)findViewById(R.id.toolbar2);
-	//toolbar.setTitle("Sub activity");
-	//toolbar.setSubtitle("this is sub");
+
+
+	toolbar = (Toolbar)findViewById(R.id.toolbar2);
+	toolbar.setTitle("Chat");
+	toolbar.setSubtitle("This uses chatter haskell program.");
  	tv = (TextView) findViewById(R.id.textview2);
 	tv.setMovementMethod(ScrollingMovementMethod.getInstance());
-        // tv.setText("Hi There");	
-
 	////setActionBar(toolbar);
 	//toolbar.inflateMenu(R.menu.toolbar2); 
 
-        //vv = (VideoView) findViewById(R.id.myvideo);
-	//String vaddr = "http://ianwookim.org/video/test.mp4";
-	//Uri vuri= Uri.parse(vaddr);
-	//vv.setVideoURI(vuri);
-	//vv.start();
-
-
-	
 	//fab = (FloatingActionButton)findViewById(R.id.favorite2);
 	button = (Button)findViewById(R.id.button1);
         button.setOnClickListener( new View.OnClickListener() {
 		@Override
 		public void onClick(View view) {
 		    onClickHS(tv);
-		    //		    Intent act1 = new Intent(view.getContext(),HelloJni.class);
-		    // startActivity(act1);
 		}
 
 	    });
+	
+	FragmentManager fm = getFragmentManager();
+	NicknameDialogFragment n = new NicknameDialogFragment();
+	n.show(fm,"fragment_nickname");
+	
 	ProcessEvents();
 	    
     }
 
-    
-    /*    public void addListenerOnButton() {
-        //fab = (FloatingActionButton) findViewById(R.id.favorite);
-	fab.setOnClickListener(new OnClickListener() {
-            @Override
-	    public void onClick(View view) {
-		onClickHS(tv);
-		//Snackbar.make(tv, "hello", Snackbar.LENGTH_LONG).show();
-	    }
-	});
-    
+    public native void onCreateHS(TextView tv);
 
-	} */ 
-       
-    /* A native method that is implemented by the
-     * 'hello-jni' native library, which is packaged
-     * with this application.
-     */
-    //public native String stringFromJNI();
-    public native void onCreateHS(TextView tv); // (Bundle savedInstanceState);
-
-    public native void onClickHS(TextView tv); // (Bundle savedInstanceState);
+    public native void onClickHS(TextView tv);
 
     public native void onIdleHS(TextView tv);
     
