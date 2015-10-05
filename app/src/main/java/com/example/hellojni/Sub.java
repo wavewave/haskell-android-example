@@ -55,13 +55,12 @@ public class Sub extends Activity
 	public boolean queueIdle() {
 	    // Log.d("HELLOJNI", "queueIdle called : " + count);
 	    // count++;
-	    onIdleHS();
+	    onIdleHS(tv);
 	    return(true);
 	}
        
     }
 
-    public native void onIdleHS();
     
     public void ProcessEvents()
     {
@@ -73,7 +72,7 @@ public class Sub extends Activity
     Button button;
     TextView  tv;
     ListView lv;
-    FloatingActionButton fab;
+    //FloatingActionButton fab;
     VideoView vv; 
 
     Toolbar toolbar;
@@ -83,11 +82,14 @@ public class Sub extends Activity
     {
         super.onCreate(savedInstanceState);
 	setContentView(R.layout.sub);
-	//toolbar = (Toolbar)findViewById(R.id.toolbar);
-	//toolbar.setTitle("My toolbar");
-	//toolbar.setSubtitle("Subtitle");
+	//toolbar = (Toolbar)findViewById(R.id.toolbar2);
+	//toolbar.setTitle("Sub activity");
+	//toolbar.setSubtitle("this is sub");
+ 	tv = (TextView) findViewById(R.id.textview2);
+        tv.setText("Hi There");	
+
 	////setActionBar(toolbar);
-	//toolbar.inflateMenu(R.menu.toolbar); 
+	//toolbar.inflateMenu(R.menu.toolbar2); 
 
         //vv = (VideoView) findViewById(R.id.myvideo);
 	//String vaddr = "http://ianwookim.org/video/test.mp4";
@@ -97,8 +99,9 @@ public class Sub extends Activity
 
 
 	
-	fab = (FloatingActionButton)findViewById(R.id.favorite2);
-        fab.setOnClickListener( new View.OnClickListener() {
+	//fab = (FloatingActionButton)findViewById(R.id.favorite2);
+	button = (Button)findViewById(R.id.button1);
+        button.setOnClickListener( new View.OnClickListener() {
 		@Override
 		public void onClick(View view) {
 		    onClickHS(tv);
@@ -134,4 +137,6 @@ public class Sub extends Activity
 
     public native void onClickHS(TextView tv); // (Bundle savedInstanceState);
 
+    public native void onIdleHS(TextView tv);
+    
 }

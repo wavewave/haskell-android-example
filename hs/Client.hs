@@ -92,6 +92,8 @@ foreign import ccall "shout" shout :: JNIEnv -> CString -> IO ()
 
 foreign import ccall "c_textView_setText" textViewSetText :: JNIEnv -> JObject -> CString -> IO ()
 
+foreign import ccall "c_textView_append" textViewAppend :: JNIEnv -> JObject -> CString -> IO ()
+
 onCreate :: JNIEnv -> JObject -> JObject -> IO ()
 onCreate env activity tv =  do
     getNumProcessors >>= setNumCapabilities
@@ -143,29 +145,30 @@ onClick (ref,tvar,msgvar) env activity tv = do
   return ()
   
 
-onIdle :: TVar [JavaMessage] -> JNIEnv -> JObject -> IO ()
-onIdle msgvar env _a = do
+onIdle :: TVar [JavaMessage] -> JNIEnv -> JObject -> JObject -> IO ()
+onIdle msgvar env _a tv = do
   msgs <- atomically $ do
     msgs <- readTVar msgvar
     writeTVar msgvar []
     return msgs
-  mapM_ (printMsg env) msgs
+  mapM_ (printMsg env tv) msgs
   
   -- cstr <- newCString "HAHAHA"
   -- shout env cstr
 
 
-printMsg :: JNIEnv -> JavaMessage -> IO ()
-printMsg env (Msg msg) = do
+printMsg :: JNIEnv -> JObject -> JavaMessage -> IO ()
+printMsg env tv (Msg msg) = do
   cstr <- newCString msg
-  shout env cstr
+  -- shout env cstr
+  textViewAppend env tv cstr
 
 foreign import ccall "wrapper" mkOnIdleFPtr
-  :: (JNIEnv -> JObject -> IO ())
-     -> IO (FunPtr (JNIEnv -> JObject -> IO ()))
+  :: (JNIEnv -> JObject -> JObject -> IO ())
+     -> IO (FunPtr (JNIEnv -> JObject -> JObject -> IO ()))
 
 foreign import ccall "c_register_on_idle_fptr"
-  registerOnIdleFPtr :: FunPtr (JNIEnv -> JObject -> IO ()) -> IO ()
+  registerOnIdleFPtr :: FunPtr (JNIEnv -> JObject -> JObject -> IO ()) -> IO ()
 
 --foreign export ccall
 --  "Java_com_example_hellojni_Sub_onIdleHS"
