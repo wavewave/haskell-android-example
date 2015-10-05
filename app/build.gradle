@@ -18,7 +18,7 @@ model {
 
         defaultConfig.with {
             applicationId = "com.example.hellojni"
-            minSdkVersion.apiLevel = 22
+            minSdkVersion.apiLevel = 21
             targetSdkVersion.apiLevel = 22
         }
 
