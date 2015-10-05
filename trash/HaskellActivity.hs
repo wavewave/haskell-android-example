@@ -97,7 +97,7 @@ onClick ref env activity tv = do
   writeIORef ref (n+1)
   cstr <- newCString (show n) -- "CLICKED"
   shout env cstr
-  textViewSetText env tv cstr
+  -- textViewSetText env tv cstr
   
 {- 
 foreign export ccall

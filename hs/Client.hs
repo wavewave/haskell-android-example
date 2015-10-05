@@ -126,7 +126,14 @@ onClick (ref,tvar) env activity tv = do
   -- textViewSetText env tv cstr
 
   atomically $ putTMVar tvar ("Hi There " ++ show n)
-  runInBoundThread (shout env cstr)
+  -- forkOn 0 $ runInBoundThread $ do
+  do 
+    putStrLn "hello"
+    (shout env cstr)
+    -- forkIO $ do
+    do 
+      print "hello"
+    print "ok"
   return ()
   
 

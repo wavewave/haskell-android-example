@@ -20,6 +20,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.MessageQueue;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
@@ -38,8 +41,51 @@ import java.io.IOException;
 import java.util.List;
 
 
+
+    
 public class Sub extends Activity
 {
+    private class IdleHandler implements MessageQueue.IdleHandler {
+	private Looper _looper;
+	protected IdleHandler(Looper looper) {
+	    _looper = looper;
+	}
+	public boolean queueIdle() {
+	    _uiEventsHandler = new Handler(_looper);
+	    _uiEventsHandler.post(_uiEventsTask);
+	    return(false);
+	}
+       
+    }
+    private boolean _processEventsf = false;
+    private Handler _uiEventsHandler = null;
+
+    private Runnable _uiEventsTask = new Runnable() {
+	    public void run() {
+		Looper looper = Looper.myLooper();
+		Log.d("HELLOJNI", "I AM HERE"); 
+		//looper.quit();
+		//_uiEventsHandler.removeCallbacks(this);
+		//_uiEventsHandler = null;
+	    }
+	};
+
+    public void ProcessEvents()
+    {
+	Log.d("HELLOJNI", "ProcessEvents");
+ 	if(!_processEventsf) {
+	    Looper looper = Looper.myLooper();
+	    looper.myQueue().addIdleHandler(new IdleHandler(looper));
+	    _processEventsf = true;
+       	    try {
+	        looper.loop();
+            } catch (RuntimeException re) {
+                Log.d("HELLOJNI", "ProcessEvents : EXCEPTION" + re.getMessage());
+            }
+            _processEventsf = false;
+	}
+	
+    }
     
     Button button;
     TextView  tv;
@@ -78,6 +124,7 @@ public class Sub extends Activity
 		}
 
 	    });
+	ProcessEvents();
 	    
     }
 

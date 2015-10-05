@@ -42,7 +42,7 @@ import java.util.List;
 
 public class HelloJni extends Activity
 {
-    
+
     Button button;
     TextView  tv;
     ListView lv;
