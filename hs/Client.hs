@@ -131,17 +131,12 @@ onClick (ref,tvar,msgvar) env activity tv = do
   writeIORef ref (n+1)
   cstr <- newCString (show n) 
   shout env cstr
-  -- textViewSetText env tv cstr
 
   forkIO $ do 
     atomically $ putTMVar tvar ("Hi There " ++ show n)
-
     atomically $ do
       msgs <- readTVar msgvar
       writeTVar msgvar (Msg ("message recorded: " ++ show n) : msgs)
-
-    -- (shout env cstr)
-    -- forkIO $ do
   return ()
   
 
@@ -151,16 +146,12 @@ onIdle msgvar env _a tv = do
     msgs <- readTVar msgvar
     writeTVar msgvar []
     return msgs
-  mapM_ (printMsg env tv) msgs
-  
-  -- cstr <- newCString "HAHAHA"
-  -- shout env cstr
+  mapM_ (printMsg env tv) . reverse $ msgs
 
 
 printMsg :: JNIEnv -> JObject -> JavaMessage -> IO ()
 printMsg env tv (Msg msg) = do
-  cstr <- newCString msg
-  -- shout env cstr
+  cstr <- newCString (msg ++ "\n")
   textViewAppend env tv cstr
 
 foreign import ccall "wrapper" mkOnIdleFPtr
@@ -170,6 +161,3 @@ foreign import ccall "wrapper" mkOnIdleFPtr
 foreign import ccall "c_register_on_idle_fptr"
   registerOnIdleFPtr :: FunPtr (JNIEnv -> JObject -> JObject -> IO ()) -> IO ()
 
---foreign export ccall
---  "Java_com_example_hellojni_Sub_onIdleHS"
---  onIdle :: JNIEnv -> JObject -> IO ()

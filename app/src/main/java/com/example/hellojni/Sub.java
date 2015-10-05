@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.MessageQueue;
+import android.text.method.ScrollingMovementMethod;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
@@ -86,7 +87,8 @@ public class Sub extends Activity
 	//toolbar.setTitle("Sub activity");
 	//toolbar.setSubtitle("this is sub");
  	tv = (TextView) findViewById(R.id.textview2);
-        tv.setText("Hi There");	
+	tv.setMovementMethod(ScrollingMovementMethod.getInstance());
+        // tv.setText("Hi There");	
 
 	////setActionBar(toolbar);
 	//toolbar.inflateMenu(R.menu.toolbar2); 
