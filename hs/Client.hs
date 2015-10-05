@@ -74,6 +74,8 @@ clientReceiver msgvar logvar ipaddrstr = do
     --  shout env cstr
 
     addJavaLog msgvar ("Connection established to " ++ show addr)
+    -- r :: Maybe [Message] <- recvAndUnpack sock
+    -- addJavaLog msgvar ("message from server: " ++ show r)
       
     flip evalStateT 0 $ whileJust_  (lift (recvAndUnpack sock)) $ \xs -> 
       if null xs 
@@ -81,9 +83,10 @@ clientReceiver msgvar logvar ipaddrstr = do
         else do n <- get
                 let n' = checkLatestMessage xs
                 liftIO $ addLog logvar xs
-                liftIO $ commander logvar (ViewAfter n)
+                liftIO $ addJavaLog msgvar ("message from server: " ++ show (n,n'))
+                -- liftIO $ commander logvar (ViewAfter n)
                 put n'
-                              
+                          
 
 clientSender :: TMVar String -> String -> String -> IO ()
 clientSender tvar ipaddrstr username = 
@@ -142,9 +145,8 @@ onClick (ref,tvar,logvar) env activity tv = do
   cstr <- newCString (show n) 
   shout env cstr
 
-  forkIO $ do 
-    atomically $ putTMVar tvar ("Hi There " ++ show n)
-    -- atomically $ do
+  atomically $ putTMVar tvar ("Hi There " ++ show n)
+  -- atomically $ do
     --   msgs <- readTVar logvar
     --   writeTVar msgvar (Msg ("message recorded: " ++ show n) : msgs)
   return ()
@@ -162,9 +164,16 @@ onIdle (msgvar,logvar) env _a tv = do
   -- msg' <- atomically 
 
 
+  msgs' <- atomically $ do
+    msgs' <- readTVar logvar
+    writeTVar logvar []
+    return msgs'
+  mapM_ (textViewMsg env tv) . reverse $ msgs'
+
+
 textViewMsg :: JNIEnv -> JObject -> Message -> IO ()
 textViewMsg env tv msg = do
-  cstr <- newCString (prettyPrintMessage msg) 
+  cstr <- newCString (prettyPrintMessage msg ++ "\n") 
   textViewAppend env tv cstr
 
 printMsg :: JNIEnv -> JavaMessage -> IO ()
