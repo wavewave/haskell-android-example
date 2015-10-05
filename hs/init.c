@@ -8,9 +8,13 @@ extern void __stginit_Client(void);
 void (*fptr_onclick)(JNIEnv*,jobject,jobject) ;
 
 void c_register_on_click_fptr( void (*v)(JNIEnv*,jobject,jobject) ) {
-
   fptr_onclick = v;
-  
+}
+
+void (*fptr_onidle)(JNIEnv*, jobject);
+
+void c_register_on_idle_fptr( void (*v)(JNIEnv*,jobject) ) {
+  fptr_onidle = v;
 }
 
 
@@ -83,10 +87,11 @@ Java_com_example_hellojni_HelloJni_stringFromJNI(JNIEnv *env, jobject this)
 void
 Java_com_example_hellojni_Sub_onClickHS( JNIEnv* env, jobject this, jobject that)
 {
-  //int c = fptr();
-  //  char str[15];
-  //  sprintf(str, "%d", c);
-   
-  //  shout(env, str) ; //"NEWMESSAGE :HERE ");
   fptr_onclick (env, this, that);
+}
+
+void
+Java_com_example_hellojni_Sub_onIdleHS( JNIEnv* env, jobject this)
+{
+  fptr_onidle (env, this);
 }

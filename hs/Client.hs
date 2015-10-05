@@ -104,10 +104,14 @@ onCreate env activity tv =  do
 
 
     logvar <- atomically $ newTVar []
-    sndvar <- atomically $ newEmptyTMVar 
+    sndvar <- atomically $ newEmptyTMVar
+    msgvar <- atomically $ newTVar []
     forkIO $ clientReceiver logvar "ianwookim.org" 
     forkIO $ clientSender sndvar "ianwookim.org" "wavewave"
-    mkOnClickFPtr (onClick (iref,sndvar)) >>= registerOnClickFPtr
+    mkOnClickFPtr (onClick (iref,sndvar,msgvar)) >>= registerOnClickFPtr
+
+    mkOnIdleFPtr (onIdle msgvar) >>= registerOnIdleFPtr
+
 
     return ()
 
@@ -117,24 +121,52 @@ foreign export ccall
   "Java_com_example_hellojni_HelloJni_onCreateHS"
   onCreate :: JNIEnv -> JObject -> JObject -> IO ()
 
-onClick :: (IORef Int, TMVar String) -> JNIEnv -> JObject -> JObject -> IO ()
-onClick (ref,tvar) env activity tv = do
+data JavaMessage = Msg String
+
+onClick :: (IORef Int, TMVar String, TVar [JavaMessage]) -> JNIEnv -> JObject -> JObject -> IO ()
+onClick (ref,tvar,msgvar) env activity tv = do
   n <- readIORef ref
   writeIORef ref (n+1)
   cstr <- newCString (show n) 
   shout env cstr
   -- textViewSetText env tv cstr
 
-  atomically $ putTMVar tvar ("Hi There " ++ show n)
-  -- forkOn 0 $ runInBoundThread $ do
-  do 
-    putStrLn "hello"
-    (shout env cstr)
+  forkIO $ do 
+    atomically $ putTMVar tvar ("Hi There " ++ show n)
+
+    atomically $ do
+      msgs <- readTVar msgvar
+      writeTVar msgvar (Msg ("message recorded: " ++ show n) : msgs)
+
+    -- (shout env cstr)
     -- forkIO $ do
-    do 
-      print "hello"
-    print "ok"
   return ()
   
 
-        
+onIdle :: TVar [JavaMessage] -> JNIEnv -> JObject -> IO ()
+onIdle msgvar env _a = do
+  msgs <- atomically $ do
+    msgs <- readTVar msgvar
+    writeTVar msgvar []
+    return msgs
+  mapM_ (printMsg env) msgs
+  
+  -- cstr <- newCString "HAHAHA"
+  -- shout env cstr
+
+
+printMsg :: JNIEnv -> JavaMessage -> IO ()
+printMsg env (Msg msg) = do
+  cstr <- newCString msg
+  shout env cstr
+
+foreign import ccall "wrapper" mkOnIdleFPtr
+  :: (JNIEnv -> JObject -> IO ())
+     -> IO (FunPtr (JNIEnv -> JObject -> IO ()))
+
+foreign import ccall "c_register_on_idle_fptr"
+  registerOnIdleFPtr :: FunPtr (JNIEnv -> JObject -> IO ()) -> IO ()
+
+--foreign export ccall
+--  "Java_com_example_hellojni_Sub_onIdleHS"
+--  onIdle :: JNIEnv -> JObject -> IO ()

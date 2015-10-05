@@ -53,13 +53,16 @@ public class Sub extends Activity
 	    count = 0;
 	}
 	public boolean queueIdle() {
-	    Log.d("HELLOJNI", "queueIdle called : " + count);
-	    count++;
+	    // Log.d("HELLOJNI", "queueIdle called : " + count);
+	    // count++;
+	    onIdleHS();
 	    return(true);
 	}
        
     }
 
+    public native void onIdleHS();
+    
     public void ProcessEvents()
     {
 	Log.d("HELLOJNI", "ProcessEvents");
