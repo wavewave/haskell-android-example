@@ -88,19 +88,19 @@ clientReceiver msgvar logvar ipaddrstr = do
                 put n'
                           
 
-clientSender :: TMVar String -> String -> String -> IO ()
-clientSender tvar ipaddrstr username = 
+clientSender :: TMVar (String,String) -> String -> IO ()
+clientSender tvar ipaddrstr = -- username = 
   connect ipaddrstr "5003" $ \(sock,_addr) -> forever $ do
-    str <- atomically $ takeTMVar tvar
+    (username,str) <- atomically $ takeTMVar tvar
     packAndSend sock (T.pack username, T.pack str)
 
 
 foreign import ccall "wrapper" mkOnClickFPtr
-  :: (JNIEnv -> JObject -> JObject -> IO ()) 
-  -> IO (FunPtr (JNIEnv -> JObject -> JObject -> IO ()))
+  :: (JNIEnv -> JObject -> JObject -> CString -> IO ()) 
+  -> IO (FunPtr (JNIEnv -> JObject -> JObject -> CString -> IO ()))
 
 foreign import ccall "c_register_on_click_fptr"
-   registerOnClickFPtr :: FunPtr (JNIEnv -> JObject -> JObject -> IO ()) -> IO ()
+   registerOnClickFPtr :: FunPtr (JNIEnv -> JObject -> JObject -> CString -> IO ()) -> IO ()
 
 
 
@@ -125,7 +125,7 @@ onCreate env activity tv =  do
     sndvar <- atomically $ newEmptyTMVar
     msgvar <- atomically $ newTVar []
     forkIO $ clientReceiver msgvar logvar "ianwookim.org" 
-    forkIO $ clientSender sndvar "ianwookim.org" "wavewave"
+    forkIO $ clientSender sndvar "ianwookim.org"
     mkOnClickFPtr (onClick (iref,sndvar,logvar)) >>= registerOnClickFPtr
     mkOnIdleFPtr (onIdle (msgvar,logvar)) >>= registerOnIdleFPtr
     return ()
@@ -138,14 +138,15 @@ foreign export ccall
 
 data JavaMessage = Msg String
 
-onClick :: (IORef Int, TMVar String, TVar [Message]) -> JNIEnv -> JObject -> JObject -> IO ()
-onClick (ref,tvar,logvar) env activity tv = do
+onClick :: (IORef Int, TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject -> JObject -> CString -> IO ()
+onClick (ref,tvar,logvar) env activity tv cstr = do
   n <- readIORef ref
   writeIORef ref (n+1)
-  cstr <- newCString (show n) 
-  shout env cstr
+  -- cstr <- newCString (show n) 
+  -- shout env cstr
+  str <- peekCString cstr
 
-  atomically $ putTMVar tvar ("Hi There " ++ show n)
+  atomically $ putTMVar tvar (str, "Hi There " ++ show n)
   -- atomically $ do
     --   msgs <- readTVar logvar
     --   writeTVar msgvar (Msg ("message recorded: " ++ show n) : msgs)

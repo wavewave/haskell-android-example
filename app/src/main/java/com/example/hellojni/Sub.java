@@ -16,6 +16,7 @@
 package com.example.hellojni;
 
 import android.app.Activity;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -30,12 +31,13 @@ import android.os.Looper;
 import android.os.MessageQueue;
 import android.text.method.ScrollingMovementMethod;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toolbar;
 import android.widget.VideoView;
-
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -52,15 +54,32 @@ import java.util.List;
 public class Sub extends Activity
 {
     private class NicknameDialogFragment extends DialogFragment {
+	// private String result;
+	private EditText input; 
+	
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 	    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+	    LayoutInflater i = getLayoutInflater();
+	    View view = i.inflate(R.layout.dialog, null);
+	    
 	    builder.setMessage("Set your nickname")
-		.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+		.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
-			    Log.d("HELLOJNI", "button clicked"); 
+			    Dialog f = (Dialog) dialog;
+			    input = (EditText)f.findViewById(R.id.edit_nickname );
+			    nickname = input.getText().toString();
+			    // Log.d("HELLOJNI", result);
+			    
+			}
+		    })
+		.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+			    dialog.dismiss();
 			}
 		    });
+	    builder.setView(view);
+	    
 	    return builder.create();
 	}
 	
@@ -96,6 +115,8 @@ public class Sub extends Activity
 
     Toolbar toolbar;
 
+    public String nickname;
+     
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -116,7 +137,10 @@ public class Sub extends Activity
         button.setOnClickListener( new View.OnClickListener() {
 		@Override
 		public void onClick(View view) {
-		    onClickHS(tv);
+                    Log.d("HELLOJNI" , "nickname = " + nickname);
+		    if(nickname != null) { 
+        		onClickHS(tv,nickname);
+		    }
 		}
 
 	    });
@@ -124,14 +148,16 @@ public class Sub extends Activity
 	FragmentManager fm = getFragmentManager();
 	NicknameDialogFragment n = new NicknameDialogFragment();
 	n.show(fm,"fragment_nickname");
-	
+
+        // nickname = n.result ; 
+	// Log.d("HELLOJNI" , "nickname = " + nickname);
 	ProcessEvents();
 	    
     }
 
     public native void onCreateHS(TextView tv);
 
-    public native void onClickHS(TextView tv);
+    public native void onClickHS(TextView tv, String str);
 
     public native void onIdleHS(TextView tv);
     

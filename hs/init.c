@@ -5,7 +5,7 @@
 //extern void hs_set_java_vm(HsPtr a1);
 extern void __stginit_Client(void);
 
-void (*fptr_onclick)(JNIEnv*,jobject,jobject) ;
+void (*fptr_onclick)(JNIEnv*,jobject,jobject,jstring) ;
 
 void c_register_on_click_fptr( void (*v)(JNIEnv*,jobject,jobject) ) {
   fptr_onclick = v;
@@ -64,9 +64,6 @@ void c_textView_append ( JNIEnv* env,  jobject tv, char* cmsg ) {
 }
 
 
-
-
-
 JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
     static char *argv[] = { "libhaskell.so", 0 }, **argv_ = argv;
     static int argc = 1;
@@ -100,9 +97,12 @@ Java_com_example_hellojni_HelloJni_stringFromJNI(JNIEnv *env, jobject this)
 }
 
 void
-Java_com_example_hellojni_Sub_onClickHS( JNIEnv* env, jobject this, jobject that)
+Java_com_example_hellojni_Sub_onClickHS( JNIEnv* env, jobject this, jobject that, jstring str)
 {
-  fptr_onclick (env, this, that);
+  const char* nativeString = (*env)->GetStringUTFChars(env, str, 0);
+  fptr_onclick (env, this, that,nativeString);
+  (*env)->ReleaseStringUTFChars(env,str,nativeString);
+  
 }
 
 void
