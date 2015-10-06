@@ -81,11 +81,11 @@ clientSender tvar ipaddrstr = -- username =
 
 
 foreign import ccall "wrapper" mkOnClickFPtr
-  :: (JNIEnv -> JObject -> JObject -> CString -> IO ()) 
-  -> IO (FunPtr (JNIEnv -> JObject -> JObject -> CString -> IO ()))
+  :: (JNIEnv -> JObject -> JObject -> CString -> CString -> IO ()) 
+  -> IO (FunPtr (JNIEnv -> JObject -> JObject -> CString -> CString -> IO ()))
 
 foreign import ccall "c_register_on_click_fptr"
-   registerOnClickFPtr :: FunPtr (JNIEnv -> JObject -> JObject -> CString -> IO ()) -> IO ()
+   registerOnClickFPtr :: FunPtr (JNIEnv -> JObject -> JObject -> CString -> CString -> IO ()) -> IO ()
 
 
 
@@ -103,8 +103,6 @@ onCreate env activity tv =  do
     let txt  = "MESSAGE FROM HASKELL:\n\nRunning on " ++ show caps ++ " CPUs!"
     cstr <- newCString txt
     iref <- newIORef 0
-    
-
 
     logvar <- atomically $ newTVar []
     sndvar <- atomically $ newEmptyTMVar
@@ -123,15 +121,14 @@ foreign export ccall
 
 data JavaMessage = Msg String
 
-onClick :: (IORef Int, TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject -> JObject -> CString -> IO ()
-onClick (ref,tvar,logvar) env activity tv cstr = do
+onClick :: (IORef Int, TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject -> JObject -> CString -> CString -> IO ()
+onClick (ref,tvar,logvar) env activity tv cnick cmsg = do
   n <- readIORef ref
   writeIORef ref (n+1)
-  -- cstr <- newCString (show n) 
-  -- shout env cstr
-  str <- peekCString cstr
+  nick <- peekCString cnick
+  msg <- peekCString cmsg
   forkIO $ 
-    atomically $ putTMVar tvar (str, "Hi There " ++ show n)
+    atomically $ putTMVar tvar (nick,msg) -- (str, "Hi There " ++ show n)
   -- atomically $ do
     --   msgs <- readTVar logvar
     --   writeTVar msgvar (Msg ("message recorded: " ++ show n) : msgs)
@@ -144,10 +141,7 @@ onIdle (msgvar,logvar) env _a tv = do
     msgs <- readTVar msgvar
     writeTVar msgvar []
     return msgs
-  -- mapM_ (textViewMsg env tv) . reverse $ msgs
-
   mapM_ (printMsg env) . reverse $ msgs
-  -- msg' <- atomically 
 
 
   msgs' <- atomically $ do
