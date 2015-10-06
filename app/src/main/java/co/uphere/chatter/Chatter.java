@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.hellojni;
+package co.uphere.chatter;
 
 import android.app.Activity;
 
@@ -51,7 +51,7 @@ import java.util.List;
 
 
     
-public class Sub extends Activity
+public class Chatter extends Activity
 {
     private class NicknameDialogFragment extends DialogFragment {
 	// private String result;

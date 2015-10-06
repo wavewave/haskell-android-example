@@ -45,14 +45,6 @@ data JNINativeInterface_
 type JNIEnv = Ptr (Ptr JNINativeInterface_)
 
 
-commander :: TVar [Message] -> Command -> IO ()
-commander logvar (ViewAfter n) = do
-    xs <- atomically (readTVar logvar) 
-    (mapM_ (putStrLn . prettyPrintMessage) 
-     . sortBy (compare `on` messageNum)
-     . filter ( (> n) . messageNum ) 
-     ) xs
-
 addLog :: TVar [Message] -> [Message] -> IO ()
 addLog logvar msgs = atomically $ do 
                        log <- readTVar logvar
@@ -69,13 +61,7 @@ clientReceiver :: TVar [JavaMessage] -> TVar [Message] -> String -> IO ()
 clientReceiver msgvar logvar ipaddrstr = do
   
   connect ipaddrstr "5002" $ \(sock,addr) -> do
-
-    -- cstr <- newCString "sorry"
-    --  shout env cstr
-
     addJavaLog msgvar ("Connection established to " ++ show addr)
-    -- r :: Maybe [Message] <- recvAndUnpack sock
-    -- addJavaLog msgvar ("message from server: " ++ show r)
       
     flip evalStateT 0 $ whileJust_  (lift (recvAndUnpack sock)) $ \xs -> 
       if null xs 
@@ -84,7 +70,6 @@ clientReceiver msgvar logvar ipaddrstr = do
                 let n' = checkLatestMessage xs
                 liftIO $ addLog logvar xs
                 liftIO $ addJavaLog msgvar ("message from server: " ++ show (n,n'))
-                -- liftIO $ commander logvar (ViewAfter n)
                 put n'
                           
 

@@ -1,11 +1,4 @@
-//apply plugin: 'java'
-
 apply plugin: 'com.android.model.application'
-//apply plugin: 'android-native-dependencies'
-
-//native_dependencies {
-//    artifact 'com.example:wrapper:0.0+:armeabi'
-//}
 
 dependencies { 
     compile 'com.android.support:design:22.2.1'
@@ -17,33 +10,19 @@ model {
         buildToolsVersion = "22.0.1"
 
         defaultConfig.with {
-            applicationId = "com.example.hellojni"
+            applicationId = "co.uphere.chatter"
             minSdkVersion.apiLevel = 21
             targetSdkVersion.apiLevel = 22
         }
 
-	
+        
     }
-
-   //repositories {
-   //    libs(PrebuildLibraries) { 
-   //        haskell {  
-   //           binaries.withType(SharedLibraryBinary) {
-   //                sharedLibraryFile = file("/home/wavewave/repo/src/haskell-android-example/test/libs/armeabi/libwrapper.so")
-   //            }    
-   //        }
-   //    }
-
-   //}
 
     compileOptions.with {
         sourceCompatibility=JavaVersion.VERSION_1_7
         targetCompatibility=JavaVersion.VERSION_1_7
     }
 
-    /*
-     * native build settings
-     */
     android.buildTypes {
         release {
             minifyEnabled = false
@@ -53,35 +32,8 @@ model {
     android.productFlavors {
         create("arm") {
            ndk.abiFilters  = ["armeabi"]
-	   // ndk.ldLibs = ["haskell"]
         }
     }
 }
 
-
-        // for detailed abiFilter descriptions, refer to "Supported ABIs" @
-        // https://developer.android.com/ndk/guides/abis.html#sa
-        //create("arm") {
-        //    ndk.abiFilters = ["armeabi"]
-        // }
-	//create("all") {
-	//    ndk.abiFilters = ["armeabi"]
-	//}
-
-
-    //android.ndk {
-    //    moduleName = "wrapper"
-        //jniLibs.srcDirs = ['libs']
-	//ldFlags += "-L/home/wavewave/.cabal/lib/arm-linux-android-ghc-7.10.2/HaskellActivity-0.1.0.0-JgVIer3Ybhx7d2iPz3EzpS"
-	//ldLibs = ["HSHaskellActivity-0.1.0.0-JgVIer3Ybhx7d2iPz3EzpS"]
-//	ldFlags += "-Lcontrib/lib"
-//	ldLibs = ["haskell"]
-        /*
-         * Other ndk flags configurable here are
-         * cppFlags += "-fno-rtti"
-         * cppFlags += "-fno-exceptions"
-         * ldLibs    = ["android", "log"]
-         * stl       = "system"
-         */
-  //  }
 

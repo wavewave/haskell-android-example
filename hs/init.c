@@ -2,7 +2,6 @@
 #include <jni.h>
 #include <HsFFI.h>
 
-//extern void hs_set_java_vm(HsPtr a1);
 extern void __stginit_Client(void);
 
 void (*fptr_onclick)(JNIEnv*,jobject,jobject,jstring) ;
@@ -19,7 +18,6 @@ void c_register_on_idle_fptr( void (*v)(JNIEnv*,jobject, jobject) ) {
 
 
 
-// static int Log.D(String tag, String msg)
 void shout ( JNIEnv* env,  char* cmsg ) { 
   jclass cls = (*env)->FindClass(env, "android/util/Log");
   if( cls ) {
@@ -35,7 +33,6 @@ void shout ( JNIEnv* env,  char* cmsg ) {
 }
 
 
-// static int Log.D(String tag, String msg)
 void c_textView_setText ( JNIEnv* env,  jobject tv, char* cmsg ) { 
   jclass cls = (*env)->FindClass(env, "android/widget/TextView");
   if( cls ) {
@@ -49,7 +46,6 @@ void c_textView_setText ( JNIEnv* env,  jobject tv, char* cmsg ) {
   }
 }
 
-// static int Log.D(String tag, String msg)
 void c_textView_append ( JNIEnv* env,  jobject tv, char* cmsg ) { 
   jclass cls = (*env)->FindClass(env, "android/widget/TextView");
   if( cls ) {
@@ -69,9 +65,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
     static int argc = 1;
 
     hs_init(&argc, &argv_);
-    //hs_init( 0, 0);
     hs_add_root(__stginit_Client);
-    //hs_set_java_vm(vm);
     return JNI_VERSION_1_2;
 }
 
@@ -80,7 +74,7 @@ JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
 }
 
 
-
+/*
 jstring
 Java_com_example_hellojni_HelloJni_stringFromJNI(JNIEnv *env, jobject this)
 {
@@ -95,9 +89,10 @@ Java_com_example_hellojni_HelloJni_stringFromJNI(JNIEnv *env, jobject this)
   shout(env, "MESSAGE TO LOG : HELLLOOOO THEREEEE ");
   return (*env)->NewStringUTF(env, str); 
 }
+*/
 
 void
-Java_com_example_hellojni_Sub_onClickHS( JNIEnv* env, jobject this, jobject that, jstring str)
+Java_co_uphere_chatter_Chatter_onClickHS( JNIEnv* env, jobject this, jobject that, jstring str)
 {
   const char* nativeString = (*env)->GetStringUTFChars(env, str, 0);
   fptr_onclick (env, this, that,nativeString);
@@ -106,7 +101,7 @@ Java_com_example_hellojni_Sub_onClickHS( JNIEnv* env, jobject this, jobject that
 }
 
 void
-Java_com_example_hellojni_Sub_onIdleHS( JNIEnv* env, jobject activity, jobject textview)
+Java_co_uphere_chatter_Chatter_onIdleHS( JNIEnv* env, jobject activity, jobject textview)
 {
   fptr_onidle (env, activity, textview);
 }
