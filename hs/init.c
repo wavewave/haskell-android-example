@@ -4,9 +4,9 @@
 
 extern void __stginit_Client(void);
 
-void (*fptr_onclick)(JNIEnv*,jobject,jobject,jstring) ;
+void (*fptr_onclick)(JNIEnv*,jobject,jobject,const char*) ;
 
-void c_register_on_click_fptr( void (*v)(JNIEnv*,jobject,jobject) ) {
+void c_register_on_click_fptr( void (*v)(JNIEnv*,jobject,jobject,const char*) ) {
   fptr_onclick = v;
 }
 
@@ -92,7 +92,7 @@ Java_com_example_hellojni_HelloJni_stringFromJNI(JNIEnv *env, jobject this)
 */
 
 void
-Java_co_uphere_chatter_Chatter_onClickHS( JNIEnv* env, jobject this, jobject that, jstring str)
+Java_com_uphere_chatter_Chatter_onClickHS( JNIEnv* env, jobject this, jobject that, jstring str)
 {
   const char* nativeString = (*env)->GetStringUTFChars(env, str, 0);
   fptr_onclick (env, this, that,nativeString);
@@ -101,7 +101,7 @@ Java_co_uphere_chatter_Chatter_onClickHS( JNIEnv* env, jobject this, jobject tha
 }
 
 void
-Java_co_uphere_chatter_Chatter_onIdleHS( JNIEnv* env, jobject activity, jobject textview)
+Java_com_uphere_chatter_Chatter_onIdleHS( JNIEnv* env, jobject activity, jobject textview)
 {
   fptr_onidle (env, activity, textview);
 }

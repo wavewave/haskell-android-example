@@ -118,7 +118,7 @@ onCreate env activity tv =  do
 
 
 foreign export ccall
-  "Java_com_example_hellojni_HelloJni_onCreateHS"
+  "Java_com_uphere_chatter_Chatter_onCreateHS"
   onCreate :: JNIEnv -> JObject -> JObject -> IO ()
 
 data JavaMessage = Msg String
@@ -130,8 +130,8 @@ onClick (ref,tvar,logvar) env activity tv cstr = do
   -- cstr <- newCString (show n) 
   -- shout env cstr
   str <- peekCString cstr
-
-  atomically $ putTMVar tvar (str, "Hi There " ++ show n)
+  forkIO $ 
+    atomically $ putTMVar tvar (str, "Hi There " ++ show n)
   -- atomically $ do
     --   msgs <- readTVar logvar
     --   writeTVar msgvar (Msg ("message recorded: " ++ show n) : msgs)

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package co.uphere.chatter;
+package com.uphere.chatter;
 
 import android.app.Activity;
 
@@ -129,6 +129,8 @@ public class Chatter extends Activity
 	toolbar.setSubtitle("This uses chatter haskell program.");
  	tv = (TextView) findViewById(R.id.textview2);
 	tv.setMovementMethod(ScrollingMovementMethod.getInstance());
+	onCreateHS(tv);
+	
 	////setActionBar(toolbar);
 	//toolbar.inflateMenu(R.menu.toolbar2); 
 
@@ -161,4 +163,9 @@ public class Chatter extends Activity
 
     public native void onIdleHS(TextView tv);
     
+    static {
+        System.loadLibrary("haskell");
+    }
+
+
 }

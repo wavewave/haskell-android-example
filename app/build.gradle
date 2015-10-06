@@ -10,7 +10,7 @@ model {
         buildToolsVersion = "22.0.1"
 
         defaultConfig.with {
-            applicationId = "co.uphere.chatter"
+            applicationId = "com.uphere.chatter"
             minSdkVersion.apiLevel = 21
             targetSdkVersion.apiLevel = 22
         }
