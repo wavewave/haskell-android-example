@@ -127,12 +127,12 @@ public class Chatter extends Activity
 	toolbar = (Toolbar)findViewById(R.id.toolbar2);
 	toolbar.setTitle("Chat");
 	toolbar.setSubtitle("This uses chatter haskell program.");
- 	tv = (TextView) findViewById(R.id.textview2);
+
+
+	tv = (TextView) findViewById(R.id.textview2);
 	tv.setMovementMethod(ScrollingMovementMethod.getInstance());
 	onCreateHS(tv);
 	
-	////setActionBar(toolbar);
-	//toolbar.inflateMenu(R.menu.toolbar2); 
 
 	//fab = (FloatingActionButton)findViewById(R.id.favorite2);
 	button = (Button)findViewById(R.id.button1);
