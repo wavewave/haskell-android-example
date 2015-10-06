@@ -93,7 +93,11 @@ public class Chatter extends Activity
 	    count = 0;
 	}
 	public boolean queueIdle() {
-	    onIdleHS(tv);
+	    new Thread( new Runnable() {
+		    public void run() { 
+			onIdleHS(tv);
+		    }
+		}).start();
 	    return(true);
 	}
        
@@ -114,7 +118,8 @@ public class Chatter extends Activity
     VideoView vv; 
 
     Toolbar toolbar;
-
+    private EditText msginput;
+    
     public String nickname;
      
     @Override
@@ -132,7 +137,8 @@ public class Chatter extends Activity
 	tv = (TextView) findViewById(R.id.textview2);
 	tv.setMovementMethod(ScrollingMovementMethod.getInstance());
 	onCreateHS(tv);
-	
+
+	msginput = (EditText) findViewById(R.id.edit_msg);
 
 	//fab = (FloatingActionButton)findViewById(R.id.favorite2);
 	button = (Button)findViewById(R.id.button1);
@@ -140,8 +146,10 @@ public class Chatter extends Activity
 		@Override
 		public void onClick(View view) {
                     Log.d("HELLOJNI" , "nickname = " + nickname);
-		    if(nickname != null) { 
-        		onClickHS(tv,nickname);
+		    String msg = msginput.getText().toString(); 
+		    if(nickname != null && msg != null) {
+        		onClickHS(tv,nickname,msg);
+			msginput.setText("");
 		    }
 		}
 
@@ -151,15 +159,13 @@ public class Chatter extends Activity
 	NicknameDialogFragment n = new NicknameDialogFragment();
 	n.show(fm,"fragment_nickname");
 
-        // nickname = n.result ; 
-	// Log.d("HELLOJNI" , "nickname = " + nickname);
 	ProcessEvents();
 	    
     }
 
     public native void onCreateHS(TextView tv);
 
-    public native void onClickHS(TextView tv, String str);
+    public native void onClickHS(TextView tv, String nick, String msg);
 
     public native void onIdleHS(TextView tv);
     

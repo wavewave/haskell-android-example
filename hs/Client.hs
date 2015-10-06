@@ -62,6 +62,9 @@ clientReceiver msgvar logvar ipaddrstr = do
   
   connect ipaddrstr "5002" $ \(sock,addr) -> do
     addJavaLog msgvar ("Connection established to " ++ show addr)
+    -- test :: Maybe [Message] <- recvAndUnpack sock
+    -- addJavaLog msgvar (show test)                           
+
       
     flip evalStateT 0 $ whileJust_  (lift (recvAndUnpack sock)) $ \xs -> 
       if null xs 
@@ -81,11 +84,11 @@ clientSender tvar ipaddrstr = -- username =
 
 
 foreign import ccall "wrapper" mkOnClickFPtr
-  :: (JNIEnv -> JObject -> JObject -> CString -> IO ()) 
-  -> IO (FunPtr (JNIEnv -> JObject -> JObject -> CString -> IO ()))
+  :: (JNIEnv -> JObject -> JObject -> CString -> CString -> IO ()) 
+  -> IO (FunPtr (JNIEnv -> JObject -> JObject -> CString -> CString -> IO ()))
 
 foreign import ccall "c_register_on_click_fptr"
-   registerOnClickFPtr :: FunPtr (JNIEnv -> JObject -> JObject -> CString -> IO ()) -> IO ()
+   registerOnClickFPtr :: FunPtr (JNIEnv -> JObject -> JObject -> CString -> CString -> IO ()) -> IO ()
 
 
 
@@ -109,8 +112,8 @@ onCreate env activity tv =  do
     logvar <- atomically $ newTVar []
     sndvar <- atomically $ newEmptyTMVar
     msgvar <- atomically $ newTVar []
-    forkIO $ clientReceiver msgvar logvar "ianwookim.org" 
-    forkIO $ clientSender sndvar "ianwookim.org"
+    forkOn 2 $ clientReceiver msgvar logvar "ianwookim.org" 
+    forkOn 3 $ clientSender sndvar "ianwookim.org"
     mkOnClickFPtr (onClick (iref,sndvar,logvar)) >>= registerOnClickFPtr
     mkOnIdleFPtr (onIdle (msgvar,logvar)) >>= registerOnIdleFPtr
     return ()
@@ -123,18 +126,15 @@ foreign export ccall
 
 data JavaMessage = Msg String
 
-onClick :: (IORef Int, TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject -> JObject -> CString -> IO ()
-onClick (ref,tvar,logvar) env activity tv cstr = do
+onClick :: (IORef Int, TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject -> JObject
+        -> CString -> CString -> IO ()
+onClick (ref,tvar,logvar) env activity tv cnick cmsg = do
   n <- readIORef ref
   writeIORef ref (n+1)
-  -- cstr <- newCString (show n) 
-  -- shout env cstr
-  str <- peekCString cstr
-  forkIO $ 
-    atomically $ putTMVar tvar (str, "Hi There " ++ show n)
-  -- atomically $ do
-    --   msgs <- readTVar logvar
-    --   writeTVar msgvar (Msg ("message recorded: " ++ show n) : msgs)
+  nick <- peekCString cnick
+  msg <- peekCString cmsg
+  forkOn 4 $ 
+    atomically $ putTMVar tvar (nick, msg)
   return ()
   
 
@@ -154,7 +154,9 @@ onIdle (msgvar,logvar) env _a tv = do
     msgs' <- readTVar logvar
     writeTVar logvar []
     return msgs'
-  mapM_ (textViewMsg env tv) . reverse $ msgs'
+  -- mapM_ (textViewMsg env tv) . reverse $ msgs'
+  mapM_ (printMsg env) . reverse . map (Msg . prettyPrintMessage) $ msgs'
+  
 
 
 textViewMsg :: JNIEnv -> JObject -> Message -> IO ()
