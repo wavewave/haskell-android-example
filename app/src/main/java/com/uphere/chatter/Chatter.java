@@ -93,11 +93,11 @@ public class Chatter extends Activity
 	    count = 0;
 	}
 	public boolean queueIdle() {
-	    new Thread( new Runnable() {
-		    public void run() { 
+	    //new Thread( new Runnable() {
+	    //    public void run() { 
 			onIdleHS(tv);
-		    }
-		}).start();
+			//    }
+			//	}).start();
 	    return(true);
 	}
        
@@ -119,7 +119,6 @@ public class Chatter extends Activity
 
     Toolbar toolbar;
     private EditText msginput;
-    
     public String nickname;
      
     @Override
@@ -145,9 +144,9 @@ public class Chatter extends Activity
         button.setOnClickListener( new View.OnClickListener() {
 		@Override
 		public void onClick(View view) {
-                    Log.d("HELLOJNI" , "nickname = " + nickname);
-		    String msg = msginput.getText().toString(); 
-		    if(nickname != null && msg != null) {
+                    // Log.d("HELLOJNI" , "nickname = " + nickname);
+		    String msg = msginput.getText().toString();
+		    if(nickname != null && msg != null) { 
         		onClickHS(tv,nickname,msg);
 			msginput.setText("");
 		    }

@@ -8,6 +8,7 @@ module Client where
 import           Control.Concurrent
 import           Control.Concurrent.STM
 import           Control.Concurrent.STM.TMVar
+import           Control.Exception
 import           Control.Monad (forever,guard)
 import           Control.Monad.IO.Class
 import           Control.Monad.Loops 
@@ -58,29 +59,38 @@ addJavaLog msgvar str = atomically $ do
 
 
 clientReceiver :: TVar [JavaMessage] -> TVar [Message] -> String -> IO ()
-clientReceiver msgvar logvar ipaddrstr = do
-  
-  connect ipaddrstr "5002" $ \(sock,addr) -> do
-    addJavaLog msgvar ("Connection established to " ++ show addr)
-    -- test :: Maybe [Message] <- recvAndUnpack sock
-    -- addJavaLog msgvar (show test)                           
+clientReceiver msgvar logvar ipaddrstr = forever $ do
+{-    forever $ do
+      threadDelay 10000000
+      addLog logvar [Message 30 "disji" "lslssg"] -}
+     
+  flip catch (exceptionHandler logvar) $ do
+    connect ipaddrstr "5002" $ \(sock,addr) -> do
+      flip catch (\(e :: SomeException) -> addLog logvar [Message 70 "error" (T.pack (show e))]) $ do
+      addJavaLog msgvar ("Connection established to " ++ show addr)
+      flip evalStateT 0 $ whileJust_  (lift (recvAndUnpack sock)) $ \(xs :: [Message]) ->
+        if null xs 
+          then return ()
+          else do n <- get
+                  let n' = checkLatestMessage xs
+                  liftIO $ addLog logvar xs
+                  liftIO $ addJavaLog msgvar ("message from server: " ++ show (n,n'))
+                  put n'        
+  threadDelay 1000000
+--    $ \(e :: SomeException)-> do
+--        addLog logvar [Message 70 "error" (T.pack (show e))]
+{-
+                        
+-}
+exceptionHandler logvar = \(e :: SomeException) -> addLog logvar [Message 70 "error" (T.pack (show e))]
 
-      
-    flip evalStateT 0 $ whileJust_  (lift (recvAndUnpack sock)) $ \xs -> 
-      if null xs 
-        then return ()
-        else do n <- get
-                let n' = checkLatestMessage xs
-                liftIO $ addLog logvar xs
-                liftIO $ addJavaLog msgvar ("message from server: " ++ show (n,n'))
-                put n'
-                          
 
-clientSender :: TMVar (String,String) -> String -> IO ()
-clientSender tvar ipaddrstr = -- username = 
-  connect ipaddrstr "5003" $ \(sock,_addr) -> forever $ do
-    (username,str) <- atomically $ takeTMVar tvar
-    packAndSend sock (T.pack username, T.pack str)
+clientSender :: TVar [Message] -> TMVar (String,String) -> String -> IO ()
+clientSender logvar tvar ipaddrstr = forever $ do 
+  flip catch (exceptionHandler logvar) $ do 
+    connect ipaddrstr "5003" $ \(sock,_addr) -> forever $ do
+      (username,str) <- atomically $ takeTMVar tvar
+      packAndSend sock (T.pack username, T.pack str)
 
 
 foreign import ccall "wrapper" mkOnClickFPtr
@@ -102,18 +112,15 @@ onCreate :: JNIEnv -> JObject -> JObject -> IO ()
 onCreate env activity tv =  do
     getNumProcessors >>= setNumCapabilities
     caps <- getNumCapabilities
-    putStrLn "hello there"
-    let txt  = "MESSAGE FROM HASKELL:\n\nRunning on " ++ show caps ++ " CPUs!"
-    cstr <- newCString txt
+    -- let txt  = "MESSAGE FROM HASKELL:\n\nRunning on " ++ show caps ++ " CPUs!"
+    -- cstr <- newCString txt
     iref <- newIORef 0
-    
-
 
     logvar <- atomically $ newTVar []
     sndvar <- atomically $ newEmptyTMVar
     msgvar <- atomically $ newTVar []
-    forkOn 2 $ clientReceiver msgvar logvar "ianwookim.org" 
-    forkOn 3 $ clientSender sndvar "ianwookim.org"
+    forkIO $ clientReceiver msgvar logvar "ianwookim.org" 
+    forkIO $ clientSender logvar sndvar "ianwookim.org"
     mkOnClickFPtr (onClick (iref,sndvar,logvar)) >>= registerOnClickFPtr
     mkOnIdleFPtr (onIdle (msgvar,logvar)) >>= registerOnIdleFPtr
     return ()
@@ -126,28 +133,24 @@ foreign export ccall
 
 data JavaMessage = Msg String
 
-onClick :: (IORef Int, TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject -> JObject
-        -> CString -> CString -> IO ()
+onClick :: (IORef Int, TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject -> JObject -> CString -> CString -> IO ()
 onClick (ref,tvar,logvar) env activity tv cnick cmsg = do
   n <- readIORef ref
   writeIORef ref (n+1)
   nick <- peekCString cnick
   msg <- peekCString cmsg
-  forkOn 4 $ 
-    atomically $ putTMVar tvar (nick, msg)
+  forkIO $ atomically $ putTMVar tvar (nick,msg) 
   return ()
   
 
 onIdle :: (TVar [JavaMessage], TVar [Message]) -> JNIEnv -> JObject -> JObject -> IO ()
 onIdle (msgvar,logvar) env _a tv = do
+  -- printMsg env (Msg "onIdle called")
   msgs <- atomically $ do
     msgs <- readTVar msgvar
     writeTVar msgvar []
     return msgs
-  -- mapM_ (textViewMsg env tv) . reverse $ msgs
-
   mapM_ (printMsg env) . reverse $ msgs
-  -- msg' <- atomically 
 
 
   msgs' <- atomically $ do
