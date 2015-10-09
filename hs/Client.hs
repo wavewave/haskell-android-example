@@ -29,6 +29,7 @@ import           GHC.Conc
 import           Network.Simple.TCP
 import           System.Environment
 import           System.Exit
+import           System.Mem
 import           System.IO
 --
 import           Common
@@ -71,7 +72,13 @@ clientReceiver msgvar logvar ipaddrstr = forever $ do
                   put n'        
   threadDelay 1000000
 
-exceptionHandler logvar = \(e :: SomeException) -> addLog logvar [Message 70 "error" (T.pack (show e))]
+exceptionHandler logvar = \(e :: SomeException) -> do
+  withCString "UPHERE" $ \ctag -> 
+    withCString (show e) $ \cstr -> 
+      androidLogWrite 4 ctag cstr
+  return ()
+
+  -- addLog logvar [Message 70 "error" (T.pack (show e))]
 
 
 clientSender :: TVar [Message] -> TMVar (String,String) -> String -> IO ()
@@ -106,13 +113,18 @@ onCreate env activity tv =  do
     sndvar <- atomically $ newEmptyTMVar
     msgvar <- atomically $ newTVar []
 
-    ctag <- newCString "HELLOJNI"
-    cstr <- newCString "Hello There"
-    
+    {-
     forkIO $ forever $ do
       threadDelay 1000000
-      androidLogWrite 3 ctag cstr
-      
+      --withCString "UPHERE" $ \ctag ->
+      --  withCString "Hello There" $ \cstr ->
+      --    androidLogWrite 3 ctag cstr
+      -- let xs = [1..10000]
+      -- print xs
+      print "abc"
+          
+      -- performGC
+    -}
     -- forkIO $ clientReceiver msgvar logvar "ianwookim.org" 
     -- forkIO $ clientSender logvar sndvar "ianwookim.org"
     mkOnClickFPtr (onClick (sndvar,logvar)) >>= registerOnClickFPtr
@@ -131,12 +143,21 @@ onClick :: (TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject -> JObje
 onClick (tvar,logvar) env activity tv cnick cmsg = do
   nick <- peekCString cnick
   msg <- peekCString cmsg
-  forkIO $ atomically $ putTMVar tvar (nick,msg) 
+  forkOS $
+  -- forkIO $ 
+    atomically $ putTMVar tvar (nick,msg) 
   return ()
   
 
 onIdle :: (TVar [JavaMessage], TVar [Message]) -> JNIEnv -> JObject -> JObject -> IO ()
 onIdle (msgvar,logvar) env _a tv = do
+
+  withCString "UPHERE" $ \ctag ->
+    withCString "OnIdle called" $ \cstr -> 
+      androidLogWrite 3 ctag cstr >> return ()
+
+  performGC
+  {- 
   msgs <- atomically $ do
     msgs <- readTVar msgvar
     writeTVar msgvar []
@@ -149,7 +170,7 @@ onIdle (msgvar,logvar) env _a tv = do
     writeTVar logvar []
     return msgs'
   mapM_ (textViewMsg env tv) . reverse $ msgs'
-
+  -}
 
 textViewMsg :: JNIEnv -> JObject -> Message -> IO ()
 textViewMsg env tv msg = do
