@@ -69,8 +69,6 @@ public class Chatter extends Activity
 			    Dialog f = (Dialog) dialog;
 			    input = (EditText)f.findViewById(R.id.edit_nickname );
 			    nickname = input.getText().toString();
-			    // Log.d("HELLOJNI", result);
-			    
 			}
 		    })
 		.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -144,7 +142,6 @@ public class Chatter extends Activity
         button.setOnClickListener( new View.OnClickListener() {
 		@Override
 		public void onClick(View view) {
-                    // Log.d("HELLOJNI" , "nickname = " + nickname);
 		    String msg = msginput.getText().toString();
 		    if(nickname != null && msg != null) { 
         		onClickHS(tv,nickname,msg);
@@ -169,7 +166,7 @@ public class Chatter extends Activity
     public native void onIdleHS(TextView tv);
     
     static {
-        System.loadLibrary("haskell");
+	System.loadLibrary("haskell");
     }
 
 

@@ -14,25 +14,23 @@ import           Control.Monad.IO.Class
 import           Control.Monad.Loops 
 import           Control.Monad.Trans.Class
 import           Control.Monad.Trans.State
+import           Data.Foldable
 import           Data.Function (on)
+import           Data.IORef
 import           Data.List (sortBy)
+import           Data.Text (Text, append, pack)
 import qualified Data.Text as T
 import           Data.Text.Binary
+import qualified Data.Text.IO as TIO
+import           Foreign.C.String
+import           Foreign.C.Types
+import           Foreign.Ptr
+import           GHC.Conc
 import           Network.Simple.TCP
 import           System.Environment
-
-import Data.Text (Text, append, pack)
-import qualified Data.Text.IO as TIO
-import Foreign.C.String
-import Foreign.Ptr
-import GHC.Conc
-
-import Data.Foldable
-import Data.IORef
-
-import System.Exit
-import System.IO
-
+import           System.Exit
+import           System.Mem
+import           System.IO
 --
 import           Common
 
@@ -60,10 +58,6 @@ addJavaLog msgvar str = atomically $ do
 
 clientReceiver :: TVar [JavaMessage] -> TVar [Message] -> String -> IO ()
 clientReceiver msgvar logvar ipaddrstr = forever $ do
-{-    forever $ do
-      threadDelay 10000000
-      addLog logvar [Message 30 "disji" "lslssg"] -}
-     
   flip catch (exceptionHandler logvar) $ do
     connect ipaddrstr "5002" $ \(sock,addr) -> do
       flip catch (\(e :: SomeException) -> addLog logvar [Message 70 "error" (T.pack (show e))]) $ do
@@ -77,12 +71,14 @@ clientReceiver msgvar logvar ipaddrstr = forever $ do
                   liftIO $ addJavaLog msgvar ("message from server: " ++ show (n,n'))
                   put n'        
   threadDelay 1000000
---    $ \(e :: SomeException)-> do
---        addLog logvar [Message 70 "error" (T.pack (show e))]
-{-
-                        
--}
-exceptionHandler logvar = \(e :: SomeException) -> addLog logvar [Message 70 "error" (T.pack (show e))]
+
+exceptionHandler logvar = \(e :: SomeException) -> do
+  withCString "UPHERE" $ \ctag -> 
+    withCString (show e) $ \cstr -> 
+      androidLogWrite 4 ctag cstr
+  return ()
+
+  -- addLog logvar [Message 70 "error" (T.pack (show e))]
 
 
 clientSender :: TVar [Message] -> TMVar (String,String) -> String -> IO ()
@@ -112,16 +108,28 @@ onCreate :: JNIEnv -> JObject -> JObject -> IO ()
 onCreate env activity tv =  do
     getNumProcessors >>= setNumCapabilities
     caps <- getNumCapabilities
-    -- let txt  = "MESSAGE FROM HASKELL:\n\nRunning on " ++ show caps ++ " CPUs!"
-    -- cstr <- newCString txt
-    iref <- newIORef 0
 
     logvar <- atomically $ newTVar []
     sndvar <- atomically $ newEmptyTMVar
     msgvar <- atomically $ newTVar []
+
+    
+    {-forkIO $ forever $ do
+      threadDelay 1000000
+      forkIO $ do
+        threadDelay 10000000
+        withCString "UPHERE" $ \ctag ->
+          withCString "Hello There" $ \cstr ->
+            androidLogWrite 3 ctag cstr >> return ()
+      -- let xs = [1..10000]
+      -- print xs
+      print "abc" -}
+          
+      -- performGC
+    -- -}
     forkIO $ clientReceiver msgvar logvar "ianwookim.org" 
     forkIO $ clientSender logvar sndvar "ianwookim.org"
-    mkOnClickFPtr (onClick (iref,sndvar,logvar)) >>= registerOnClickFPtr
+    mkOnClickFPtr (onClick (sndvar,logvar)) >>= registerOnClickFPtr
     mkOnIdleFPtr (onIdle (msgvar,logvar)) >>= registerOnIdleFPtr
     return ()
 
@@ -133,26 +141,35 @@ foreign export ccall
 
 data JavaMessage = Msg String
 
-onClick :: (IORef Int, TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject -> JObject -> CString -> CString -> IO ()
-onClick (ref,tvar,logvar) env activity tv cnick cmsg = do
-  n <- readIORef ref
-  writeIORef ref (n+1)
+onClick :: (TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject -> JObject -> CString -> CString -> IO ()
+onClick (tvar,logvar) env activity tv cnick cmsg = do
   nick <- peekCString cnick
   msg <- peekCString cmsg
-  forkIO $ atomically $ putTMVar tvar (nick,msg) 
+  withCString "UPHERE" $ \ctag -> 
+    androidLogWrite 3 ctag cmsg  
+  -- forkOS $
+  forkIO $ atomically $ putTMVar tvar (nick,msg)
+  -- print "hello"
+  performGC
   return ()
   
 
 onIdle :: (TVar [JavaMessage], TVar [Message]) -> JNIEnv -> JObject -> JObject -> IO ()
 onIdle (msgvar,logvar) env _a tv = do
-  -- printMsg env (Msg "onIdle called")
+  {-
+  withCString "UPHERE" $ \ctag ->
+    withCString "OnIdle called" $ \cstr -> 
+      androidLogWrite 3 ctag cstr >> return ()
+
+  performGC -}
+  {- 
   msgs <- atomically $ do
     msgs <- readTVar msgvar
     writeTVar msgvar []
     return msgs
   mapM_ (printMsg env) . reverse $ msgs
-
-
+  -}
+  
   msgs' <- atomically $ do
     msgs' <- readTVar logvar
     writeTVar logvar []
@@ -161,6 +178,7 @@ onIdle (msgvar,logvar) env _a tv = do
   mapM_ (printMsg env) . reverse . map (Msg . prettyPrintMessage) $ msgs'
   
 
+  performGC
 
 textViewMsg :: JNIEnv -> JObject -> Message -> IO ()
 textViewMsg env tv msg = do
@@ -176,4 +194,7 @@ foreign import ccall "wrapper" mkOnIdleFPtr
 
 foreign import ccall "c_register_on_idle_fptr"
   registerOnIdleFPtr :: FunPtr (JNIEnv -> JObject -> JObject -> IO ()) -> IO ()
+
+foreign import ccall "__android_log_write"
+  androidLogWrite :: CInt -> CString -> CString -> IO CInt
 

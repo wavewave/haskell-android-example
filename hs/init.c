@@ -23,7 +23,7 @@ void shout ( JNIEnv* env,  char* cmsg ) {
   if( cls ) {
     jmethodID mid = (*env)->GetStaticMethodID(env, cls, "d", "(Ljava/lang/String;Ljava/lang/String;)I");
     if( mid ) {
-      jstring tmsg = (*env)->NewStringUTF(env,"HELLOJNI");
+      jstring tmsg = (*env)->NewStringUTF(env,"UPHERE");
       jstring jmsg = (*env)->NewStringUTF(env,cmsg);
       if( jmsg ) { 
         (*env)->CallStaticIntMethod(env,cls,mid,tmsg,jmsg);
