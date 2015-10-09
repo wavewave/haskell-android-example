@@ -101,7 +101,7 @@ onCreate :: JNIEnv -> JObject -> JObject -> IO ()
 onCreate env activity tv =  do
     getNumProcessors >>= setNumCapabilities
     caps <- getNumCapabilities
-    iref <- newIORef 0
+
     logvar <- atomically $ newTVar []
     sndvar <- atomically $ newEmptyTMVar
     msgvar <- atomically $ newTVar []
@@ -113,9 +113,9 @@ onCreate env activity tv =  do
       threadDelay 1000000
       androidLogWrite 3 ctag cstr
       
-    forkIO $ clientReceiver msgvar logvar "ianwookim.org" 
-    forkIO $ clientSender logvar sndvar "ianwookim.org"
-    mkOnClickFPtr (onClick (iref,sndvar,logvar)) >>= registerOnClickFPtr
+    -- forkIO $ clientReceiver msgvar logvar "ianwookim.org" 
+    -- forkIO $ clientSender logvar sndvar "ianwookim.org"
+    mkOnClickFPtr (onClick (sndvar,logvar)) >>= registerOnClickFPtr
     mkOnIdleFPtr (onIdle (msgvar,logvar)) >>= registerOnIdleFPtr
     return ()
 
@@ -127,10 +127,8 @@ foreign export ccall
 
 data JavaMessage = Msg String
 
-onClick :: (IORef Int, TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject -> JObject -> CString -> CString -> IO ()
-onClick (ref,tvar,logvar) env activity tv cnick cmsg = do
-  n <- readIORef ref
-  writeIORef ref (n+1)
+onClick :: (TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject -> JObject -> CString -> CString -> IO ()
+onClick (tvar,logvar) env activity tv cnick cmsg = do
   nick <- peekCString cnick
   msg <- peekCString cmsg
   forkIO $ atomically $ putTMVar tvar (nick,msg) 

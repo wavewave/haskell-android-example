@@ -144,7 +144,7 @@ public class Chatter extends Activity
                     // Log.d("HELLOJNI" , "nickname = " + nickname);
 		    String msg = msginput.getText().toString();
 		    if(nickname != null && msg != null) { 
-        		onClickHS(tv,nickname,msg);
+        		//onClickHS(tv,nickname,msg);
 			msginput.setText("");
 		    }
 		}
@@ -155,7 +155,7 @@ public class Chatter extends Activity
 	NicknameDialogFragment n = new NicknameDialogFragment();
 	n.show(fm,"fragment_nickname");
 
-	ProcessEvents();
+	// ProcessEvents();
 	    
     }
 
@@ -166,7 +166,7 @@ public class Chatter extends Activity
     public native void onIdleHS(TextView tv);
     
     static {
-        System.loadLibrary("haskell");
+	System.loadLibrary("haskell");
     }
 
 
