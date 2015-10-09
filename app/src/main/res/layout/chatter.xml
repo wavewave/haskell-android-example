@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+  <Toolbar
+      android:id="@+id/toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="56dp"
+      android:background="#dddddd"
+      >
+  </Toolbar> 
+
+  <RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below = "@id/toolbar"
+    >
+  
+    <Button
+	android:id="@+id/button"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:layout_alignParentBottom="true"
+	android:text="Send Message" />
+    
+    
+    <EditText android:id="@+id/edit_msg"
+	      android:layout_width="match_parent"
+	      android:layout_height="wrap_content"
+              android:layout_above="@id/button"
+	      android:hint="message" /> 
+    
+    
+    <TextView
+	android:id="@+id/textview"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:layout_above="@id/edit_msg"
+	android:maxLines = "1000"
+	android:scrollbars = "vertical"
+	android:gravity="bottom"
+	/>
+  </RelativeLayout>
+</RelativeLayout>
+
+<!-- "wrap_content"
+
+      android:layout_below="@id/edit_msg"
+
+-->
+
+<!--
+  <FrameLayout
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      >
+  </FrameLayout>  
+
+
+<VideoView
+      android:id="@+id/myvideo"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:layout_centerInParent="true" />
+-->

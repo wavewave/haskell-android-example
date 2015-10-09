@@ -91,11 +91,7 @@ public class Chatter extends Activity
 	    count = 0;
 	}
 	public boolean queueIdle() {
-	    //new Thread( new Runnable() {
-	    //    public void run() { 
-			onIdleHS(tv);
-			//    }
-			//	}).start();
+	    onIdleHS(tv);
 	    return(true);
 	}
        
@@ -111,9 +107,6 @@ public class Chatter extends Activity
     
     Button button;
     TextView  tv;
-    ListView lv;
-    //FloatingActionButton fab;
-    VideoView vv; 
 
     Toolbar toolbar;
     private EditText msginput;
@@ -123,22 +116,21 @@ public class Chatter extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-	setContentView(R.layout.sub);
+	setContentView(R.layout.chatter);
 
 
-	toolbar = (Toolbar)findViewById(R.id.toolbar2);
+	toolbar = (Toolbar)findViewById(R.id.toolbar);
 	toolbar.setTitle("Chat");
 	toolbar.setSubtitle("This uses chatter haskell program.");
 
 
-	tv = (TextView) findViewById(R.id.textview2);
+	tv = (TextView) findViewById(R.id.textview);
 	tv.setMovementMethod(ScrollingMovementMethod.getInstance());
 	onCreateHS(tv);
 
 	msginput = (EditText) findViewById(R.id.edit_msg);
 
-	//fab = (FloatingActionButton)findViewById(R.id.favorite2);
-	button = (Button)findViewById(R.id.button1);
+	button = (Button)findViewById(R.id.button);
         button.setOnClickListener( new View.OnClickListener() {
 		@Override
 		public void onClick(View view) {
