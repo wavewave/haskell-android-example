@@ -174,8 +174,8 @@ onIdle (msgvar,logvar) env _a tv = do
     msgs' <- readTVar logvar
     writeTVar logvar []
     return msgs'
-  -- mapM_ (textViewMsg env tv) . reverse $ msgs'
-  mapM_ (printMsg env) . reverse . map (Msg . prettyPrintMessage) $ msgs'
+  mapM_ (textViewMsg env tv) . reverse $ msgs'
+  -- mapM_ (printMsg env) . reverse . map (Msg . prettyPrintMessage) $ msgs'
   
 
   performGC
