@@ -113,20 +113,22 @@ onCreate env activity tv =  do
     sndvar <- atomically $ newEmptyTMVar
     msgvar <- atomically $ newTVar []
 
-    {-
-    forkIO $ forever $ do
+    
+    {-forkIO $ forever $ do
       threadDelay 1000000
-      --withCString "UPHERE" $ \ctag ->
-      --  withCString "Hello There" $ \cstr ->
-      --    androidLogWrite 3 ctag cstr
+      forkIO $ do
+        threadDelay 10000000
+        withCString "UPHERE" $ \ctag ->
+          withCString "Hello There" $ \cstr ->
+            androidLogWrite 3 ctag cstr >> return ()
       -- let xs = [1..10000]
       -- print xs
-      print "abc"
+      print "abc" -}
           
       -- performGC
-    -}
-    -- forkIO $ clientReceiver msgvar logvar "ianwookim.org" 
-    -- forkIO $ clientSender logvar sndvar "ianwookim.org"
+    -- -}
+    forkIO $ clientReceiver msgvar logvar "ianwookim.org" 
+    forkIO $ clientSender logvar sndvar "ianwookim.org"
     mkOnClickFPtr (onClick (sndvar,logvar)) >>= registerOnClickFPtr
     mkOnIdleFPtr (onIdle (msgvar,logvar)) >>= registerOnIdleFPtr
     return ()
@@ -143,34 +145,38 @@ onClick :: (TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject -> JObje
 onClick (tvar,logvar) env activity tv cnick cmsg = do
   nick <- peekCString cnick
   msg <- peekCString cmsg
-  forkOS $
-  -- forkIO $ 
-    atomically $ putTMVar tvar (nick,msg) 
+  withCString "UPHERE" $ \ctag -> 
+    androidLogWrite 3 ctag cmsg  
+  -- forkOS $
+  forkIO $ atomically $ putTMVar tvar (nick,msg)
+  -- print "hello"
+  performGC
   return ()
   
 
 onIdle :: (TVar [JavaMessage], TVar [Message]) -> JNIEnv -> JObject -> JObject -> IO ()
 onIdle (msgvar,logvar) env _a tv = do
-
+  {-
   withCString "UPHERE" $ \ctag ->
     withCString "OnIdle called" $ \cstr -> 
       androidLogWrite 3 ctag cstr >> return ()
 
-  performGC
+  performGC -}
   {- 
   msgs <- atomically $ do
     msgs <- readTVar msgvar
     writeTVar msgvar []
     return msgs
   mapM_ (printMsg env) . reverse $ msgs
-
-
+  -}
+  
   msgs' <- atomically $ do
     msgs' <- readTVar logvar
     writeTVar logvar []
     return msgs'
   mapM_ (textViewMsg env tv) . reverse $ msgs'
-  -}
+
+  performGC
 
 textViewMsg :: JNIEnv -> JObject -> Message -> IO ()
 textViewMsg env tv msg = do

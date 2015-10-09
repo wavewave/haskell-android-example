@@ -152,7 +152,7 @@ public class Chatter extends Activity
 	NicknameDialogFragment n = new NicknameDialogFragment();
 	n.show(fm,"fragment_nickname");
 
-	//ProcessEvents();
+	ProcessEvents();
 	    
     }
 
