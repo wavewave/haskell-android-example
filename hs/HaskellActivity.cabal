@@ -13,7 +13,7 @@ cabal-version: >=1.8
 
 executable libhaskell.so
   build-depends: base, text, transformers, monad-loops, text-binary, network-simple, bytestring, stm, binary
-  ghc-options: -fPIC -threaded -no-hs-main
+  ghc-options: -fPIC -threaded -no-hs-main -optl-llog
   main-is: Client.hs
   c-sources: init.c
   exposed-modules: HaskellActivity
