@@ -1,39 +1,43 @@
-apply plugin: 'com.android.model.application'
+// apply plugin: 'com.android.model.application'
+apply plugin: 'com.android.application'
 
 dependencies { 
     compile 'com.android.support:design:22.2.1'
 }
 
-model {
-    android {
-        compileSdkVersion = 22
-        buildToolsVersion = "22.0.1"
+android {
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
 
-        defaultConfig.with {
-            applicationId = "com.uphere.chatter"
-            minSdkVersion.apiLevel = 21
-            targetSdkVersion.apiLevel = 22
-        }
-
-        
+    defaultConfig {
+	applicationId "com.uphere.chatter"
+	minSdkVersion 21
+	targetSdkVersion 22
     }
 
-    compileOptions.with {
-        sourceCompatibility=JavaVersion.VERSION_1_7
-        targetCompatibility=JavaVersion.VERSION_1_7
-    }
 
-    android.buildTypes {
-        release {
-            minifyEnabled = false
-            proguardFiles  += file('proguard-rules.txt')
-        }
+
+
+//compileOptions.with {
+//    sourceCompatibility=JavaVersion.VERSION_1_7
+//    targetCompatibility=JavaVersion.VERSION_1_7
+//}
+
+    buildTypes {
+	debug {
+	    jniDebuggable = true
+	}
+	release {
+	    minifyEnabled = false
+	    proguardFiles  += file('proguard-rules.txt')
+	}
     }
-    android.productFlavors {
-        create("arm") {
-           ndk.abiFilters  = ["armeabi"]
-        }
-    }
+    //productFlavors {
+//	create("arm") {
+//	   ndk.abiFilters  = ["armeabi"]
+//	}
+  //  }
 }
+
 
 
