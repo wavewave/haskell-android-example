@@ -43,10 +43,12 @@ data JNINativeInterface_
 type JNIEnv = Ptr (Ptr JNINativeInterface_)
 
 foreign import ccall safe "wrapper" mkCallbackFPtr
-  :: (JNIEnv -> JObject -> IO ()) -> IO (FunPtr (JNIEnv -> JObject -> IO ()))
+  :: (JNIEnv -> JObject -> CString -> CString -> IO ())
+  -> IO (FunPtr (JNIEnv -> JObject -> CString -> CString -> IO ()))
 
 foreign import ccall safe "register_callback_fptr"
-  registerCallbackFPtr :: FunPtr (JNIEnv -> JObject -> IO ()) -> IO ()
+  registerCallbackFPtr :: FunPtr (JNIEnv -> JObject -> CString -> CString -> IO ())
+                       -> IO ()
 
 foreign import ccall safe "__android_log_write"
   androidLogWrite :: CInt -> CString -> CString -> IO CInt
@@ -101,11 +103,15 @@ chatter = do
 
 
 
-onClick :: (TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject -> IO ()
-onClick (sndvar,logvar) env activity = do
+onClick :: (TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject
+        -> CString -> CString -> IO ()
+onClick (sndvar,logvar) env activity cnick cmsg = do
   atomically $ putTMVar sndvar ("UPHERE","HELLO")
-  withCString "hello there\n" $ \cmsg ->
-    c_Chatter_sendMsgToChatter env activity cmsg
+  -- withCString "hello there\n" $ \cmsg ->
+  c_Chatter_sendMsgToChatter env activity cmsg
+  nick <- peekCString cnick
+  msg <- peekCString cmsg
+  atomically $ putTMVar sndvar (nick,msg)
 
                                 
 

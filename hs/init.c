@@ -17,9 +17,9 @@
 
 extern void __stginit_Client(void);
 
-void (*fptr_callback)(JNIEnv*, jobject);
+void (*fptr_callback)(JNIEnv*, jobject, char*, char*);
 
-void register_callback_fptr ( void (*v)(JNIEnv*,jobject) ) {
+void register_callback_fptr ( void (*v)(JNIEnv*,jobject, char*, char*) ) {
   fptr_callback = v;
 }
 
@@ -31,6 +31,10 @@ int counter;
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t  cond = PTHREAD_COND_INITIALIZER;
 jobject ref_act; 
+
+char nickbox[4096];
+char messagebox[4096]; 
+
 
 void Chatter_sendMsgToChatter ( JNIEnv* env, jobject activity, char* cmsg ) { 
   jclass cls = (*env)->GetObjectClass(env, activity);
@@ -72,9 +76,9 @@ void* reader_runtime( void* d )
   while( 1 ) {
     pthread_mutex_lock(&lock);
     pthread_cond_wait(&cond,&lock);
-    
+
     pthread_mutex_unlock(&lock);
-    fptr_callback(env,ref_act);
+    fptr_callback(env,ref_act,nickbox,messagebox);
     //callback1(env,ref_act);
     //Chatter_sendMsgToChatter(env,ref_act,"Hello there\n");
   }
@@ -109,8 +113,15 @@ void
 Java_com_uphere_chatter_Chatter_onClickHS( JNIEnv* env, jobject this, jobject that,
 					   jstring nick, jstring msg)
 {
+  char* cmsg = (*env)->GetStringUTFChars(env,msg,0);
+  char* cnick = (*env)->GetStringUTFChars(env,nick,0);
   pthread_mutex_lock(&lock);
+  strcpy( messagebox , cmsg);
+  strcpy( nickbox, cnick);
   pthread_cond_signal(&cond);
   pthread_mutex_unlock(&lock);
+  (*env)->ReleaseStringUTFChars(env,msg,cmsg);
+  (*env)->ReleaseStringUTFChars(env,nick,cnick);
+  
 }
 
