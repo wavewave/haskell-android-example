@@ -164,7 +164,7 @@ foreign export ccall
   "test1"
   test1 :: IO ()
 
-test1 = forkIO (flip catch exceptionHandler test) >> return ()
+test1 = flip catch exceptionHandler test >> return ()
 
 
 data JavaMessage = Msg String

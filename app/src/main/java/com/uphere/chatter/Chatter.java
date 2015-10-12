@@ -117,7 +117,7 @@ public class Chatter extends Activity
     {
         super.onCreate(savedInstanceState);
 	setContentView(R.layout.chatter);
-        startHS();
+        // startHS();
 
 	toolbar = (Toolbar)findViewById(R.id.toolbar);
 	toolbar.setTitle("Chat");
@@ -151,7 +151,7 @@ public class Chatter extends Activity
 	    
     }
 
-    public native void startHS();
+    // public native void startHS();
      
     public native void onCreateHS(TextView tv);
 

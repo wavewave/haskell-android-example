@@ -4,6 +4,17 @@
 #include <Rts.h>
 #include <RtsAPI.h>
 
+#include <android/log.h>
+
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <string.h>
+
+
 extern void __stginit_Client(void);
 
 void (*fptr_onclick)(JNIEnv*,jobject,jobject,const char*,const char*);
@@ -18,6 +29,7 @@ void c_register_on_idle_fptr( void (*v)(JNIEnv*,jobject, jobject) ) {
   fptr_onidle = v;
 }
 
+/*
 void Java_com_uphere_chatter_Chatter_startHS( JNIEnv* env, jobject Activity ) {
     static char *argv[] = { "libhaskell.so", 0 }, **argv_ = argv;
     static int argc = 1;
@@ -28,6 +40,7 @@ void Java_com_uphere_chatter_Chatter_startHS( JNIEnv* env, jobject Activity ) {
     test1();
     //return JNI_VERSION_1_2;
 }
+*/
 
 /*
 void shout ( JNIEnv* env,  char* cmsg ) { 
@@ -77,20 +90,31 @@ void c_textView_append ( JNIEnv* env,  jobject tv, char* cmsg ) {
   }
 }
 
-/*
+
+void* haskell_runtime( void* d )
+{
+  static char *argv[] = { "libhaskell.so", 0 }, **argv_ = argv;
+  static int argc = 1;
+  static RtsConfig rtsopts = { RtsOptsAll, "-H128m -K64m" };
+  // hs_init(&argc, &argv_);
+  hs_init_ghc(&argc,&argv_, rtsopts);
+  __android_log_write( 3, "UPHERE", "start" ) ; 
+  // hs_add_root(__stginit_Client);
+  test1();  
+}
+  
+
+
 JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
-    static char *argv[] = { "libhaskell.so", 0 }, **argv_ = argv;
-    static int argc = 1;
-    static RtsConfig rtsopts = { RtsOptsAll, "-H128m -K64m" };
-    // hs_init(&argc, &argv_);
-    hs_init_ghc(&argc,&argv_, rtsopts);
-    hs_add_root(__stginit_Client);
-    return JNI_VERSION_1_2;
-    } 
+  pthread_t thread1;
+  pthread_create( &thread1, NULL, &haskell_runtime, NULL );
+  //pthread_join(thread1, NULL);
+  return JNI_VERSION_1_2;
+} 
 
 JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
-    hs_exit();
-    } */
+  hs_exit();
+} 
 
 void
 Java_com_uphere_chatter_Chatter_onClickHS( JNIEnv* env, jobject this, jobject that,
