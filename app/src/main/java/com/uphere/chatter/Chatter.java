@@ -100,7 +100,7 @@ public class Chatter extends Activity
     
     public void ProcessEvents()
     {
-	Log.d("HELLOJNI", "ProcessEvents");
+	Log.d("UPHERE", "ProcessEvents");
         Looper looper = Looper.myLooper();
         looper.myQueue().addIdleHandler(new IdleHandler(looper));	
     }
@@ -117,7 +117,7 @@ public class Chatter extends Activity
     {
         super.onCreate(savedInstanceState);
 	setContentView(R.layout.chatter);
-
+        startHS();
 
 	toolbar = (Toolbar)findViewById(R.id.toolbar);
 	toolbar.setTitle("Chat");
@@ -126,7 +126,7 @@ public class Chatter extends Activity
 
 	tv = (TextView) findViewById(R.id.textview);
 	tv.setMovementMethod(ScrollingMovementMethod.getInstance());
-	onCreateHS(tv);
+	// onCreateHS(tv);
 
 	msginput = (EditText) findViewById(R.id.edit_msg);
 
@@ -136,7 +136,7 @@ public class Chatter extends Activity
 		public void onClick(View view) {
 		    String msg = msginput.getText().toString();
 		    if(nickname != null && msg != null) { 
-        		onClickHS(tv,nickname,msg);
+        		//onClickHS(tv,nickname,msg);
 			msginput.setText("");
 		    }
 		}
@@ -147,10 +147,12 @@ public class Chatter extends Activity
 	NicknameDialogFragment n = new NicknameDialogFragment();
 	n.show(fm,"fragment_nickname");
 
-	ProcessEvents();
+	//ProcessEvents();
 	    
     }
 
+    public native void startHS();
+     
     public native void onCreateHS(TextView tv);
 
     public native void onClickHS(TextView tv, String nick, String msg);

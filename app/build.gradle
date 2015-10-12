@@ -25,18 +25,20 @@ android {
 
     buildTypes {
 	debug {
-	    jniDebuggable = true
+	    jniDebuggable true
 	}
 	release {
 	    minifyEnabled = false
 	    proguardFiles  += file('proguard-rules.txt')
 	}
     }
-    //productFlavors {
-//	create("arm") {
-//	   ndk.abiFilters  = ["armeabi"]
-//	}
-  //  }
+    productFlavors {
+	arm {
+	   ndk {
+	     abiFilters  "armeabi"
+	   }
+	}
+    }
 }
 
 
