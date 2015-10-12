@@ -17,29 +17,19 @@
 
 extern void __stginit_Client(void);
 
-/*
+void (*fptr_callback)(JNIEnv*, jobject);
 
-void c_textView_append ( JNIEnv* env,  jobject tv, char* cmsg ) { 
-  jclass cls = (*env)->FindClass(env, "android/widget/TextView");
-  if( cls ) {
-    jmethodID mid = (*env)->GetMethodID(env, cls, "append", "(Ljava/lang/CharSequence;)V");
-    if( mid ) {
-      jstring jmsg = (*env)->NewStringUTF(env,cmsg);
-      if( jmsg ) { 
-        (*env)->CallVoidMethod(env,tv,mid,jmsg);
-	// (*env)->DeleteLocalRef(env,jmsg);
-      }
-      //(*env)->DeleteLocalRef(env,mid);
-    }
-    (*env)->DeleteLocalRef(env,cls);
-  }
+void register_callback_fptr ( void (*v)(JNIEnv*,jobject) ) {
+  fptr_callback = v;
 }
-*/
 
+static JavaVM* jvm; 
 
-/*void sendMessageToJava( JNIEnv* env, char* cmsg )
-{
-}*/
+pthread_t thr_haskell;
+pthread_t thr_msgread; 
+int counter;
+pthread_mutex_t lock;
+jobject ref_act; 
 
 void Chatter_sendMsgToChatter ( JNIEnv* env, jobject activity, char* cmsg ) { 
   jclass cls = (*env)->GetObjectClass(env, activity);
@@ -57,13 +47,6 @@ void Chatter_sendMsgToChatter ( JNIEnv* env, jobject activity, char* cmsg ) {
 
 
 
-static JavaVM* jvm; 
-
-pthread_t thr_haskell;
-pthread_t thr_msgread; 
-int counter;
-pthread_mutex_t lock;
-jobject act; 
 
 void* haskell_runtime( void* d )
 {
@@ -87,12 +70,12 @@ void* reader_runtime( void* d )
   (*jvm)->AttachCurrentThread(jvm,(void**)&env, &args); 
   while( 1 ) {
     pthread_mutex_lock(&lock);
-    callback1();
-    Chatter_sendMsgToChatter(env,act,"Hello there");
+    fptr_callback(env,ref_act);
+    //callback1(env,ref_act);
+    //Chatter_sendMsgToChatter(env,ref_act,"Hello there\n");
   }
   return NULL;
 }
-
 
 JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
   jvm = vm; 
@@ -107,15 +90,13 @@ JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
   pthread_mutex_destroy(&lock);
   JNIEnv* env ;
   (*vm)->GetEnv(vm,(void**)(&env),JNI_VERSION_1_6);
-  (*env)->DeleteGlobalRef(env,act);
+  (*env)->DeleteGlobalRef(env,ref_act);
 } 
-
-
 
 void
 Java_com_uphere_chatter_Chatter_onCreateHS( JNIEnv* env, jobject activity)
 {
-  act = (*env)->NewGlobalRef(env,activity);
+  ref_act = (*env)->NewGlobalRef(env,activity);
   pthread_create( &thr_msgread, NULL, &reader_runtime, NULL );
 }
   
@@ -124,6 +105,5 @@ Java_com_uphere_chatter_Chatter_onClickHS( JNIEnv* env, jobject this, jobject th
 					   jstring nick, jstring msg)
 {
   pthread_mutex_unlock(&lock);
-
 }
 

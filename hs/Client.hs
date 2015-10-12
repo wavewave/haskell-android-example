@@ -59,7 +59,7 @@ test = do
       withCString ("sub thread " ++ show n) $ \cstr ->
         androidLogWrite 3 ctag cstr
       writeIORef iref (n+2)
-      threadDelay 1000000
+      threadDelay 100000
       performGC
 
     forever $ do
@@ -67,23 +67,42 @@ test = do
       withCString ("main thread " ++ show n) $ \cstr ->
         androidLogWrite 3 ctag cstr
       writeIORef iref (n+1)
-      threadDelay 1000000
+      threadDelay 100000
       performGC
     
 
 foreign export ccall "test1" test1 :: IO ()
 
-test1 = flip catch exceptionHandler test >> return ()
+test1 = do
+  ref <- newIORef (0 :: Int)
+  mkCallbackFPtr (callback1 ref) >>= registerCallbackFPtr 
+  flip catch exceptionHandler test >> return ()
 
-foreign export ccall "callback1" callback1 :: IO ()
+-- foreign export ccall "callback1" callback1 :: JNIEnv -> JObject -> IO ()
 
-callback1 = do
-  let msg = "HASKELL I AM ALIVE"
+foreign import ccall safe "wrapper" mkCallbackFPtr
+  :: (JNIEnv -> JObject -> IO ()) -> IO (FunPtr (JNIEnv -> JObject -> IO ()))
+
+foreign import ccall safe "register_callback_fptr"
+  registerCallbackFPtr :: FunPtr (JNIEnv -> JObject -> IO ()) -> IO ()
+
+
+callback1 ref env activity = do
+  n <- readIORef ref
+  writeIORef ref (n+1)
+  let msg = "HASKELL I AM ALIVE : " ++ show n ++ "\n"
+  {- 
   withCString "UPHERE" $ \ctag -> 
     withCString msg $ \cmsg ->
       androidLogWrite 3 ctag cmsg >> return ()
-
+  -}
+  withCString msg $ \cmsg ->
+    c_Chatter_sendMsgToChatter env activity cmsg
   
 foreign import ccall safe "__android_log_write"
   androidLogWrite :: CInt -> CString -> CString -> IO CInt
+
+foreign import ccall "Chatter_sendMsgToChatter"
+  c_Chatter_sendMsgToChatter :: JNIEnv -> JObject -> CString -> IO ()
+                                
 
