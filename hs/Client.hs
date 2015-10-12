@@ -119,7 +119,7 @@ test = do
       withCString ("sub thread " ++ show n) $ \cstr ->
         androidLogWrite 3 ctag cstr
       writeIORef iref (n+2)
-      threadDelay 100000
+      threadDelay 1000000
       performGC
 
     forever $ do
@@ -127,7 +127,7 @@ test = do
       withCString ("main thread " ++ show n) $ \cstr ->
         androidLogWrite 3 ctag cstr
       writeIORef iref (n+1)
-      threadDelay 100000
+      threadDelay 1000000
       performGC
     
 
@@ -160,11 +160,17 @@ foreign export ccall
   "Java_com_uphere_chatter_Chatter_onCreateHS"
   onCreate :: JNIEnv -> JObject -> JObject -> IO ()
 
-foreign export ccall
-  "test1"
-  test1 :: IO ()
+foreign export ccall "test1" test1 :: IO ()
 
 test1 = flip catch exceptionHandler test >> return ()
+
+foreign export ccall "callback1" callback1 :: IO ()
+
+callback1 = do
+  let msg = "HASKELL I AM ALIVE"
+  withCString "UPHERE" $ \ctag -> 
+    withCString msg $ \cmsg ->
+      androidLogWrite 3 ctag cmsg >> return ()
 
 
 data JavaMessage = Msg String

@@ -91,6 +91,12 @@ void c_textView_append ( JNIEnv* env,  jobject tv, char* cmsg ) {
 }
 
 
+pthread_t thr_haskell;
+pthread_t thr_msgread; 
+int counter;
+pthread_mutex_t lock;
+
+
 void* haskell_runtime( void* d )
 {
   static char *argv[] = { "libhaskell.so", 0 }, **argv_ = argv;
@@ -100,33 +106,54 @@ void* haskell_runtime( void* d )
   hs_init_ghc(&argc,&argv_, rtsopts);
   __android_log_write( 3, "UPHERE", "start" ) ; 
   // hs_add_root(__stginit_Client);
-  test1();  
+  test1();
+  return NULL;
 }
-  
+
+void* reader_runtime( void* d )
+{
+  while( 1 ) {
+    pthread_mutex_lock(&lock);
+    callback1();
+    //__android_log_write( 3, "UPHERE", "I am alive" );
+    //pthread_mutex_unlock(&lock);
+  }
+  return NULL;
+}
 
 
 JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
-  pthread_t thread1;
-  pthread_create( &thread1, NULL, &haskell_runtime, NULL );
-  //pthread_join(thread1, NULL);
+  // if( pthread_mutex_init(&lock,NULL) != 0 ) {
+  // // some error handling   
+  // }
+  pthread_mutex_lock(&lock);
+  pthread_create( &thr_haskell, NULL, &haskell_runtime, NULL );
+  pthread_create( &thr_msgread, NULL, &reader_runtime, NULL );
+  
   return JNI_VERSION_1_2;
 } 
 
 JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
   hs_exit();
+  pthread_mutex_destroy(&lock);
 } 
 
 void
 Java_com_uphere_chatter_Chatter_onClickHS( JNIEnv* env, jobject this, jobject that,
 					   jstring nick, jstring msg)
 {
+  pthread_mutex_unlock(&lock);
+
+  //pthread_mutex_lock(&lock);
+  /*
   if(fptr_onclick) { 
     const char* cnick = (*env)->GetStringUTFChars(env, nick, 0);
     const char* cmsg = (*env)->GetStringUTFChars(env, msg, 0);
     fptr_onclick (env, this, that, cnick, cmsg);
     (*env)->ReleaseStringUTFChars(env,nick,cnick);
     (*env)->ReleaseStringUTFChars(env,msg,cmsg);
-  }
+  } 
+  */
 }
 
 void

@@ -136,7 +136,7 @@ public class Chatter extends Activity
 		public void onClick(View view) {
 		    String msg = msginput.getText().toString();
 		    if(nickname != null && msg != null) { 
-        		//onClickHS(tv,nickname,msg);
+        		onClickHS(tv,nickname,msg);
 			msginput.setText("");
 		    }
 		}
