@@ -56,7 +56,7 @@ void* haskell_runtime( void* d )
   // hs_init(&argc, &argv_);
   hs_init_ghc(&argc,&argv_, rtsopts);
   __android_log_write( 3, "UPHERE", "start" ) ; 
-  test1();
+  chatter();
   return NULL;
 }
 
