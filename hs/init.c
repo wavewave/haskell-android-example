@@ -17,22 +17,7 @@
 
 extern void __stginit_Client(void);
 
-
-void c_textView_setText ( JNIEnv* env,  jobject tv, char* cmsg ) { 
-  jclass cls = (*env)->FindClass(env, "android/widget/TextView");
-  if( cls ) {
-    jmethodID mid = (*env)->GetMethodID(env, cls, "setText", "(Ljava/lang/CharSequence;)V");
-    if( mid ) {
-      jstring jmsg = (*env)->NewStringUTF(env,cmsg);
-      if( jmsg ) { 
-        (*env)->CallVoidMethod(env,tv,mid,jmsg);
-	// (*env)->DeleteLocalRef(env,jmsg);
-      }
-      //(*env)->DeleteLocalRef(env,mid);
-    }
-    (*env)->DeleteLocalRef(env,cls);
-  }
-}
+/*
 
 void c_textView_append ( JNIEnv* env,  jobject tv, char* cmsg ) { 
   jclass cls = (*env)->FindClass(env, "android/widget/TextView");
@@ -49,12 +34,36 @@ void c_textView_append ( JNIEnv* env,  jobject tv, char* cmsg ) {
     (*env)->DeleteLocalRef(env,cls);
   }
 }
+*/
 
+
+/*void sendMessageToJava( JNIEnv* env, char* cmsg )
+{
+}*/
+
+void Chatter_sendMsgToChatter ( JNIEnv* env, jobject activity, char* cmsg ) { 
+  jclass cls = (*env)->GetObjectClass(env, activity);
+  if( cls ) {
+    jmethodID mid = (*env)->GetMethodID(env, cls, "sendMsgToChatter", "(Ljava/lang/String;)V");
+    if( mid ) {
+      jstring jmsg = (*env)->NewStringUTF(env,cmsg);
+      if( jmsg ) { 
+        (*env)->CallVoidMethod(env,activity,mid,jmsg);
+      }
+    }
+    (*env)->DeleteLocalRef(env,cls);
+  }
+}
+
+
+
+static JavaVM* jvm; 
 
 pthread_t thr_haskell;
 pthread_t thr_msgread; 
 int counter;
 pthread_mutex_t lock;
+jobject act; 
 
 void* haskell_runtime( void* d )
 {
@@ -64,39 +73,52 @@ void* haskell_runtime( void* d )
   // hs_init(&argc, &argv_);
   hs_init_ghc(&argc,&argv_, rtsopts);
   __android_log_write( 3, "UPHERE", "start" ) ; 
-  // hs_add_root(__stginit_Client);
   test1();
   return NULL;
 }
 
 void* reader_runtime( void* d )
 {
+  JNIEnv* env;
+  JavaVMAttachArgs args;
+  args.version = JNI_VERSION_1_6;
+  args.name = NULL;
+  args.group = NULL;
+  (*jvm)->AttachCurrentThread(jvm,(void**)&env, &args); 
   while( 1 ) {
     pthread_mutex_lock(&lock);
     callback1();
-    //__android_log_write( 3, "UPHERE", "I am alive" );
-    //pthread_mutex_unlock(&lock);
+    Chatter_sendMsgToChatter(env,act,"Hello there");
   }
   return NULL;
 }
 
 
 JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
-  // if( pthread_mutex_init(&lock,NULL) != 0 ) {
-  // // some error handling   
-  // }
+  jvm = vm; 
   pthread_mutex_lock(&lock);
   pthread_create( &thr_haskell, NULL, &haskell_runtime, NULL );
-  pthread_create( &thr_msgread, NULL, &reader_runtime, NULL );
-  
-  return JNI_VERSION_1_2;
+ 
+  return JNI_VERSION_1_6;
 } 
 
 JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
   hs_exit();
   pthread_mutex_destroy(&lock);
+  JNIEnv* env ;
+  (*vm)->GetEnv(vm,(void**)(&env),JNI_VERSION_1_6);
+  (*env)->DeleteGlobalRef(env,act);
 } 
 
+
+
+void
+Java_com_uphere_chatter_Chatter_onCreateHS( JNIEnv* env, jobject activity)
+{
+  act = (*env)->NewGlobalRef(env,activity);
+  pthread_create( &thr_msgread, NULL, &reader_runtime, NULL );
+}
+  
 void
 Java_com_uphere_chatter_Chatter_onClickHS( JNIEnv* env, jobject this, jobject that,
 					   jstring nick, jstring msg)

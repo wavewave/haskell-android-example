@@ -95,6 +95,7 @@ public class Chatter extends Activity
     {
         super.onCreate(savedInstanceState);
 	setContentView(R.layout.chatter);
+	onCreateHS();
 
 	toolbar = (Toolbar)findViewById(R.id.toolbar);
 	toolbar.setTitle("Chat");
@@ -126,6 +127,18 @@ public class Chatter extends Activity
     }
 
     public native void onClickHS(TextView tv, String nick, String msg);
+
+    public native void onCreateHS(); 
+    
+    public void sendMsgToChatter( String msg ) {
+	final String msg1 = msg;
+	runOnUiThread( new Runnable() {
+		public void run() { 
+		    tv.append(msg1);
+		}
+	    });
+    }
+    
    
     static {
 	System.loadLibrary("haskell");

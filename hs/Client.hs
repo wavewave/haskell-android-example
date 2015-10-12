@@ -50,9 +50,6 @@ exceptionHandler = \(e :: SomeException) -> do
   return ()
 
 
-foreign import ccall safe "c_textView_setText" textViewSetText :: JNIEnv -> JObject -> CString -> IO ()
-
-foreign import ccall safe "c_textView_append" textViewAppend :: JNIEnv -> JObject -> CString -> IO ()
 
 test = do
   iref <- newIORef (0 :: Int)
