@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -13,38 +14,51 @@
       >
   </Toolbar> 
 
-  <RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_below = "@id/toolbar"
-    >
-  
-    <Button
-	android:id="@+id/button"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:layout_alignParentBottom="true"
-	android:text="Send Message" />
-    
-    
-    <EditText android:id="@+id/edit_msg"
-	      android:layout_width="match_parent"
-	      android:layout_height="wrap_content"
-              android:layout_above="@id/button"
-	      android:hint="message" /> 
-    
-    
-    <TextView
-	android:id="@+id/textview"
+  <FrameLayout
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_below="@id/toolbar"
+      android:orientation="vertical">
+
+    <FrameLayout
+	android:id="@+id/camera_preview"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:layout_above="@id/edit_msg"
-	android:maxLines = "1000"
-	android:scrollbars = "vertical"
-	android:gravity="bottom"
 	/>
-  </RelativeLayout>
+    
+    <RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	>
+      
+      <Button
+	  android:id="@+id/button"
+	  android:layout_width="match_parent"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentBottom="true"
+	  android:text="Send Message" />
+      
+      
+      <EditText android:id="@+id/edit_msg"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_above="@id/button"
+		android:hint="message" /> 
+      
+      
+      <TextView
+	  android:id="@+id/textview"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:layout_above="@id/edit_msg"
+	  android:maxLines = "1000"
+	  android:scrollbars = "vertical"
+	  android:gravity="bottom"
+	  />
+    </RelativeLayout>
+  </FrameLayout>
 </RelativeLayout>
 
 <!-- "wrap_content"
@@ -54,7 +68,10 @@
 -->
 
 <!--
-  <FrameLayout
+
+	android:layout_below = "@id/toolbar"
+
+<FrameLayout
       xmlns:android="http://schemas.android.com/apk/res/android"
       android:layout_width="match_parent"
       android:layout_height="match_parent"

@@ -129,7 +129,7 @@ JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
 } 
 
 void
-Java_com_uphere_chatter_Chatter_onCreateHS( JNIEnv* env, jobject activity)
+Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity)
 {
   ref_act = (*env)->NewGlobalRef(env,activity);
   pthread_create( &thr_msgread, NULL, &reader_runtime, NULL );
@@ -137,7 +137,7 @@ Java_com_uphere_chatter_Chatter_onCreateHS( JNIEnv* env, jobject activity)
 }
   
 void
-Java_com_uphere_chatter_Chatter_onClickHS( JNIEnv* env, jobject this, jobject that,
+Java_com_uphere_vchatter_Chatter_onClickHS( JNIEnv* env, jobject this, jobject that,
 					   jstring nick, jstring msg)
 {
   char* cmsg = (*env)->GetStringUTFChars(env,msg,0);
