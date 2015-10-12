@@ -130,8 +130,8 @@ public class Chatter extends Activity
 
     public native void onCreateHS(); 
     
-    public void sendMsgToChatter( String nick, String msg ) {
-	final String msg1 = nick + ":" + msg + "\n";
+    public void sendMsgToChatter( String msg ) {
+	final String msg1 = msg;
 	runOnUiThread( new Runnable() {
 		public void run() { 
 		    tv.append(msg1);

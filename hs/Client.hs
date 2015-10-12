@@ -53,8 +53,11 @@ foreign import ccall safe "register_callback_fptr"
 foreign import ccall safe "__android_log_write"
   androidLogWrite :: CInt -> CString -> CString -> IO CInt
 
-foreign import ccall "Chatter_sendMsgToChatter"
-  c_Chatter_sendMsgToChatter :: JNIEnv -> JObject -> CString -> CString -> IO ()
+-- foreign import ccall "Chatter_sendMsgToChatter"
+--   c_Chatter_sendMsgToChatter :: JNIEnv -> JObject -> CString -> CString -> IO ()
+
+foreign import ccall safe "write_message"
+  c_write_message :: CString -> IO ()
 
 foreign export ccall "chatter" chatter :: IO ()
 
@@ -100,9 +103,7 @@ chatter = do
   
   forkIO $ clientSender logvar sndvar "ianwookim.org"
   forkIO $ clientReceiver logvar "ianwookim.org" 
-
   messageViewer logvar
-
 
 onClick :: (TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject
         -> CString -> CString -> IO ()
@@ -121,12 +122,9 @@ messageViewer logvar = forever $ do
   mapM_ (printMsg . format) . reverse $ msgs
  where format x = show (messageNum x) ++ " : " ++
                   T.unpack (messageUser x) ++ " : " ++
-                  T.unpack (messageBody x)
+                  T.unpack (messageBody x) ++ "\n"
 
 
 printMsg :: String -> IO ()
-printMsg msg = do
-    withCString "UPHERE" $ \ctag -> 
-      withCString msg $ \cmsg ->
-        androidLogWrite 3 ctag cmsg >> return ()
+printMsg msg = withCString msg $ \cmsg -> c_write_message cmsg
 

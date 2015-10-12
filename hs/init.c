@@ -17,6 +17,8 @@
 
 extern void __stginit_Client(void);
 
+extern void chatter( void );
+
 void (*fptr_callback)(JNIEnv*, jobject, char*, char*);
 
 void register_callback_fptr ( void (*v)(JNIEnv*,jobject, char*, char*) ) {
@@ -27,28 +29,31 @@ static JavaVM* jvm;
 
 pthread_t thr_haskell;
 pthread_t thr_msgread; 
-int counter;
+pthread_t thr_msgwrite;
+
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t  cond = PTHREAD_COND_INITIALIZER;
+
+pthread_mutex_t wlock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t wcond = PTHREAD_COND_INITIALIZER;
+
 jobject ref_act; 
 
 char nickbox[4096];
 char messagebox[4096]; 
 
+char wmessage[4096];
 
-void Chatter_sendMsgToChatter ( JNIEnv* env, jobject activity,
-				char* cnick, char* cmsg ) { 
+void Chatter_sendMsgToChatter ( JNIEnv* env, jobject activity, char* cmsg ) { 
   jclass cls = (*env)->GetObjectClass(env, activity);
   if( cls ) {
     jmethodID mid =
       (*env)->GetMethodID(env, cls, "sendMsgToChatter",
-			  "(Ljava/lang/String;Ljava/lang/String;)V");
+			  "(Ljava/lang/String;)V");
     if( mid ) {
-      jstring jnick = (*env)->NewStringUTF(env,cnick);
       jstring jmsg = (*env)->NewStringUTF(env,cmsg);
-
-      if( jnick && jmsg ) { 
-        (*env)->CallVoidMethod(env,activity,mid,jnick,jmsg);
+      if( jmsg ) { 
+        (*env)->CallVoidMethod(env,activity,mid,jmsg);
       }
     }
     (*env)->DeleteLocalRef(env,cls);
@@ -81,11 +86,27 @@ void* reader_runtime( void* d )
   while( 1 ) {
     pthread_mutex_lock(&lock);
     pthread_cond_wait(&cond,&lock);
-
     pthread_mutex_unlock(&lock);
+
     fptr_callback(env,ref_act,nickbox,messagebox);
-    //callback1(env,ref_act);
-    //Chatter_sendMsgToChatter(env,ref_act,"Hello there\n");
+  }
+  return NULL;
+}
+
+void* writer_runtime( void* d )
+{
+  JNIEnv* env;
+  JavaVMAttachArgs args;
+  args.version = JNI_VERSION_1_6;
+  args.name = NULL;
+  args.group = NULL;
+  (*jvm)->AttachCurrentThread(jvm,(void**)&env, &args); 
+  while( 1 ) {
+    pthread_mutex_lock(&wlock);
+    pthread_cond_wait(&wcond,&wlock);
+    pthread_mutex_unlock(&wlock);
+
+    Chatter_sendMsgToChatter( env, ref_act, wmessage );
   }
   return NULL;
 }
@@ -112,6 +133,7 @@ Java_com_uphere_chatter_Chatter_onCreateHS( JNIEnv* env, jobject activity)
 {
   ref_act = (*env)->NewGlobalRef(env,activity);
   pthread_create( &thr_msgread, NULL, &reader_runtime, NULL );
+  pthread_create( &thr_msgwrite, NULL, &writer_runtime, NULL );
 }
   
 void
@@ -130,3 +152,11 @@ Java_com_uphere_chatter_Chatter_onClickHS( JNIEnv* env, jobject this, jobject th
   
 }
 
+void write_message( char* cmsg )
+{
+  pthread_mutex_lock(&wlock);
+  strcpy( wmessage , cmsg);
+  pthread_cond_signal(&wcond);
+  pthread_mutex_unlock(&wlock);
+}
+ 
