@@ -62,28 +62,6 @@ exceptionHandler = \(e :: SomeException) -> do
       androidLogWrite 4 ctag cstr
   return ()
 
-{-
-test = do
-  iref <- newIORef (0 :: Int)
-  withCString "UPHERE" $ \ctag -> do
-    forkIO $ forever $ do
-      n <- readIORef iref
-      withCString ("sub thread " ++ show n) $ \cstr ->
-        androidLogWrite 3 ctag cstr
-      writeIORef iref (n+2)
-      threadDelay 100000
-      performGC
-
-    forever $ do
-      n <- readIORef iref
-      withCString ("main thread " ++ show n) $ \cstr ->
-        androidLogWrite 3 ctag cstr
-      writeIORef iref (n+1)
-      threadDelay 100000
-      performGC
-
--- foreign export ccall "test1" test1 :: IO ()
--}
 
 addLog :: TVar [Message] -> [Message] -> IO ()
 addLog logvar msgs = atomically $ do 
@@ -114,16 +92,13 @@ clientSender logvar tvar ipaddrstr = forever $ do
 
 chatter :: IO ()
 chatter = do
-  -- ref <- newIORef (0 :: Int)
   logvar <- atomically $ newTVar []
   sndvar <- atomically $ newEmptyTMVar
   mkCallbackFPtr (onClick (sndvar,logvar)) >>= registerCallbackFPtr 
   
   forkIO $ clientSender   logvar sndvar "ianwookim.org"
-
   clientReceiver logvar        "ianwookim.org" 
 
-  -- flip catch exceptionHandler test >> return ()
 
 
 onClick :: (TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject -> IO ()

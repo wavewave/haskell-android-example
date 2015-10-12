@@ -28,7 +28,8 @@ static JavaVM* jvm;
 pthread_t thr_haskell;
 pthread_t thr_msgread; 
 int counter;
-pthread_mutex_t lock;
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t  cond = PTHREAD_COND_INITIALIZER;
 jobject ref_act; 
 
 void Chatter_sendMsgToChatter ( JNIEnv* env, jobject activity, char* cmsg ) { 
@@ -70,6 +71,9 @@ void* reader_runtime( void* d )
   (*jvm)->AttachCurrentThread(jvm,(void**)&env, &args); 
   while( 1 ) {
     pthread_mutex_lock(&lock);
+    pthread_cond_wait(&cond,&lock);
+    
+    pthread_mutex_unlock(&lock);
     fptr_callback(env,ref_act);
     //callback1(env,ref_act);
     //Chatter_sendMsgToChatter(env,ref_act,"Hello there\n");
@@ -79,14 +83,15 @@ void* reader_runtime( void* d )
 
 JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
   jvm = vm; 
-  pthread_mutex_lock(&lock);
+  // pthread_mutex_lock(&lock);
   pthread_create( &thr_haskell, NULL, &haskell_runtime, NULL );
- 
+  
   return JNI_VERSION_1_6;
 } 
 
 JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
   hs_exit();
+  pthread_cond_destroy(&cond);
   pthread_mutex_destroy(&lock);
   JNIEnv* env ;
   (*vm)->GetEnv(vm,(void**)(&env),JNI_VERSION_1_6);
@@ -104,6 +109,8 @@ void
 Java_com_uphere_chatter_Chatter_onClickHS( JNIEnv* env, jobject this, jobject that,
 					   jstring nick, jstring msg)
 {
+  pthread_mutex_lock(&lock);
+  pthread_cond_signal(&cond);
   pthread_mutex_unlock(&lock);
 }
 
