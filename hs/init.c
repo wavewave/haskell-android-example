@@ -36,14 +36,19 @@ char nickbox[4096];
 char messagebox[4096]; 
 
 
-void Chatter_sendMsgToChatter ( JNIEnv* env, jobject activity, char* cmsg ) { 
+void Chatter_sendMsgToChatter ( JNIEnv* env, jobject activity,
+				char* cnick, char* cmsg ) { 
   jclass cls = (*env)->GetObjectClass(env, activity);
   if( cls ) {
-    jmethodID mid = (*env)->GetMethodID(env, cls, "sendMsgToChatter", "(Ljava/lang/String;)V");
+    jmethodID mid =
+      (*env)->GetMethodID(env, cls, "sendMsgToChatter",
+			  "(Ljava/lang/String;Ljava/lang/String;)V");
     if( mid ) {
+      jstring jnick = (*env)->NewStringUTF(env,cnick);
       jstring jmsg = (*env)->NewStringUTF(env,cmsg);
-      if( jmsg ) { 
-        (*env)->CallVoidMethod(env,activity,mid,jmsg);
+
+      if( jnick && jmsg ) { 
+        (*env)->CallVoidMethod(env,activity,mid,jnick,jmsg);
       }
     }
     (*env)->DeleteLocalRef(env,cls);

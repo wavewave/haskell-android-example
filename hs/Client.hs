@@ -54,7 +54,7 @@ foreign import ccall safe "__android_log_write"
   androidLogWrite :: CInt -> CString -> CString -> IO CInt
 
 foreign import ccall "Chatter_sendMsgToChatter"
-  c_Chatter_sendMsgToChatter :: JNIEnv -> JObject -> CString -> IO ()
+  c_Chatter_sendMsgToChatter :: JNIEnv -> JObject -> CString -> CString -> IO ()
 
 foreign export ccall "chatter" chatter :: IO ()
 
@@ -98,20 +98,35 @@ chatter = do
   sndvar <- atomically $ newEmptyTMVar
   mkCallbackFPtr (onClick (sndvar,logvar)) >>= registerCallbackFPtr 
   
-  forkIO $ clientSender   logvar sndvar "ianwookim.org"
-  clientReceiver logvar        "ianwookim.org" 
+  forkIO $ clientSender logvar sndvar "ianwookim.org"
+  forkIO $ clientReceiver logvar "ianwookim.org" 
 
+  messageViewer logvar
 
 
 onClick :: (TMVar (String,String), TVar [Message]) -> JNIEnv -> JObject
         -> CString -> CString -> IO ()
 onClick (sndvar,logvar) env activity cnick cmsg = do
-  atomically $ putTMVar sndvar ("UPHERE","HELLO")
-  -- withCString "hello there\n" $ \cmsg ->
-  c_Chatter_sendMsgToChatter env activity cmsg
   nick <- peekCString cnick
   msg <- peekCString cmsg
   atomically $ putTMVar sndvar (nick,msg)
 
                                 
+messageViewer :: TVar [Message] -> IO ()
+messageViewer logvar = forever $ do 
+  msgs <- atomically $ do
+    msgs <- readTVar logvar
+    writeTVar logvar []
+    return msgs
+  mapM_ (printMsg . format) . reverse $ msgs
+ where format x = show (messageNum x) ++ " : " ++
+                  T.unpack (messageUser x) ++ " : " ++
+                  T.unpack (messageBody x)
+
+
+printMsg :: String -> IO ()
+printMsg msg = do
+    withCString "UPHERE" $ \ctag -> 
+      withCString msg $ \cmsg ->
+        androidLogWrite 3 ctag cmsg >> return ()
 
