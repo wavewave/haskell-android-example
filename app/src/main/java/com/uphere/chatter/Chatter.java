@@ -83,28 +83,6 @@ public class Chatter extends Activity
 	
     }
 
-    private class IdleHandler implements MessageQueue.IdleHandler {
-	private Looper _looper;
-	private int count;
-	protected IdleHandler(Looper looper) {
-	    _looper = looper;
-	    count = 0;
-	}
-	public boolean queueIdle() {
-	    onIdleHS(tv);
-	    return(true);
-	}
-       
-    }
-
-    
-    public void ProcessEvents()
-    {
-	Log.d("UPHERE", "ProcessEvents");
-        Looper looper = Looper.myLooper();
-        looper.myQueue().addIdleHandler(new IdleHandler(looper));	
-    }
-    
     Button button;
     TextView  tv;
 
@@ -117,7 +95,6 @@ public class Chatter extends Activity
     {
         super.onCreate(savedInstanceState);
 	setContentView(R.layout.chatter);
-        // startHS();
 
 	toolbar = (Toolbar)findViewById(R.id.toolbar);
 	toolbar.setTitle("Chat");
@@ -126,7 +103,6 @@ public class Chatter extends Activity
 
 	tv = (TextView) findViewById(R.id.textview);
 	tv.setMovementMethod(ScrollingMovementMethod.getInstance());
-	// onCreateHS(tv);
 
 	msginput = (EditText) findViewById(R.id.edit_msg);
 
@@ -146,19 +122,11 @@ public class Chatter extends Activity
 	FragmentManager fm = getFragmentManager();
 	NicknameDialogFragment n = new NicknameDialogFragment();
 	n.show(fm,"fragment_nickname");
-
-	//ProcessEvents();
 	    
     }
 
-    // public native void startHS();
-     
-    public native void onCreateHS(TextView tv);
-
     public native void onClickHS(TextView tv, String nick, String msg);
-
-    public native void onIdleHS(TextView tv);
-    
+   
     static {
 	System.loadLibrary("haskell");
     }
