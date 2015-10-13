@@ -119,7 +119,9 @@ messageViewer logvar = forever $ do
     msgs <- readTVar logvar
     writeTVar logvar []
     return msgs
-  mapM_ (printMsg . format) . reverse $ msgs
+  let formatted = (map format . reverse) msgs
+  mapM_ (\x -> printLog x >> printMsg x) formatted
+  -- mapM_ (printMsg . format) . reverse $ msgs
  where format x = show (messageNum x) ++ " : " ++
                   T.unpack (messageUser x) ++ " : " ++
                   T.unpack (messageBody x) ++ "\n"
@@ -128,3 +130,6 @@ messageViewer logvar = forever $ do
 printMsg :: String -> IO ()
 printMsg msg = withCString msg $ \cmsg -> c_write_message cmsg
 
+printLog :: String -> IO ()
+printLog msg = withCString "UPHERE" $ \ctag ->
+                 withCString msg $ \cmsg -> androidLogWrite 3 ctag cmsg >> return ()

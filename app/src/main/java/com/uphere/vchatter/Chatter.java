@@ -76,11 +76,26 @@ public class Chatter extends Activity
     
     public void sendMsgToChatter( String msg ) {
 	final String msg1 = msg;
-	runOnUiThread( new Runnable() {
-		public void run() { 
+	final Runnable myrun = new Runnable() {
+		public void run() {
+		    //Log.d("UPHERE", "sendMsgToChatter : " + msg1); 
 		    vfrag.tv.append(msg1);
+		    //synchronized(this) {
+		    //	this.notify();
+		    //}
 		}
-	    }); 
+	    };
+
+	//synchronized( myrun ) { 
+	    runOnUiThread(myrun);
+	    //   try {     
+	    //	myrun.wait();
+	    //  }
+	    // catch (InterruptedException e) {
+	    //e.printStackTrace();
+	    // }
+	    //}
+	
     }
     
    

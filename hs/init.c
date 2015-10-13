@@ -37,6 +37,9 @@ pthread_cond_t  cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t wlock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t wcond = PTHREAD_COND_INITIALIZER;
 
+pthread_mutex_t wlock2 = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t wcond2 = PTHREAD_COND_INITIALIZER;
+
 jobject ref_act; 
 
 char nickbox[4096];
@@ -95,8 +98,6 @@ void* reader_runtime( void* d )
 
 void* writer_runtime( void* d )
 {
-  __android_log_write( 3, "UPHERE", "1:  writer_runtime");
-
   JNIEnv* env;
   JavaVMAttachArgs args;
   args.version = JNI_VERSION_1_6;
@@ -105,9 +106,20 @@ void* writer_runtime( void* d )
   (*jvm)->AttachCurrentThread(jvm,(void**)&env, &args); 
   while( 1 ) {
     pthread_mutex_lock(&wlock);
+    //__android_log_write(3,"UPHERE","checkpoint1");
     pthread_cond_wait(&wcond,&wlock);
-    pthread_mutex_unlock(&wlock);
+    //__android_log_write(3,"UPHERE","checkpoint2");
     Chatter_sendMsgToChatter( env, ref_act, wmessage );
+    //__android_log_write(3,"UPHERE","checkpoint3");
+    pthread_cond_signal(&wcond);
+    //__android_log_write(3,"UPHERE","checkpoint4");   
+    pthread_mutex_unlock(&wlock);
+
+    
+    //pthread_mutex_lock(&wlock2);
+    //pthread_mutex_unlock(&wlock2);
+    //__android_log_write(3,"UPHERE","I've got here 2");    
+    
   }
   return NULL;
 }
@@ -123,6 +135,11 @@ JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
   hs_exit();
   pthread_cond_destroy(&cond);
   pthread_mutex_destroy(&lock);
+  pthread_cond_destroy(&wcond);
+  pthread_mutex_destroy(&wlock);
+  pthread_cond_destroy(&wcond2);
+  pthread_mutex_destroy(&wlock2);
+  
   JNIEnv* env ;
   (*vm)->GetEnv(vm,(void**)(&env),JNI_VERSION_1_6);
   (*env)->DeleteGlobalRef(env,ref_act);
@@ -157,6 +174,13 @@ void write_message( char* cmsg )
   pthread_mutex_lock(&wlock);
   strcpy( wmessage , cmsg);
   pthread_cond_signal(&wcond);
+  //__android_log_write(3,"UPHERE","write_message");
+  //__android_log_write(3,"UPHERE",cmsg);
+  pthread_cond_wait(&wcond,&wlock);
   pthread_mutex_unlock(&wlock);
+
+  //pthread_mutex_lock(&wlock2);
+  //pthread_mutex_lock(&wlock2);
+
 }
  
