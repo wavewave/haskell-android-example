@@ -9,7 +9,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-	applicationId "com.uphere.vchatter"
+	applicationId "com.uphere.vchatter2"
 	minSdkVersion 21
 	targetSdkVersion 22
     }

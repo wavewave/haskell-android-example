@@ -99,6 +99,8 @@ public class Chatter extends Activity
     Camera mCamera;
     CameraPreview mPreview;
     private View mCameraView;
+
+    VideoView vv;
     
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -133,13 +135,19 @@ public class Chatter extends Activity
 
 	    });
 	
-
+        /*
         mCameraView = (View) findViewById(R.id.camera_preview);
 	boolean opened = safeCameraOpenInView( mCameraView );
 
 	if(opened == false ) {
 	    Log.d("UPHERE", "Error, Camera failed to open");
-	}
+	    } */
+
+	vv = (VideoView) findViewById(R.id.myvideo);
+	String vaddr = "http://ianwookim.org/video/test.mp4";
+	Uri vuri = Uri.parse(vaddr);
+	vv.setVideoURI(vuri);
+	vv.start();
 
 	FragmentManager fm = getFragmentManager();
 	NicknameDialogFragment n = new NicknameDialogFragment();

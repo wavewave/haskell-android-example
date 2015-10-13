@@ -21,12 +21,29 @@
       android:layout_below="@id/toolbar"
       android:orientation="vertical">
 
-    <FrameLayout
+    <!-- <FrameLayout
 	android:id="@+id/camera_preview"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	/>
-    
+	/> -->
+    <RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	>
+	
+      <VideoView
+	  android:id="@+id/myvideo"
+	  android:layout_alignParentTop="true"
+	  android:layout_alignParentBottom="true"
+	  android:layout_alignParentLeft="true"
+	  android:layout_alignParentRight="true"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:layout_centerInParent="true"
+	  />
+    </RelativeLayout>
+      
     <RelativeLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
