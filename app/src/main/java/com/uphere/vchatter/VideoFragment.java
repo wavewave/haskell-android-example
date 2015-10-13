@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toolbar;
 import android.widget.VideoView;
@@ -44,13 +45,22 @@ public class VideoFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			       Bundle savedInstanceState) {
-	//super.onCreateView(inflater,container,savedInstanceState);
 	View rootView = inflater.inflate(R.layout.video, container, false); 
-	// setContentView(R.layout.video);
+
 	toolbar = (Toolbar)rootView.findViewById(R.id.toolbar);
 	toolbar.setTitle("Chat");
 	toolbar.setSubtitle("This uses chatter haskell program.");
 
+
+        // ScrollView sv = (ScrollView)rootView.findViewById(R.id.scrollview);	
+        //sv.setOnClickListener( new View.OnClickListener() {
+	//	@Override
+	//	public void onClick(View view) {
+	//		    Log.d("UPHERE", "text veiew on click");
+	//	}
+	//   });
+
+	
 	tv = (TextView) rootView.findViewById(R.id.textview);
 	tv.setMovementMethod(ScrollingMovementMethod.getInstance());
         tv.setTextColor(Color.WHITE);
