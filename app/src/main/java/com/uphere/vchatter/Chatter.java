@@ -16,14 +16,9 @@
 package com.uphere.vchatter;
 
 import android.app.Activity;
-
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.net.Uri;
@@ -39,7 +34,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toolbar;
 import android.widget.VideoView;
-import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -54,39 +48,11 @@ import java.io.IOException;
 import java.util.List;
 
 
+import com.uphere.vchatter.NicknameDialogFragment;
 
-    
 public class Chatter extends Activity
 {
-    private class NicknameDialogFragment extends DialogFragment {
-	// private String result;
-	private EditText input; 
-	
-	@Override
-	public Dialog onCreateDialog(Bundle savedInstanceState) {
-	    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-	    LayoutInflater i = getLayoutInflater();
-	    View view = i.inflate(R.layout.dialog, null);
-	    
-	    builder.setMessage("Set your nickname")
-		.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-			    Dialog f = (Dialog) dialog;
-			    input = (EditText)f.findViewById(R.id.edit_nickname );
-			    nickname = input.getText().toString();
-			}
-		    })
-		.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-			    dialog.dismiss();
-			}
-		    });
-	    builder.setView(view);
-	    
-	    return builder.create();
-	}
-	
-    }
+    NicknameDialogFragment dialog;
 
     Button button;
     TextView  tv;
@@ -127,8 +93,8 @@ public class Chatter extends Activity
 		@Override
 		public void onClick(View view) {
 		    String msg = msginput.getText().toString();
-		    if(nickname != null && msg != null) { 
-        		onClickHS(tv,nickname,msg);
+		    if(dialog.nickname != null && msg != null) { 
+        		onClickHS(tv,dialog.nickname,msg);
 			msginput.setText("");
 		    }
 		}
@@ -150,8 +116,9 @@ public class Chatter extends Activity
 	vv.start();
 
 	FragmentManager fm = getFragmentManager();
-	NicknameDialogFragment n = new NicknameDialogFragment();
-	n.show(fm,"fragment_nickname");
+	// NicknameDialogFragment
+	dialog = new NicknameDialogFragment(this);
+	dialog.show(fm,"fragment_nickname");
 	    
     }
 
