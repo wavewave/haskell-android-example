@@ -64,16 +64,21 @@
 		android:layout_above="@id/button"
 		android:hint="message" /> 
       
-      
-      <TextView
-	  android:id="@+id/textview"
+      <ScrollView
+	  android:id="@+id/scrollview"
 	  android:layout_width="match_parent"
 	  android:layout_height="match_parent"
 	  android:layout_above="@id/edit_msg"
-	  android:maxLines = "1000"
-	  android:scrollbars = "vertical"
-	  android:gravity="bottom"
-	  />
+	  android:layout_gravity="bottom" >
+	<TextView
+	    android:id="@+id/textview"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:maxLines = "1000"
+	    android:scrollbars = "vertical"
+	    android:gravity="bottom"
+	    />
+      </ScrollView>
     </RelativeLayout>
   </FrameLayout>
 </RelativeLayout>
