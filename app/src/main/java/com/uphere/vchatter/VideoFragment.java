@@ -27,7 +27,8 @@ public class VideoFragment extends Fragment
 
     Chatter parent;
     public TextView  tv;
-
+    public ScrollView sv;
+    
     Button button;
 
     Toolbar toolbar;
@@ -64,6 +65,8 @@ public class VideoFragment extends Fragment
 	tv = (TextView) rootView.findViewById(R.id.textview);
 	tv.setMovementMethod(ScrollingMovementMethod.getInstance());
         tv.setTextColor(Color.WHITE);
+
+	sv = (ScrollView) rootView.findViewById(R.id.scrollview);
 	
 	msginput = (EditText) rootView.findViewById(R.id.edit_msg);
         msginput.setTextColor(Color.WHITE);

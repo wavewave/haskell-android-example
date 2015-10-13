@@ -80,6 +80,12 @@ public class Chatter extends Activity
 		public void run() {
 		    //Log.d("UPHERE", "sendMsgToChatter : " + msg1); 
 		    vfrag.tv.append(msg1);
+		    vfrag.sv.post( new Runnable() {
+			    public void run() {
+				vfrag.sv.fullScroll(View.FOCUS_DOWN);
+			    }
+				
+			});
 		    //synchronized(this) {
 		    //	this.notify();
 		    //}
