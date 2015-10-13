@@ -95,6 +95,8 @@ void* reader_runtime( void* d )
 
 void* writer_runtime( void* d )
 {
+  __android_log_write( 3, "UPHERE", "1:  writer_runtime");
+
   JNIEnv* env;
   JavaVMAttachArgs args;
   args.version = JNI_VERSION_1_6;
@@ -105,7 +107,6 @@ void* writer_runtime( void* d )
     pthread_mutex_lock(&wlock);
     pthread_cond_wait(&wcond,&wlock);
     pthread_mutex_unlock(&wlock);
-
     Chatter_sendMsgToChatter( env, ref_act, wmessage );
   }
   return NULL;
@@ -113,7 +114,6 @@ void* writer_runtime( void* d )
 
 JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
   jvm = vm; 
-  // pthread_mutex_lock(&lock);
   pthread_create( &thr_haskell, NULL, &haskell_runtime, NULL );
   
   return JNI_VERSION_1_6;
@@ -137,8 +137,8 @@ Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity)
 }
   
 void
-Java_com_uphere_vchatter_Chatter_onClickHS( JNIEnv* env, jobject this, jobject that,
-					   jstring nick, jstring msg)
+Java_com_uphere_vchatter_VideoFragment_onClickHS( JNIEnv* env, jobject f, jobject v,
+				     	          jstring nick, jstring msg)
 {
   char* cmsg = (*env)->GetStringUTFChars(env,msg,0);
   char* cnick = (*env)->GetStringUTFChars(env,nick,0);

@@ -10,14 +10,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-
+import com.uphere.vchatter.Chatter;
+    
 public class NicknameDialogFragment extends DialogFragment {
-    public String nickname;
+    //public String nickname;
     private EditText input;
-    private Activity parent;
+    private Chatter parent;
 
     
-    public NicknameDialogFragment( Activity p ) {
+    public NicknameDialogFragment( Chatter p ) {
 	parent = p;
     }
     
@@ -32,7 +33,7 @@ public class NicknameDialogFragment extends DialogFragment {
 		    public void onClick(DialogInterface dialog, int id) {
 			Dialog f = (Dialog) dialog;
 			input = (EditText)f.findViewById(R.id.edit_nickname );
-			nickname = input.getText().toString();
+			parent.nickname = input.getText().toString();
 		    }
 		})
 	    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
