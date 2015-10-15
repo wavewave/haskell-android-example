@@ -14,14 +14,15 @@
 #include <pthread.h>
 #include <string.h>
 
+#include "uthash.h"
 
 extern void __stginit_Client(void);
 
 extern void chatter( void );
 
-void (*fptr_callback)(JNIEnv*, jobject, char*, char*);
+void (*fptr_callback)(char*, char*);
 
-void register_callback_fptr ( void (*v)(JNIEnv*,jobject, char*, char*) ) {
+void register_callback_fptr ( void (*v)(char*, char*) ) {
   fptr_callback = v;
 }
 
@@ -40,13 +41,27 @@ pthread_mutex_t wcond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t wlock2 = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t wcond2 = PTHREAD_COND_INITIALIZER;
 
-jobject ref_act; 
 
 char nickbox[4096];
 char messagebox[4096]; 
 
 char wmessage[4096];
 
+//JNIEnv* ref_env;
+//jobject ref_act; 
+jclass ref_class;
+jmethodID ref_mid;
+
+struct my_jobject {
+  int id;
+  jobject ref;
+  UT_hash_handle hh;
+};
+
+struct my_jobject *ref_objs = NULL;
+
+
+/*
 void Chatter_sendMsgToChatter ( JNIEnv* env, jobject activity, char* cmsg ) { 
   jclass cls = (*env)->GetObjectClass(env, activity);
   if( cls ) {
@@ -62,8 +77,31 @@ void Chatter_sendMsgToChatter ( JNIEnv* env, jobject activity, char* cmsg ) {
     (*env)->DeleteLocalRef(env,cls);
   }
 }
+*/
+
+void prepareJni( JNIEnv* env ) {
+  struct my_jobject* s;
+  int k = 1;
+  HASH_FIND_INT( ref_objs, &k, s );
+  jclass cls = (*env)->GetObjectClass(env, s->ref);
+  //jclass cls = (*env)->FindClass(env,"com/uphere/jchatter/Chatter"); 
+  if( cls ) {
+    ref_mid = (*env)->GetMethodID(env, cls, "sendMsgToChatter", "(Ljava/lang/String;)V");
+    // (*env)->DeleteLocalRef(env,cls);
+  }
+}
 
 
+void callJniTest( JNIEnv* env, char* cmsg )
+{
+  jstring jmsg = (*env)->NewStringUTF(env,cmsg);
+  if( jmsg ) {
+    struct my_jobject *s; 
+    int k = 1;
+    HASH_FIND_INT( ref_objs, &k, s );
+    (*env)->CallVoidMethod(env,s->ref,ref_mid,jmsg);
+  }  
+}  
 
 
 void* haskell_runtime( void* d )
@@ -73,7 +111,6 @@ void* haskell_runtime( void* d )
   static RtsConfig rtsopts = { RtsOptsAll, "-H128m -K64m" };
   // hs_init(&argc, &argv_);
   hs_init_ghc(&argc,&argv_, rtsopts);
-  __android_log_write( 3, "UPHERE", "start" ) ; 
   chatter();
   return NULL;
 }
@@ -85,13 +122,13 @@ void* reader_runtime( void* d )
   args.version = JNI_VERSION_1_6;
   args.name = NULL;
   args.group = NULL;
-  (*jvm)->AttachCurrentThread(jvm,(void**)&env, &args); 
+  (*jvm)->AttachCurrentThread(jvm,(void**)&env, &args);
   while( 1 ) {
     pthread_mutex_lock(&lock);
     pthread_cond_wait(&cond,&lock);
     pthread_mutex_unlock(&lock);
 
-    fptr_callback(env,ref_act,nickbox,messagebox);
+    fptr_callback(nickbox,messagebox);
   }
   return NULL;
 }
@@ -103,22 +140,15 @@ void* writer_runtime( void* d )
   args.version = JNI_VERSION_1_6;
   args.name = NULL;
   args.group = NULL;
-  (*jvm)->AttachCurrentThread(jvm,(void**)&env, &args); 
+  (*jvm)->AttachCurrentThread(jvm,(void**)&env, &args);
+  prepareJni(env);
   while( 1 ) {
     pthread_mutex_lock(&wlock);
-    //__android_log_write(3,"UPHERE","checkpoint1");
     pthread_cond_wait(&wcond,&wlock);
-    //__android_log_write(3,"UPHERE","checkpoint2");
-    Chatter_sendMsgToChatter( env, ref_act, wmessage );
-    //__android_log_write(3,"UPHERE","checkpoint3");
+    //Chatter_sendMsgToChatter( env, ref_act, wmessage );
+    callJniTest( env, wmessage );
     pthread_cond_signal(&wcond);
-    //__android_log_write(3,"UPHERE","checkpoint4");   
     pthread_mutex_unlock(&wlock);
-
-    
-    //pthread_mutex_lock(&wlock2);
-    //pthread_mutex_unlock(&wlock2);
-    //__android_log_write(3,"UPHERE","I've got here 2");    
     
   }
   return NULL;
@@ -142,13 +172,23 @@ JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
   
   JNIEnv* env ;
   (*vm)->GetEnv(vm,(void**)(&env),JNI_VERSION_1_6);
-  (*env)->DeleteGlobalRef(env,ref_act);
+  int k = 1 ; 
+  struct my_jobject* r;
+
+  HASH_FIND_INT( ref_objs, &k, r );
+  if( r ) 
+    (*env)->DeleteGlobalRef(env,r->ref);
 } 
 
 void
 Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity)
 {
-  ref_act = (*env)->NewGlobalRef(env,activity);
+  jobject ref_act = (*env)->NewGlobalRef(env,activity);
+  struct my_jobject *s ;
+  s = malloc(sizeof(struct my_jobject));
+  s->id = 1 ;
+  s->ref = ref_act; 
+  HASH_ADD_INT( ref_objs, id, s );
   pthread_create( &thr_msgread, NULL, &reader_runtime, NULL );
   pthread_create( &thr_msgwrite, NULL, &writer_runtime, NULL );
 }
@@ -174,13 +214,7 @@ void write_message( char* cmsg )
   pthread_mutex_lock(&wlock);
   strcpy( wmessage , cmsg);
   pthread_cond_signal(&wcond);
-  //__android_log_write(3,"UPHERE","write_message");
-  //__android_log_write(3,"UPHERE",cmsg);
   pthread_cond_wait(&wcond,&wlock);
   pthread_mutex_unlock(&wlock);
-
-  //pthread_mutex_lock(&wlock2);
-  //pthread_mutex_lock(&wlock2);
-
 }
  
