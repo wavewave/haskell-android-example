@@ -80,11 +80,11 @@ void Chatter_sendMsgToChatter ( JNIEnv* env, jobject activity, char* cmsg ) {
 */
 
 void prepareJni( JNIEnv* env ) {
-  struct my_jobject* s;
-  int k = 1;
-  HASH_FIND_INT( ref_objs, &k, s );
-  jclass cls = (*env)->GetObjectClass(env, s->ref);
-  //jclass cls = (*env)->FindClass(env,"com/uphere/jchatter/Chatter"); 
+  //struct my_jobject* s;
+  //int k = 1;
+  //HASH_FIND_INT( ref_objs, &k, s );
+  //jclass cls = (*env)->GetObjectClass(env, s->ref);
+  jclass cls = (*env)->FindClass(env,"com/uphere/vchatter/Chatter"); 
   if( cls ) {
     ref_mid = (*env)->GetMethodID(env, cls, "sendMsgToChatter", "(Ljava/lang/String;)V");
     // (*env)->DeleteLocalRef(env,cls);
@@ -141,7 +141,6 @@ void* writer_runtime( void* d )
   args.name = NULL;
   args.group = NULL;
   (*jvm)->AttachCurrentThread(jvm,(void**)&env, &args);
-  prepareJni(env);
   while( 1 ) {
     pthread_mutex_lock(&wlock);
     pthread_cond_wait(&wcond,&wlock);
@@ -155,7 +154,11 @@ void* writer_runtime( void* d )
 }
 
 JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
-  jvm = vm; 
+  jvm = vm;
+  JNIEnv* env;
+  (*jvm)->GetEnv(jvm, (void **)&env, JNI_VERSION_1_6);
+  prepareJni(env);
+  
   pthread_create( &thr_haskell, NULL, &haskell_runtime, NULL );
   
   return JNI_VERSION_1_6;
