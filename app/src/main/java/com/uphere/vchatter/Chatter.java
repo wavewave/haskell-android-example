@@ -27,6 +27,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.List;
 
+import com.uphere.vchatter.ObjectRegisterer; 
 import com.uphere.vchatter.CameraFragment;
 import com.uphere.vchatter.NicknameDialogFragment;
 import com.uphere.vchatter.VideoFragment;
@@ -56,6 +57,7 @@ public class Chatter extends Activity
         super.onCreate(savedInstanceState);
 	setContentView(R.layout.chatter);
 	onCreateHS(0);
+	ObjectRegisterer.registerJRef(0,this);
 	
 	FragmentManager fm = getFragmentManager();
         
@@ -74,7 +76,7 @@ public class Chatter extends Activity
     
     public native void onCreateHS( int k ); 
 
-    public native void registerJRef( int k, Object v );
+    // public native void registerJRef( int k, Object v );
 
     public void sendMsgToChatter( String msg ) {
 	final String msg1 = msg;

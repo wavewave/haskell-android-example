@@ -78,8 +78,15 @@ void callJniTest( JNIEnv* env, char* cmsg )
   if( jmsg ) {
     struct my_jobject *s; 
     //int k = 1;
+    
     HASH_FIND_INT( ref_objs, &activityId, s );
-    (*env)->CallVoidMethod(env,s->ref,ref_mid,jmsg);
+    if( s ) {
+      (*env)->CallVoidMethod(env,s->ref,ref_mid,jmsg);
+      
+    }
+    else {
+      __android_log_write(3, "UPHERE", "NON EXIST");
+    }
   }  
 }  
 
@@ -154,12 +161,15 @@ JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
   
   JNIEnv* env ;
   (*vm)->GetEnv(vm,(void**)(&env),JNI_VERSION_1_6);
+
+  /* unregistering 
   int k = 1 ; 
   struct my_jobject* r;
 
   HASH_FIND_INT( ref_objs, &k, r );
   if( r ) 
     (*env)->DeleteGlobalRef(env,r->ref);
+  */
 } 
 
 void
@@ -171,27 +181,32 @@ Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity, jint
 }
 
 
-Java_com_uphere_vchatter_Chatter_registerJRef( JNIEnv* env, jobject activity
-					       jint k, jobject v )
+Java_com_uphere_vchatter_ObjectRegisterer_registerJRef( JNIEnv* env, jobject obj, jint k, jobject v )
 {
+
+  __android_log_write(3,"UPHERE", " I Am here" );
+  char str[1000] ;
+  sprintf(str, "k = %d, v = %d ", k, v );
+  __android_log_write(3,"UPHERE", str );
+  
   jobject ref = (*env)->NewGlobalRef(env,v);
   struct my_jobject *s ;
   s = malloc(sizeof(struct my_jobject));
   s->id = k ;
   s->ref = ref; 
-  HASH_ADD_INT( ref_objs, k, s );
+  HASH_ADD_INT( ref_objs, id, s );
 
   
 }
   
 void
 Java_com_uphere_vchatter_VideoFragment_onCreateHS( JNIEnv* env, jobject f,
-						   jint id, jobject tv )
+						   jint k, jobject tv )
 {
   jobject ref  = (*env)->NewGlobalRef(env,tv);
   struct my_jobject *s ;
   s = malloc(sizeof(struct my_jobject));
-  s->id = id ;
+  s->id = k ;
   s->ref = ref; 
   HASH_ADD_INT( ref_objs, id, s );
 }
@@ -200,8 +215,6 @@ void
 Java_com_uphere_vchatter_VideoFragment_onClickHS( JNIEnv* env, jobject f,
 				     	          jstring nick, jstring msg)
 {
-
-  
   char* cmsg = (*env)->GetStringUTFChars(env,msg,0);
   char* cnick = (*env)->GetStringUTFChars(env,nick,0);
   pthread_mutex_lock(&lock);
