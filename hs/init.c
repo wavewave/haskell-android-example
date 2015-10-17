@@ -49,6 +49,8 @@ char wmessage[4096];
 
 //JNIEnv* ref_env;
 //jobject ref_act; 
+
+int activityId;
 jclass ref_class;
 jmethodID ref_mid;
 
@@ -61,33 +63,11 @@ struct my_jobject {
 struct my_jobject *ref_objs = NULL;
 
 
-/*
-void Chatter_sendMsgToChatter ( JNIEnv* env, jobject activity, char* cmsg ) { 
-  jclass cls = (*env)->GetObjectClass(env, activity);
-  if( cls ) {
-    jmethodID mid =
-      (*env)->GetMethodID(env, cls, "sendMsgToChatter",
-			  "(Ljava/lang/String;)V");
-    if( mid ) {
-      jstring jmsg = (*env)->NewStringUTF(env,cmsg);
-      if( jmsg ) { 
-        (*env)->CallVoidMethod(env,activity,mid,jmsg);
-      }
-    }
-    (*env)->DeleteLocalRef(env,cls);
-  }
-}
-*/
-
 void prepareJni( JNIEnv* env ) {
-  //struct my_jobject* s;
-  //int k = 1;
-  //HASH_FIND_INT( ref_objs, &k, s );
-  //jclass cls = (*env)->GetObjectClass(env, s->ref);
   jclass cls = (*env)->FindClass(env,"com/uphere/vchatter/Chatter"); 
   if( cls ) {
     ref_mid = (*env)->GetMethodID(env, cls, "sendMsgToChatter", "(Ljava/lang/String;)V");
-    // (*env)->DeleteLocalRef(env,cls);
+    (*env)->DeleteLocalRef(env,cls);
   }
 }
 
@@ -97,8 +77,8 @@ void callJniTest( JNIEnv* env, char* cmsg )
   jstring jmsg = (*env)->NewStringUTF(env,cmsg);
   if( jmsg ) {
     struct my_jobject *s; 
-    int k = 1;
-    HASH_FIND_INT( ref_objs, &k, s );
+    //int k = 1;
+    HASH_FIND_INT( ref_objs, &activityId, s );
     (*env)->CallVoidMethod(env,s->ref,ref_mid,jmsg);
   }  
 }  
@@ -144,7 +124,6 @@ void* writer_runtime( void* d )
   while( 1 ) {
     pthread_mutex_lock(&wlock);
     pthread_cond_wait(&wcond,&wlock);
-    //Chatter_sendMsgToChatter( env, ref_act, wmessage );
     callJniTest( env, wmessage );
     pthread_cond_signal(&wcond);
     pthread_mutex_unlock(&wlock);
@@ -184,20 +163,27 @@ JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
 } 
 
 void
-Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity)
+Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity, jint k)
 {
-  jobject ref_act = (*env)->NewGlobalRef(env,activity);
-  struct my_jobject *s ;
-  s = malloc(sizeof(struct my_jobject));
-  s->id = 1 ;
-  s->ref = ref_act; 
-  HASH_ADD_INT( ref_objs, id, s );
-
+  activityId = k;
   pthread_create( &thr_msgread, NULL, &reader_runtime, NULL );
   pthread_create( &thr_msgwrite, NULL, &writer_runtime, NULL );
 }
 
 
+Java_com_uphere_vchatter_Chatter_registerJRef( JNIEnv* env, jobject activity
+					       jint k, jobject v )
+{
+  jobject ref = (*env)->NewGlobalRef(env,v);
+  struct my_jobject *s ;
+  s = malloc(sizeof(struct my_jobject));
+  s->id = k ;
+  s->ref = ref; 
+  HASH_ADD_INT( ref_objs, k, s );
+
+  
+}
+  
 void
 Java_com_uphere_vchatter_VideoFragment_onCreateHS( JNIEnv* env, jobject f,
 						   jint id, jobject tv )

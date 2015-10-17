@@ -78,21 +78,6 @@ public class VideoFragment extends Fragment
 		    return false;
 		}
 	    });
-	/*
-	button = (Button) rootView.findViewById(R.id.button);
-        button.setOnClickListener( new View.OnClickListener() {
-		@Override
-		public void onClick(View view) {
-		    String msg = msginput.getText().toString();
-		    if(parent.nickname != null && msg != null)
-		    {
-        		onClickHS(tv,parent.nickname,msg);
-			msginput.setText("");
-		    }
-		}
-		
-	    }); 
-	*/
 	
 	vv = (VideoView) rootView.findViewById(R.id.myvideo);
 	String vaddr = "http://ianwookim.org/video/test.mp4";

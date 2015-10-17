@@ -55,7 +55,7 @@ public class Chatter extends Activity
     {
         super.onCreate(savedInstanceState);
 	setContentView(R.layout.chatter);
-	onCreateHS();
+	onCreateHS(0);
 	
 	FragmentManager fm = getFragmentManager();
         
@@ -72,13 +72,14 @@ public class Chatter extends Activity
 
     }
     
-    public native void onCreateHS(); 
-    
+    public native void onCreateHS( int k ); 
+
+    public native void registerJRef( int k, Object v );
+
     public void sendMsgToChatter( String msg ) {
 	final String msg1 = msg;
 	final Runnable myrun = new Runnable() {
 		public void run() {
-		    //Log.d("UPHERE", "sendMsgToChatter : " + msg1); 
 		    vfrag.tv.append(msg1);
 		    vfrag.sv.post( new Runnable() {
 			    public void run() {
@@ -86,22 +87,10 @@ public class Chatter extends Activity
 			    }
 				
 			});
-		    //synchronized(this) {
-		    //	this.notify();
-		    //}
 		}
 	    };
 
-	//synchronized( myrun ) { 
 	    runOnUiThread(myrun);
-	    //   try {     
-	    //	myrun.wait();
-	    //  }
-	    // catch (InterruptedException e) {
-	    //e.printStackTrace();
-	    // }
-	    //}
-	
     }
     
    
