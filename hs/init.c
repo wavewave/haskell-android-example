@@ -20,9 +20,9 @@ extern void __stginit_Client(void);
 
 extern void chatter( void );
 
-void (*fptr_callback)(char*, char*);
+void (*fptr_callback)(char*, int, char*, int);
 
-void register_callback_fptr ( void (*v)(char*, char*) ) {
+void register_callback_fptr ( void (*v)(char*, int, char*, int) ) {
   fptr_callback = v;
 }
 
@@ -42,9 +42,13 @@ pthread_mutex_t wlock2 = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t wcond2 = PTHREAD_COND_INITIALIZER;
 
 
+int size_nickbox =0;
 char nickbox[4096];
+
+int size_messagebox = 0;
 char messagebox[4096]; 
 
+int size_wmessage = 0;
 char wmessage[4096];
 
 //JNIEnv* ref_env;
@@ -66,28 +70,28 @@ struct my_jobject *ref_objs = NULL;
 void prepareJni( JNIEnv* env ) {
   jclass cls = (*env)->FindClass(env,"com/uphere/vchatter/Chatter"); 
   if( cls ) {
-    ref_mid = (*env)->GetMethodID(env, cls, "sendMsgToChatter", "(Ljava/lang/String;)V");
+    ref_mid = (*env)->GetMethodID(env, cls, "sendMsgToChatter", "([B)V");
     (*env)->DeleteLocalRef(env,cls);
   }
 }
 
 
-void callJniTest( JNIEnv* env, char* cmsg )
+void callJniTest( JNIEnv* env, char* cmsg, int n )
 {
-  jstring jmsg = (*env)->NewStringUTF(env,cmsg);
-  if( jmsg ) {
-    struct my_jobject *s; 
-    //int k = 1;
+  // jstring jmsg = (*env)->NewStringUTF(env,cmsg);
+  jbyteArray jmsg = (*env)->NewByteArray(env,n);
+  (*env)->SetByteArrayRegion(env,jmsg,0,n,(jbyte*)cmsg);
+  struct my_jobject *s; 
+
+  HASH_FIND_INT( ref_objs, &activityId, s );
+  if( s ) {
+    (*env)->CallVoidMethod(env,s->ref,ref_mid,jmsg);
     
-    HASH_FIND_INT( ref_objs, &activityId, s );
-    if( s ) {
-      (*env)->CallVoidMethod(env,s->ref,ref_mid,jmsg);
-      
-    }
-    else {
-      __android_log_write(3, "UPHERE", "NON EXIST");
-    }
-  }  
+  }
+  else {
+    __android_log_write(3, "UPHERE", "NON EXIST");
+  }
+
 }  
 
 
@@ -115,7 +119,10 @@ void* reader_runtime( void* d )
     pthread_cond_wait(&cond,&lock);
     pthread_mutex_unlock(&lock);
 
-    fptr_callback(nickbox,messagebox);
+    //size_t m = strlen(nickbox); 
+    //size_t n = strlen(messagebox);
+    
+    fptr_callback(nickbox,size_nickbox,messagebox,size_messagebox);
   }
   return NULL;
 }
@@ -131,7 +138,7 @@ void* writer_runtime( void* d )
   while( 1 ) {
     pthread_mutex_lock(&wlock);
     pthread_cond_wait(&wcond,&wlock);
-    callJniTest( env, wmessage );
+    callJniTest( env, wmessage, size_wmessage );
     pthread_cond_signal(&wcond);
     pthread_mutex_unlock(&wlock);
     
@@ -213,24 +220,32 @@ Java_com_uphere_vchatter_VideoFragment_onCreateHS( JNIEnv* env, jobject f,
 
 void
 Java_com_uphere_vchatter_VideoFragment_onClickHS( JNIEnv* env, jobject f,
-				     	          jstring nick, jstring msg)
+				     	          jbyteArray nick, jbyteArray msg)
 {
-  char* cmsg = (*env)->GetStringUTFChars(env,msg,0);
-  char* cnick = (*env)->GetStringUTFChars(env,nick,0);
+  char* cnick = (*env)->GetByteArrayElements(env,nick,NULL);
+  char* cmsg  = (*env)->GetByteArrayElements(env,msg,NULL);
   pthread_mutex_lock(&lock);
   strcpy( messagebox , cmsg);
   strcpy( nickbox, cnick);
+  size_nickbox = (*env)->GetArrayLength(env,nick);
+  size_messagebox = (*env)->GetArrayLength(env,msg);
+  char logmsg[100];
+  sprintf(logmsg,"size_messagebox = %d", size_messagebox);
+  __android_log_write(3,"UPHERE", logmsg );
+
+  
   pthread_cond_signal(&cond);
   pthread_mutex_unlock(&lock);
-  (*env)->ReleaseStringUTFChars(env,msg,cmsg);
-  (*env)->ReleaseStringUTFChars(env,nick,cnick);
+  (*env)->ReleaseByteArrayElements(env,msg,cmsg,NULL);
+  (*env)->ReleaseByteArrayElements(env,nick,cnick,NULL);
   
 }
 
-void write_message( char* cmsg )
+void write_message( char* cmsg, int n )
 {
   pthread_mutex_lock(&wlock);
   strcpy( wmessage , cmsg);
+  size_wmessage = n;
   pthread_cond_signal(&wcond);
   pthread_cond_wait(&wcond,&wlock);
   pthread_mutex_unlock(&wlock);

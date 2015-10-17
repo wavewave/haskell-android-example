@@ -18,9 +18,11 @@ import           Data.Foldable
 import           Data.Function (on)
 import           Data.IORef
 import           Data.List (sortBy)
-import           Data.Text (Text, append, pack)
+import           Data.Monoid
+-- import           Data.Text (Text, append, pack)
 import qualified Data.Text as T
 import           Data.Text.Binary
+import qualified Data.Text.Foreign as TF
 import qualified Data.Text.IO as TIO
 import           Foreign.C.String
 import           Foreign.C.Types
@@ -43,21 +45,27 @@ data JNINativeInterface_
 type JNIEnv = Ptr (Ptr JNINativeInterface_)
 
 foreign import ccall safe "wrapper" mkCallbackFPtr
-  :: (CString -> CString -> IO ()) -> IO (FunPtr (CString -> CString -> IO ()))
+  :: (CString -> CInt -> CString -> CInt -> IO ())
+  -> IO (FunPtr (CString -> CInt -> CString -> CInt -> IO ()))
 
 foreign import ccall safe "register_callback_fptr"
-  registerCallbackFPtr :: FunPtr (CString -> CString -> IO ()) -> IO ()
+  registerCallbackFPtr :: FunPtr (CString -> CInt -> CString -> CInt -> IO ()) -> IO ()
 
 foreign import ccall safe "__android_log_write"
   androidLogWrite :: CInt -> CString -> CString -> IO CInt
 
--- foreign import ccall "Chatter_sendMsgToChatter"
---   c_Chatter_sendMsgToChatter :: JNIEnv -> JObject -> CString -> CString -> IO ()
-
 foreign import ccall safe "write_message"
-  c_write_message :: CString -> IO ()
+  c_write_message :: CString -> CInt -> IO ()
 
 foreign export ccall "chatter" chatter :: IO ()
+
+{-
+cStrLen :: CStringLen -> CInt
+cStrLen = mkCInt . snd
+
+cStr :: CStringLen -> CString
+cStr = fst
+-}
 
 exceptionHandler = \(e :: SomeException) -> do
   withCString "UPHERE" $ \ctag -> 
@@ -86,12 +94,12 @@ clientReceiver logvar ipaddrstr = forever $ do
                   put n'        
   threadDelay 1000000
 
-clientSender :: TVar [Message] -> TMVar (String,String) -> String -> IO ()
+clientSender :: TVar [Message] -> TMVar (T.Text,T.Text) -> String -> IO ()
 clientSender logvar tvar ipaddrstr = forever $ do 
   flip catch exceptionHandler $ do 
     connect ipaddrstr "5003" $ \(sock,_addr) -> forever $ do
-      (username,str) <- atomically $ takeTMVar tvar
-      packAndSend sock (T.pack username, T.pack str)
+      (username,msg) <- atomically $ takeTMVar tvar
+      packAndSend sock (username, msg)
 
 chatter :: IO ()
 chatter = do
@@ -103,10 +111,11 @@ chatter = do
   forkIO $ clientReceiver logvar "ianwookim.org" 
   messageViewer logvar
 
-onClick :: (TMVar (String,String), TVar [Message]) -> CString -> CString -> IO ()
-onClick (sndvar,logvar) cnick cmsg = do
-  nick <- peekCString cnick
-  msg <- peekCString cmsg
+onClick :: (TMVar (T.Text,T.Text), TVar [Message]) -> CString -> CInt -> CString -> CInt
+        -> IO ()
+onClick (sndvar,logvar) cnick m cmsg n = do
+  nick <- TF.peekCStringLen (cnick,fromIntegral m)
+  msg <- TF.peekCStringLen (cmsg,fromIntegral n)
   atomically $ putTMVar sndvar (nick,msg)
 
                                 
@@ -119,14 +128,17 @@ messageViewer logvar = forever $ do
   let formatted = (map format . reverse) msgs
   mapM_ (\x -> printLog x >> printMsg x) formatted
   -- mapM_ (printMsg . format) . reverse $ msgs
- where format x = show (messageNum x) ++ " : " ++
-                  T.unpack (messageUser x) ++ " : " ++
-                  T.unpack (messageBody x) ++ "\n"
+ where format x = T.pack (show (messageNum x)) <> " : " <>
+                  messageUser x <> " : " <>
+                  messageBody x <> "\n"
 
 
-printMsg :: String -> IO ()
-printMsg msg = withCString msg $ \cmsg -> c_write_message cmsg
+printMsg :: T.Text -> IO ()
+printMsg msg =
+  TF.withCStringLen msg $
+    \(cmsg,n) -> c_write_message cmsg (fromIntegral n)
 
-printLog :: String -> IO ()
-printLog msg = withCString "UPHERE" $ \ctag ->
-                 withCString msg $ \cmsg -> androidLogWrite 3 ctag cmsg >> return ()
+printLog :: T.Text -> IO ()
+printLog msg = TF.withCStringLen "UPHERE" $ \(ctag,_) ->
+                 TF.withCStringLen msg $ \(cmsg,_) ->
+                   androidLogWrite 3 ctag cmsg >> return ()

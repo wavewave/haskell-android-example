@@ -1,5 +1,7 @@
 package com.uphere.vchatter;
 
+import java.io.UnsupportedEncodingException;
+//
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -70,9 +72,13 @@ public class VideoFragment extends Fragment
 		    if (actionId == EditorInfo.IME_ACTION_DONE) {
 			String msg = msginput.getText().toString();
 			if(parent.nickname != null && msg != null) {
-			    onClickHS(parent.nickname,msg);
-			    msginput.setText("");
-			    return true;
+			    try { 
+				onClickHS( parent.nickname.getBytes("UTF-8"),
+					   msg.getBytes("UTF-8"));
+				msginput.setText("");
+				return true;
+			    } catch (UnsupportedEncodingException e) {
+			    }
 			}
 		    }
 		    return false;
@@ -91,6 +97,6 @@ public class VideoFragment extends Fragment
 
     public native void onCreateHS( int id, TextView tv );
     
-    public native void onClickHS( String nick, String msg);
+    public native void onClickHS( byte[] nick, byte[] msg ); // ( String nick, String msg);
     
 }

@@ -45,5 +45,5 @@ public class NicknameDialogFragment extends DialogFragment {
 	
 	return builder.create();
     }
-    
+
 }

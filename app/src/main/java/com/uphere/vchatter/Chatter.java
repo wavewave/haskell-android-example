@@ -1,5 +1,9 @@
 package com.uphere.vchatter;
 
+import java.io.UnsupportedEncodingException;
+import java.io.IOException;
+import java.util.List;
+//
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -24,8 +28,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
-import java.io.IOException;
-import java.util.List;
 
 import com.uphere.vchatter.ObjectRegisterer; 
 import com.uphere.vchatter.CameraFragment;
@@ -39,16 +41,6 @@ public class Chatter extends Activity
     
     public String nickname;
 
-    /*    Button button;
-    TextView  tv;
-
-    Toolbar toolbar;
-    private EditText msginput;
-    */
-
-    //Camera mCamera;
-    //CameraPreview mPreview;
-    //private View mCameraView;
 
     
     @Override
@@ -76,23 +68,25 @@ public class Chatter extends Activity
     
     public native void onCreateHS( int k ); 
 
-    // public native void registerJRef( int k, Object v );
-
-    public void sendMsgToChatter( String msg ) {
-	final String msg1 = msg;
-	final Runnable myrun = new Runnable() {
-		public void run() {
-		    vfrag.tv.append(msg1);
-		    vfrag.sv.post( new Runnable() {
-			    public void run() {
-				vfrag.sv.fullScroll(View.FOCUS_DOWN);
-			    }
+    public void sendMsgToChatter( byte[] msg ) {  // ( String msg ) {
+	try { 
+	    final String msg1 = new String(msg, "UTF-8");
+	    final Runnable myrun = new Runnable() {
+		    public void run() {
+			vfrag.tv.append(msg1);
+			vfrag.sv.post( new Runnable() {
+				public void run() {
+				    vfrag.sv.fullScroll(View.FOCUS_DOWN);
+				}
 				
-			});
-		}
-	    };
-
+			    });
+		    }
+		};
 	    runOnUiThread(myrun);
+	    
+	} catch(UnsupportedEncodingException e) {
+	}
+
     }
     
    
