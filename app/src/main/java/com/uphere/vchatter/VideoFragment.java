@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.inputmethod.EditorInfo;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,10 +23,9 @@ import android.widget.VideoView;
 import com.uphere.vchatter.Chatter;
 
 
-
 public class VideoFragment extends Fragment
 {
-
+     
     Chatter parent;
     public TextView  tv;
     public ScrollView sv;
@@ -37,7 +38,6 @@ public class VideoFragment extends Fragment
 
     VideoView vv;
 
-    //public VideoFragment() { }
      
     public VideoFragment( Chatter p ) {
 	parent = p;
@@ -52,26 +52,33 @@ public class VideoFragment extends Fragment
 	toolbar.setTitle("Chat");
 	toolbar.setSubtitle("This uses chatter haskell program.");
 
-
-        // ScrollView sv = (ScrollView)rootView.findViewById(R.id.scrollview);	
-        //sv.setOnClickListener( new View.OnClickListener() {
-	//	@Override
-	//	public void onClick(View view) {
-	//		    Log.d("UPHERE", "text veiew on click");
-	//	}
-	//   });
-
-	
 	tv = (TextView) rootView.findViewById(R.id.textview);
 	tv.setMovementMethod(ScrollingMovementMethod.getInstance());
         tv.setTextColor(Color.WHITE);
 
+	onCreateHS( R.id.textview, tv );
+	
 	sv = (ScrollView) rootView.findViewById(R.id.scrollview);
 	
 	msginput = (EditText) rootView.findViewById(R.id.edit_msg);
         msginput.setTextColor(Color.WHITE);
 	msginput.setHintTextColor(Color.GRAY);
-	
+	msginput.setImeOptions(EditorInfo.IME_ACTION_DONE);
+	msginput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+		@Override
+		public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+		    if (actionId == EditorInfo.IME_ACTION_DONE) {
+			String msg = msginput.getText().toString();
+			if(parent.nickname != null && msg != null) {
+			    onClickHS(parent.nickname,msg);
+			    msginput.setText("");
+			    return true;
+			}
+		    }
+		    return false;
+		}
+	    });
+	/*
 	button = (Button) rootView.findViewById(R.id.button);
         button.setOnClickListener( new View.OnClickListener() {
 		@Override
@@ -85,16 +92,20 @@ public class VideoFragment extends Fragment
 		}
 		
 	    }); 
-
+	*/
+	
 	vv = (VideoView) rootView.findViewById(R.id.myvideo);
 	String vaddr = "http://ianwookim.org/video/test.mp4";
 	Uri vuri = Uri.parse(vaddr);
 	vv.setVideoURI(vuri);
 	vv.start(); 
 
+	
 	return rootView;
     }
 
-    public native void onClickHS(TextView tv, String nick, String msg);
+    public native void onCreateHS( int id, TextView tv );
+    
+    public native void onClickHS( String nick, String msg);
     
 }

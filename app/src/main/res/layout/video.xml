@@ -45,18 +45,19 @@
 	android:layout_height="match_parent"
 	>
       
-      <Button
+      <!-- <Button
 	  android:id="@+id/button"
 	  android:layout_width="match_parent"
 	  android:layout_height="wrap_content"
 	  android:layout_alignParentBottom="true"
-	  android:text="Send Message" />
+	  android:text="Send Message" /> -->
       
       
       <EditText android:id="@+id/edit_msg"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_above="@id/button"
+     		android:layout_alignParentBottom="true"
+		android:singleLine="true"
 		android:hint="message" /> 
       
       <ScrollView

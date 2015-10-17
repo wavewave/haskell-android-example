@@ -192,14 +192,30 @@ Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity)
   s->id = 1 ;
   s->ref = ref_act; 
   HASH_ADD_INT( ref_objs, id, s );
+
   pthread_create( &thr_msgread, NULL, &reader_runtime, NULL );
   pthread_create( &thr_msgwrite, NULL, &writer_runtime, NULL );
 }
-  
+
+
 void
-Java_com_uphere_vchatter_VideoFragment_onClickHS( JNIEnv* env, jobject f, jobject v,
+Java_com_uphere_vchatter_VideoFragment_onCreateHS( JNIEnv* env, jobject f,
+						   jint id, jobject tv )
+{
+  jobject ref  = (*env)->NewGlobalRef(env,tv);
+  struct my_jobject *s ;
+  s = malloc(sizeof(struct my_jobject));
+  s->id = id ;
+  s->ref = ref; 
+  HASH_ADD_INT( ref_objs, id, s );
+}
+
+void
+Java_com_uphere_vchatter_VideoFragment_onClickHS( JNIEnv* env, jobject f,
 				     	          jstring nick, jstring msg)
 {
+
+  
   char* cmsg = (*env)->GetStringUTFChars(env,msg,0);
   char* cnick = (*env)->GetStringUTFChars(env,nick,0);
   pthread_mutex_lock(&lock);
