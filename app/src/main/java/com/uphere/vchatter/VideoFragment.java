@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 //
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
+//import android.app.Fragment;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,12 +22,13 @@ import android.widget.TextView;
 import android.widget.Toolbar;
 import android.widget.VideoView;
 //
+import android.support.v4.app.Fragment;
+//
 import com.uphere.vchatter.Chatter;
-
 
 public class VideoFragment extends Fragment
 {
-     
+         
     Chatter parent;
     public TextView  tv;
     public ScrollView sv;
@@ -39,7 +40,6 @@ public class VideoFragment extends Fragment
     public String nickname;
 
     VideoView vv;
-
      
     public VideoFragment( Chatter p ) {
 	parent = p;
@@ -97,6 +97,6 @@ public class VideoFragment extends Fragment
 
     public native void onCreateHS( int id, TextView tv );
     
-    public native void onClickHS( byte[] nick, byte[] msg ); // ( String nick, String msg);
+    public native void onClickHS( byte[] nick, byte[] msg );
     
 }

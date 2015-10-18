@@ -38,10 +38,6 @@ pthread_cond_t  cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t wlock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t wcond = PTHREAD_COND_INITIALIZER;
 
-pthread_mutex_t wlock2 = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t wcond2 = PTHREAD_COND_INITIALIZER;
-
-
 int size_nickbox =0;
 char nickbox[4096];
 
@@ -163,8 +159,6 @@ JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
   pthread_mutex_destroy(&lock);
   pthread_cond_destroy(&wcond);
   pthread_mutex_destroy(&wlock);
-  pthread_cond_destroy(&wcond2);
-  pthread_mutex_destroy(&wlock2);
   
   JNIEnv* env ;
   (*vm)->GetEnv(vm,(void**)(&env),JNI_VERSION_1_6);
