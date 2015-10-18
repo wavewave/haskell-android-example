@@ -1,14 +1,16 @@
 package com.uphere.vchatter;
 
+import java.io.IOException;
+import java.util.List;
+//
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.MessageQueue;
+//import android.os.Handler;
+//import android.os.Looper;
+//import android.os.MessageQueue;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -16,19 +18,18 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
+//
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
-import java.io.IOException;
-import java.util.List;
-
-
+import android.support.v4.app.Fragment;
+//
 import com.uphere.vchatter.NicknameDialogFragment;
 import com.uphere.vchatter.VideoFragment;
 

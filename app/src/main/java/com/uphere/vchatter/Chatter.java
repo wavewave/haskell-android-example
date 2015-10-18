@@ -48,6 +48,7 @@ public class Chatter extends FragmentActivity
 {
     NicknameDialogFragment dialog;
     VideoFragment vfrag;
+    CameraFragment cfrag;
     
     public String nickname;
 
@@ -80,7 +81,8 @@ public class Chatter extends FragmentActivity
 
     private void setupViewPager(FragmentManager fm, ViewPager viewPager) {
 	ViewPagerAdapter adapter = new ViewPagerAdapter(fm);
-	adapter.addFrag(new DummyFragment(Color.RED), "CAT" );
+	cfrag = new CameraFragment();
+	adapter.addFrag(cfrag, "CAMERA" );
 	//adapter.addFrag(new DummyFragment(Color.BLUE), "DOG");
 	vfrag = new VideoFragment(this);
 	adapter.addFrag(vfrag, "VIDEO");
