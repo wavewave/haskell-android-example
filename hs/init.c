@@ -169,14 +169,13 @@ JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
   JNIEnv* env ;
   (*vm)->GetEnv(vm,(void**)(&env),JNI_VERSION_1_6);
 
-  /* unregistering 
-  int k = 1 ; 
-  struct my_jobject* r;
+  struct my_jobject *s, *tmp;
 
-  HASH_FIND_INT( ref_objs, &k, r );
-  if( r ) 
-    (*env)->DeleteGlobalRef(env,r->ref);
-  */
+  HASH_ITER(hh, ref_objs, s, tmp ) {
+    HASH_DEL( ref_objs, s );
+    (*env)->DeleteGlobalRef(env,s->ref);
+    free(s);
+  }
 } 
 
 void
@@ -190,20 +189,12 @@ Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity, jint
 
 Java_com_uphere_vchatter_ObjectRegisterer_registerJRef( JNIEnv* env, jobject obj, jint k, jobject v )
 {
-
-  __android_log_write(3,"UPHERE", " I Am here" );
-  char str[1000] ;
-  sprintf(str, "k = %d, v = %d ", k, v );
-  __android_log_write(3,"UPHERE", str );
-  
   jobject ref = (*env)->NewGlobalRef(env,v);
   struct my_jobject *s ;
   s = malloc(sizeof(struct my_jobject));
   s->id = k ;
   s->ref = ref; 
   HASH_ADD_INT( ref_objs, id, s );
-
-  
 }
   
 void
@@ -229,16 +220,10 @@ Java_com_uphere_vchatter_VideoFragment_onClickHS( JNIEnv* env, jobject f,
   strcpy( nickbox, cnick);
   size_nickbox = (*env)->GetArrayLength(env,nick);
   size_messagebox = (*env)->GetArrayLength(env,msg);
-  char logmsg[100];
-  sprintf(logmsg,"size_messagebox = %d", size_messagebox);
-  __android_log_write(3,"UPHERE", logmsg );
-
-  
   pthread_cond_signal(&cond);
   pthread_mutex_unlock(&lock);
   (*env)->ReleaseByteArrayElements(env,msg,cmsg,NULL);
   (*env)->ReleaseByteArrayElements(env,nick,cnick,NULL);
-  
 }
 
 void write_message( char* cmsg, int n )
