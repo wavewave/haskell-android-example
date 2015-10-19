@@ -1,13 +1,27 @@
 apply plugin: 'com.android.application'
 
+def androidHome = System.getenv("ANDROID_HOME")
+
+//	maven {
+//              url "$androidHome/extras/google/google_play_services/libproject/google-play-services_lib"
+//        }
+
+
 dependencies { 
     compile 'com.android.support:design:22.2.1'
     compile 'com.android.support:support-v4:22.2.1'
+    compile project(':google-play-services_lib')
+    //compile 'com.google.android.gms:play-services:+'
+    //compile files('$androidHome/extras/google/google_play_services/libproject/google-play-services_lib/libs/google-play-services.jar')
+    //compile fileTree(dir: "$androidHome/extras/google/google_play_services/libproject/google-play-services_lib/libs", include: '*.jar')
+    //compile fileTree(dir: "$androidHome/extras/google/google_play_services/libproject/google-play-services_lib/res", include: '*.xml')
+    // compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
+
 
     defaultConfig {
 	applicationId "com.uphere.vchatter3"

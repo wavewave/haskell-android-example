@@ -44,11 +44,21 @@ import com.uphere.vchatter.CameraFragment;
 import com.uphere.vchatter.NicknameDialogFragment;
 import com.uphere.vchatter.VideoFragment;
 
-public class Chatter extends FragmentActivity
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+
+public class Chatter extends FragmentActivity implements OnMapReadyCallback
 {
     NicknameDialogFragment dialog;
     VideoFragment vfrag;
     CameraFragment cfrag;
+    SupportMapFragment mapFragment;
+
     
     public String nickname;
 
@@ -86,8 +96,17 @@ public class Chatter extends FragmentActivity
 	//adapter.addFrag(new DummyFragment(Color.BLUE), "DOG");
 	vfrag = new VideoFragment(this);
 	adapter.addFrag(vfrag, "VIDEO");
-	adapter.addFrag(new DummyFragment(Color.GREEN), "MOUSE");
+	mapFragment = SupportMapFragment.newInstance();
+	mapFragment.getMapAsync(this);
+	adapter.addFrag(mapFragment, "MAP");
+	//adapter.addFrag(new DummyFragment(Color.GREEN), "MOUSE");
 	viewPager.setAdapter(adapter);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+	LatLng sydney = new LatLng(-34,151);
+	map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
     
     public native void onCreateHS( int k ); 

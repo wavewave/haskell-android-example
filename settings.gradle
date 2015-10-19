@@ -1,1 +1,2 @@
 include ':app'
+include ':google-play-services_lib'
