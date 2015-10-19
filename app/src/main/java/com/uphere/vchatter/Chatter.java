@@ -13,7 +13,7 @@ import android.content.Intent;
 import android.graphics.Color;
 //import android.hardware.Camera;
 import android.os.Bundle;
-//import android.os.Handler;
+import android.os.Handler;
 //import android.os.Looper;
 //import android.os.MessageQueue;
 import android.widget.Button;
@@ -39,26 +39,23 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 
+
+
 import com.uphere.vchatter.ObjectRegisterer; 
 import com.uphere.vchatter.CameraFragment;
+import com.uphere.vchatter.MapFragment;
 import com.uphere.vchatter.NicknameDialogFragment;
 import com.uphere.vchatter.VideoFragment;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
-
-public class Chatter extends FragmentActivity implements OnMapReadyCallback
+public class Chatter extends FragmentActivity
 {
     NicknameDialogFragment dialog;
     VideoFragment vfrag;
     CameraFragment cfrag;
-    SupportMapFragment mapFragment;
-
+    MapFragment mapFragment;
+    ViewPagerAdapter adapter;
+    ViewPager vp; 
     
     public String nickname;
 
@@ -73,8 +70,17 @@ public class Chatter extends FragmentActivity implements OnMapReadyCallback
 	ObjectRegisterer.registerJRef(0,this);
         FragmentManager fm = getSupportFragmentManager();
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-	setupViewPager(fm,viewPager);
+        vp = (ViewPager) findViewById(R.id.viewpager);
+	setupViewPager(fm,vp);
+
+	// final OnMapReadyCallback listener = this;
+	//new Handler().postDelayed(new Runnable() {
+	//	@Override
+	//		public void run() {
+	//	    
+	//          mapFragment.getMapAsync(listener);
+	//	}
+	//   }, 1000);
 	
 	/* FragmentManager fm = getFragmentManager();
         
@@ -90,24 +96,27 @@ public class Chatter extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void setupViewPager(FragmentManager fm, ViewPager viewPager) {
-	ViewPagerAdapter adapter = new ViewPagerAdapter(fm);
+	adapter = new ViewPagerAdapter(fm);
 	cfrag = new CameraFragment();
 	adapter.addFrag(cfrag, "CAMERA" );
 	//adapter.addFrag(new DummyFragment(Color.BLUE), "DOG");
 	vfrag = new VideoFragment(this);
 	adapter.addFrag(vfrag, "VIDEO");
-	mapFragment = SupportMapFragment.newInstance();
-	mapFragment.getMapAsync(this);
+        mapFragment = new MapFragment(this); // SupportMapFragment.newInstance();
 	adapter.addFrag(mapFragment, "MAP");
+	
 	//adapter.addFrag(new DummyFragment(Color.GREEN), "MOUSE");
 	viewPager.setAdapter(adapter);
     }
 
-    @Override
-    public void onMapReady(GoogleMap map) {
-	LatLng sydney = new LatLng(-34,151);
-	map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-    }
+    //@Override
+    //public void onMapReady(GoogleMap map) {
+    //	Log.d("UPHERE","MAPREADY");
+    //	LatLng sydney = new LatLng(-34,151);
+    //	map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    //	//viewPager.setAdapter(adapter);
+    //	
+    //}
     
     public native void onCreateHS( int k ); 
 

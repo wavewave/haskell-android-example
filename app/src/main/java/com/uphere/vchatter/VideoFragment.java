@@ -33,7 +33,7 @@ public class VideoFragment extends Fragment
     public TextView  tv;
     public ScrollView sv;
     
-    Button button;
+    //Button button;
 
     Toolbar toolbar;
     private EditText msginput;
