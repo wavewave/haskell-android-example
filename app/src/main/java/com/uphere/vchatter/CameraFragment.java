@@ -49,13 +49,10 @@ public class CameraFragment extends Fragment
 			       Bundle savedInstanceState) {
 	View rootView = inflater.inflate(R.layout.camera, container, false); 
 
-	/* toolbar = (Toolbar)rootView.findViewById(R.id.toolbar);
-	toolbar.setTitle("Chat");
-	toolbar.setSubtitle("This uses chatter haskell program."); */
-
         mCameraView = (View) rootView.findViewById(R.id.camera_preview);
 	boolean opened = safeCameraOpenInView( mCameraView );
-
+        //boolean opened = false;	
+ 
 	if(opened == false ) {
 	    Log.d("UPHERE", "Error, Camera failed to open");
 	}
@@ -160,11 +157,30 @@ public class CameraFragment extends Fragment
 	}
 
 	public void surfaceDestroyed(SurfaceHolder holder) {
-	    if(mCamera != null) {
-	    }
 	}
 
 	public void surfaceChanged( SurfaceHolder holder, int format, int w, int h ) {
+	    Log.d("UPHERE", "surfaceChanged called");
+	    if(mHolder.getSurface() == null ) {
+     	        Log.d("UPHERE", "getSurface == null");
+		
+                return;
+	    }
+
+	    try {
+		mCamera.stopPreview();
+	    } catch ( Exception e ) {
+     	        Log.d("UPHERE", "error in stopPreview");
+		
+	    }
+
+	    try {
+		mCamera.setPreviewDisplay(mHolder);
+		mCamera.startPreview();
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+	   
 	}
 
     } 

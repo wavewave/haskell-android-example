@@ -71,8 +71,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback
 	fmt.replace(childFragContainer.getId(), mMapFragment, "map_fragment");
 	fmt.commit();
 
-
-
 	
 	return rootView;
     }

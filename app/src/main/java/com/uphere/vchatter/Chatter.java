@@ -21,6 +21,8 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import android.view.Choreographer;
 import android.view.LayoutInflater;
 //import android.view.Surface;
 //import android.view.SurfaceHolder;
@@ -59,11 +61,14 @@ public class Chatter extends FragmentActivity
     
     public String nickname;
 
-
+    int n = 0;
+    Choreographer mChoreographer;
+    Choreographer.FrameCallback mFrameCallback;
     
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+	
         super.onCreate(savedInstanceState);
 	setContentView(R.layout.chatter);
 	onCreateHS(0);
@@ -72,7 +77,17 @@ public class Chatter extends FragmentActivity
 
         vp = (ViewPager) findViewById(R.id.viewpager);
 	setupViewPager(fm,vp);
+        mChoreographer = Choreographer.getInstance();
+        mFrameCallback = new Choreographer.FrameCallback() {
+		@Override public void doFrame( long frameTimeNanos ) {
+		    Log.d("UPHERE", "test: " + Integer.toString(n) );
+		    n = n+1;
+                    mChoreographer.postFrameCallback(mFrameCallback);
+		}
+	    };
+        mChoreographer.postFrameCallback(mFrameCallback);
 
+	
 	// final OnMapReadyCallback listener = this;
 	//new Handler().postDelayed(new Runnable() {
 	//	@Override
@@ -97,15 +112,15 @@ public class Chatter extends FragmentActivity
 
     private void setupViewPager(FragmentManager fm, ViewPager viewPager) {
 	adapter = new ViewPagerAdapter(fm);
-	cfrag = new CameraFragment();
-	adapter.addFrag(cfrag, "CAMERA" );
-	//adapter.addFrag(new DummyFragment(Color.BLUE), "DOG");
+	// cfrag = new CameraFragment();
+	// adapter.addFrag(cfrag, "CAMERA" );
+	adapter.addFrag(new DummyFragment(Color.BLUE), "DOG");
 	vfrag = new VideoFragment(this);
 	adapter.addFrag(vfrag, "VIDEO");
-        mapFragment = new MapFragment(this); // SupportMapFragment.newInstance();
-	adapter.addFrag(mapFragment, "MAP");
+        //mapFragment = new MapFragment(this); // SupportMapFragment.newInstance();
+	//adapter.addFrag(mapFragment, "MAP");
 	
-	//adapter.addFrag(new DummyFragment(Color.GREEN), "MOUSE");
+	adapter.addFrag(new DummyFragment(Color.GREEN), "MOUSE");
 	viewPager.setAdapter(adapter);
     }
 

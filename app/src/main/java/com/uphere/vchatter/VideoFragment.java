@@ -85,11 +85,11 @@ public class VideoFragment extends Fragment
 		}
 	    });
 	
-	vv = (VideoView) rootView.findViewById(R.id.myvideo);
-	String vaddr = "http://ianwookim.org/video/test.mp4";
-	Uri vuri = Uri.parse(vaddr);
-	vv.setVideoURI(vuri);
-	vv.start(); 
+	//vv = (VideoView) rootView.findViewById(R.id.myvideo);
+	//String vaddr = "http://ianwookim.org/video/test.mp4";
+	//Uri vuri = Uri.parse(vaddr);
+	//vv.setVideoURI(vuri);
+	// vv.start(); 
 
 	
 	return rootView;
