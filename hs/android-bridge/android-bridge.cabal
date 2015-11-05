@@ -15,7 +15,7 @@ cabal-version: >=1.8
 library
   build-depends: base
   ghc-options:  -debug -fPIC -threaded
-  c-sources: android-bridge.c
+  c-sources: android-bridge.cpp
   includes:  uthash.h
              android-bridge.h
   install-includes: uthash.h

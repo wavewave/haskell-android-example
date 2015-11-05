@@ -1,6 +1,12 @@
-#include <uthash.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "uthash.h"
 #include <jni.h>
 
+  
 struct my_jobject {
   int id;
   jobject ref;
@@ -13,3 +19,8 @@ void* reader_runtime( void* d );
 
 void* writer_runtime( void* d );
 
+void chatter( void );
+  
+#ifdef __cplusplus
+}
+#endif
