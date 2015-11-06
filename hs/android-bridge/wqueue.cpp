@@ -30,8 +30,9 @@ void wqueue::loop( JNIEnv* env,
 	callback( env, it.first, it.second );
       }
       msgs.clear();
-      flush( env );
     }
+    flush( env );
+    
     pthread_mutex_unlock(&wlock);
     
   }

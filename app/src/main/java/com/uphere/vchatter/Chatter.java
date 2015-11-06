@@ -76,10 +76,10 @@ public class Chatter extends FragmentActivity
 	    typ = MessageType.DRAW;
 	}
 
-        public Boolean isMESSAGE() {
+        public boolean isMESSAGE() {
 	    return (typ == MessageType.MESSAGE);
 	}
-	public Boolean isDRAW() {
+	public boolean isDRAW() {
 	    return (typ == MessageType.DRAW);
 	}
 
@@ -99,8 +99,11 @@ public class Chatter extends FragmentActivity
     Choreographer mChoreographer;
     Choreographer.FrameCallback mFrameCallback;
 
+    CanvasFragment cvsFrag;
     ArrayList<String> mMsgbox;
-    
+    int testx = 0;
+    int testy = 0;
+    boolean testupdated = false;
     
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -120,6 +123,7 @@ public class Chatter extends FragmentActivity
 		@Override public void doFrame( long frameTimeNanos ) {
 		    Bridge.onFrameHS();
 		    n = n+1;
+		    sendMsgToChatter( new Message( n, n ) );
                     mChoreographer.postFrameCallback(mFrameCallback);
 		}
 	    };
@@ -159,8 +163,9 @@ public class Chatter extends FragmentActivity
 	//adapter.addFrag(mapFragment, "MAP");
 	
 	adapter.addFrag(new DummyFragment(Color.GREEN), "MOUSE");
-
-	adapter.addFrag(new CanvasFragment(Color.WHITE), "CANVAS1");
+	
+        cvsFrag = new CanvasFragment(Color.WHITE);
+	adapter.addFrag(cvsFrag, "CANVAS1");
 	viewPager.setAdapter(adapter);
     }
 
@@ -183,15 +188,26 @@ public class Chatter extends FragmentActivity
 	  } catch(UnsupportedEncodingException e) {
 	  }
 	} else {
-	    Log.d("UPHERE", "Not yet");  
+	    testx = m.mX ;
+	    testy = m.mY;
+	    testupdated = true;
 	}
 
     }
 
     public void flushMsg() {
-	Log.d("UPHERE", "FLUSH MSG");
 	final Runnable myrun = new Runnable() {
 		public void run() {
+		    if( cvsFrag != null ) {
+			if( cvsFrag.mView != null ) {
+			    if( testupdated ) {
+				cvsFrag.mView.prepareDraw( testx, testy );
+				cvsFrag.mView.postInvalidate();
+				testupdated = false;
+				Log.d("UPHERE", "x = " +  Integer.toString(testx) );
+			    }
+			}
+		    }
 		    if(vfrag.tv != null && vfrag.sv != null) {
 			for(String tmp: mMsgbox ) { 
 			    vfrag.tv.append(tmp);
@@ -207,7 +223,6 @@ public class Chatter extends FragmentActivity
 		}
 	    };
 	runOnUiThread(myrun);
-	
     }
 
    
@@ -267,7 +282,7 @@ public class Chatter extends FragmentActivity
 	//SimpleRecyclerAdapter adapter;
 
 
-        MyView mView;
+        public MyView mView;
 	
 	public CanvasFragment(int color) {
 	    this.color = color;
@@ -296,25 +311,28 @@ public class Chatter extends FragmentActivity
 	    init();
 	}
 
+        public void prepareDraw( int x, int y ) {
+	    path = new Path();
+	    path.moveTo(x+50,y+50);
+	    path.lineTo(x+50,y+500);
+	    path.lineTo(x+200,y+500);
+	    path.lineTo(x+200,y+300);
+	    path.lineTo(x+350,y+300);
+	}
+	
         private void init() { 
 	    paint = new Paint();
 	    paint.setColor(Color.BLUE);
 	    paint.setStrokeWidth(10);
 	    paint.setStyle(Paint.Style.STROKE);
-	    
-	    path = new Path();
-	    path.moveTo(50,50);
-	    path.lineTo(50,500);
-	    path.lineTo(200,500);
-	    path.lineTo(200,300);
-	    path.lineTo(350,300);
 
 	    float[] intervals = new float[]{50.0f, 20.0f};
 	    float phase = 0;
-
-	    DashPathEffect dashPathEffect =
+    	    DashPathEffect dashPathEffect =
 		new DashPathEffect(intervals, phase);
 	    paint.setPathEffect(dashPathEffect);
+	    
+            prepareDraw(0,0);
 	    
 	}
 	
