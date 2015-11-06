@@ -56,6 +56,16 @@ import com.uphere.vchatter.VideoFragment;
 
 public class Chatter extends FragmentActivity
 {
+    public class Message {
+	public byte[] content;
+	public Message( byte[] dat ) {
+	    content = dat;
+	}
+        public Message( ) {}
+
+    }
+
+    
     NicknameDialogFragment dialog;
     VideoFragment vfrag;
     CameraFragment cfrag;
@@ -145,9 +155,9 @@ public class Chatter extends FragmentActivity
     
     public native void onCreateHS( int k );
 
-    public void sendMsgToChatter( byte[] dat ) {
+    public void sendMsgToChatter( Message m ) {  // ( byte[] dat ) {
 	try { 
-	    String msg = new String(dat, "UTF-8");
+	    String msg = new String(m.content, "UTF-8");
 	    mMsgbox.add(msg);
 	} catch(UnsupportedEncodingException e) {
 	}
@@ -254,8 +264,8 @@ public class Chatter extends FragmentActivity
     }
     
     public class MyView extends View {
-	private	Paint paint;
-	private Path path;
+	public Paint paint;
+	public Path path;
 
 	public MyView(Context context) {
 	    super(context);
@@ -274,6 +284,14 @@ public class Chatter extends FragmentActivity
 	    path.lineTo(200,500);
 	    path.lineTo(200,300);
 	    path.lineTo(350,300);
+
+	    float[] intervals = new float[]{50.0f, 20.0f};
+	    float phase = 0;
+
+	    DashPathEffect dashPathEffect =
+		new DashPathEffect(intervals, phase);
+	    paint.setPathEffect(dashPathEffect);
+	    
 	}
 	
         @Override

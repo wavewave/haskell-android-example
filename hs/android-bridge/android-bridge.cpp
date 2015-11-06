@@ -35,6 +35,10 @@ JavaVM* jvm;
 
 jmethodID ref_mid1;
 jmethodID ref_mid2;
+jmethodID ref_mid3;
+
+jclass cls1;
+jclass cls2;
 
 pthread_t thr_haskell;
 pthread_t thr_msgread; 
@@ -42,15 +46,23 @@ pthread_t thr_msgwrite;
 
    
 void prepareJni( JNIEnv* env ) {
-  jclass cls1 = env->FindClass("com/uphere/vchatter/Chatter"); 
+  cls1 = (jclass)(env->NewGlobalRef(env->FindClass("com/uphere/vchatter/Chatter"))); 
   if( cls1 ) {
-    ref_mid1 = env->GetMethodID(cls1, "sendMsgToChatter", "([B)V");
+    ref_mid1 = env->GetMethodID(cls1, "sendMsgToChatter", "(Lcom/uphere/vchatter/Chatter$Message;)V");
     ref_mid2 = env->GetMethodID(cls1, "flushMsg", "()V");
-    env->DeleteLocalRef(cls1);
+    //env->DeleteLocalRef(cls1);
   } else {
     __android_log_write( ANDROID_LOG_ERROR, "ANDROIDRUNTIME", "No such class Chatter");
   }
-   
+
+  cls2 = (jclass)(env->NewGlobalRef(env->FindClass("com/uphere/vchatter/Chatter$Message")));   
+  if( cls2 ) {
+    ref_mid3 = env->GetMethodID(cls2, "<init>", "(Lcom/uphere/vchatter/Chatter;[B)V");
+    //env->DeleteLocalRef(cls2);
+  } else {
+    __android_log_write( ANDROID_LOG_ERROR, "ANDROIDRUNTIME", "No such class Message");
+  }
+  
 }
 
 void* haskell_runtime( void* d )

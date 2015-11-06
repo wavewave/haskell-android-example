@@ -28,7 +28,9 @@ extern "C" {
   extern JavaVM* jvm; 
   extern jmethodID ref_mid1;
   extern jmethodID ref_mid2;
-  
+  extern jmethodID ref_mid3;
+  extern jclass cls1;
+  extern jclass cls2;
 
   extern pthread_t thr_haskell;
   extern pthread_t thr_msgread; 

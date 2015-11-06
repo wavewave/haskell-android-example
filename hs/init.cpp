@@ -45,9 +45,13 @@ void callSendMsgToChatter( JNIEnv* env, char* cmsg, int n )
   jbyteArray jmsg = env->NewByteArray(n);
   env->SetByteArrayRegion(jmsg,0,n,(jbyte*)cmsg);
 
+  //jclass cls = env->FindClass("com/uphere/vchatter/Chatter$Message");
+  
   auto it = ref_objs.find(activityId);
   if( it != ref_objs.end() ) {
-    env->CallVoidMethod(it->second,ref_mid1,jmsg);
+    jobject jmsgobj = env->NewObject( cls2, ref_mid3, it->second, jmsg );
+    
+    env->CallVoidMethod(it->second,ref_mid1,jmsgobj);
   }  else {
     __android_log_write(3, "UPHERE", "NON EXIST");
   }
