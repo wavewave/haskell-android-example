@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/canvas"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+</FrameLayout>
+ 
+  
+
+<!--
+
+      android:name="com.uphere.vchatter.VideoFragment"
+      android:id="@+id/video_fragment"
+      android:layout_weight="1"
+      android:layout_width="0dp"
+      android:layout_height="match_parent" />
+
+<Toolbar
+      android:id="@+id/toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="56dp"
+      android:background="#dddddd"
+      >
+  </Toolbar> 
+
+  <FrameLayout
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_below="@id/toolbar"
+      android:orientation="vertical">
+
+    <RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	>
+	
+      <VideoView
+	  android:id="@+id/myvideo"
+	  android:layout_alignParentTop="true"
+	  android:layout_alignParentBottom="true"
+	  android:layout_alignParentLeft="true"
+	  android:layout_alignParentRight="true"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:layout_centerInParent="true"
+	  />
+    </RelativeLayout>
+      
+    <RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	>
+      
+      <Button
+	  android:id="@+id/button"
+	  android:layout_width="match_parent"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentBottom="true"
+	  android:text="Send Message" />
+      
+      
+      <EditText android:id="@+id/edit_msg"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_above="@id/button"
+		android:hint="message" /> 
+      
+      <ScrollView
+	  android:id="@+id/scrollview"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:layout_above="@id/edit_msg"
+	  android:layout_gravity="bottom" >
+	<TextView
+	    android:id="@+id/textview"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:maxLines = "1000"
+	    android:scrollbars = "vertical"
+	    android:gravity="bottom"
+	    />
+      </ScrollView>
+    </RelativeLayout>
+  </FrameLayout>
+
+-->

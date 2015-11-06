@@ -10,7 +10,11 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
+import android.graphics.Paint;
+import android.graphics.Path;
 //import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
@@ -125,6 +129,8 @@ public class Chatter extends FragmentActivity
 	//adapter.addFrag(mapFragment, "MAP");
 	
 	adapter.addFrag(new DummyFragment(Color.GREEN), "MOUSE");
+
+	adapter.addFrag(new CanvasFragment(Color.WHITE), "CANVAS1");
 	viewPager.setAdapter(adapter);
     }
 
@@ -203,9 +209,8 @@ public class Chatter extends FragmentActivity
 	public CharSequence getPageTitle(int position) {
 	    return mFragmentTitleList.get(position);
 	}
-	    
-	
     }
+    
     public class DummyFragment extends Fragment {
 	int color;
 	//SimpleRecyclerAdapter adapter;
@@ -221,6 +226,62 @@ public class Chatter extends FragmentActivity
 	    fr.setBackgroundColor(color);
 	    return view;
 	}
+    }
+
+    public class CanvasFragment extends Fragment {
+	int color;
+	//SimpleRecyclerAdapter adapter;
+
+
+        MyView mView;
+	
+	public CanvasFragment(int color) {
+	    this.color = color;
+	}
+
+	@Override
+	public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle SavedInstanceState) {
+            View view = inflater.inflate(R.layout.canvas, container, false);
+            final FrameLayout fr = (FrameLayout)view.findViewById(R.id.canvas);
+	    fr.setBackgroundColor(color);
+	    
+	    mView = new MyView(fr.getContext());
+	    fr.addView(mView);
+
+	    return view;
+	}
 	
     }
+    
+    public class MyView extends View {
+	private	Paint paint;
+	private Path path;
+
+	public MyView(Context context) {
+	    super(context);
+	    init();
+	}
+
+        private void init() { 
+	    paint = new Paint();
+	    paint.setColor(Color.BLUE);
+	    paint.setStrokeWidth(10);
+	    paint.setStyle(Paint.Style.STROKE);
+	    
+	    path = new Path();
+	    path.moveTo(50,50);
+	    path.lineTo(50,500);
+	    path.lineTo(200,500);
+	    path.lineTo(200,300);
+	    path.lineTo(350,300);
+	}
+	
+        @Override
+	protected void onDraw(Canvas canvas) {
+	    super.onDraw(canvas);
+	    canvas.drawPath(path, paint);
+	}
+    }
+
+    
 }
