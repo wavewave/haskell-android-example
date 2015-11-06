@@ -1,6 +1,29 @@
+//#include <map>
+#include <string>
 #include <android-bridge.h>
 
-// extern "C" { 
+
+
+extern "C" { 
+  void
+  Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity, jint k);
+  
+  void
+  Java_com_uphere_vchatter_ObjectRegisterer_registerJRef( JNIEnv* env, jobject obj, jint k, jobject v );
+
+  void
+Java_com_uphere_vchatter_VideoFragment_onCreateHS( JNIEnv* env, jobject f,
+						   jint k, jobject tv );
+
+  void
+Java_com_uphere_vchatter_VideoFragment_onClickHS( JNIEnv* env, jobject f,
+				     	          jbyteArray nick, jbyteArray msg);
+
+
+
+
+}
+
 
 #include <stdio.h>
 #include <jni.h>
@@ -52,15 +75,15 @@ int activityId;
 
 void callJniTest( JNIEnv* env, char* cmsg, int n )
 {
-  // jstring jmsg = (*env)->NewStringUTF(env,cmsg);
   jbyteArray jmsg = env->NewByteArray(n);
   env->SetByteArrayRegion(jmsg,0,n,(jbyte*)cmsg);
-  auto it = ref_objs.find(activityId);
-  if( it != ref_objs.end() ) {
-    env->CallVoidMethod(it->second,ref_mid,jmsg);
-  }  else {
-    __android_log_write(3, "UPHERE", "NON EXIST");
-  }
+
+  //auto it = ref_objs.find(activityId);
+  //if( it != ref_objs.end() ) {
+  //  env->CallVoidMethod(it->second,ref_mid,jmsg);
+  //}  else {
+  //  __android_log_write(3, "UPHERE", "NON EXIST");
+  //}
 }  
 
 
@@ -68,6 +91,14 @@ void callJniTest( JNIEnv* env, char* cmsg, int n )
 void
 Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity, jint k)
 {
+  //std::map<int,char*> test;
+  //test[1] = "hi man";
+  //__android_log_write(3, "UPHERE", test[1]);
+
+  std::string* test;
+  test = new std::string("new pointer test");
+  __android_log_write(3,"UPHERE", test->c_str()); 
+  
   fptr_calljava = callJniTest;
   activityId = k;
   pthread_create( &thr_msgread, NULL, &reader_runtime, NULL );
@@ -79,7 +110,7 @@ void
 Java_com_uphere_vchatter_ObjectRegisterer_registerJRef( JNIEnv* env, jobject obj, jint k, jobject v )
 {
   jobject ref = env->NewGlobalRef(v);
-  ref_objs[k] = ref; 
+  //ref_objs[k] = ref; 
 }
   
 void
@@ -87,7 +118,7 @@ Java_com_uphere_vchatter_VideoFragment_onCreateHS( JNIEnv* env, jobject f,
 						   jint k, jobject tv )
 {
   jobject ref  = env->NewGlobalRef(tv);
-  ref_objs[k] = ref;
+  //ref_objs[k] = ref;
 }
 
 void

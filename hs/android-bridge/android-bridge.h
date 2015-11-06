@@ -1,5 +1,5 @@
 
-#include <map>
+// #include <map>
 
 #include <jni.h>
 #include <pthread.h>
@@ -22,7 +22,7 @@ extern "C" {
 
   void register_callback_fptr( void(*v)(char*,int,char*, int) );
   
-  extern std::map<int,jobject> ref_objs;
+  //  extern std::map<int,jobject> ref_objs;
   extern void (*fptr_callback)(char*, int, char*, int);
   extern void (*fptr_calljava)( JNIEnv*, char*, int );
   extern JavaVM* jvm; 
