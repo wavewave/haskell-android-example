@@ -8,6 +8,9 @@
 extern "C" { 
   void
   Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity, jint k);
+
+  void
+  Java_com_uphere_vchatter_Chatter_onFrameHS( JNIEnv* env );
   
   void
   Java_com_uphere_vchatter_ObjectRegisterer_registerJRef( JNIEnv* env, jobject obj, jint k, jobject v );
@@ -77,6 +80,15 @@ Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity, jint
   activityId = k;
   pthread_create( &thr_msgread, NULL, &reader_runtime, NULL );
   pthread_create( &thr_msgwrite, NULL, &writer_runtime, NULL );
+}
+
+
+void
+Java_com_uphere_vchatter_Chatter_onFrameHS( JNIEnv* env )
+{
+  //__android_log_write(ANDROID_LOG_DEBUG, "UPHERE", "onFrameHS" );
+  // wq->process(env, fptr_calljava, fptr_flushjava);
+  pthread_cond_signal(&(wq->choreocond));
 }
 
 

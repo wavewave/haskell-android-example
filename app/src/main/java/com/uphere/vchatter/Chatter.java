@@ -85,6 +85,7 @@ public class Chatter extends FragmentActivity
         mFrameCallback = new Choreographer.FrameCallback() {
 		@Override public void doFrame( long frameTimeNanos ) {
 		    //  Log.d("UPHERE", "test: " + Integer.toString(n) );
+		    onFrameHS();
 		    n = n+1;
                     mChoreographer.postFrameCallback(mFrameCallback);
 		}
@@ -137,7 +138,9 @@ public class Chatter extends FragmentActivity
     //	
     //}
     
-    public native void onCreateHS( int k ); 
+    public native void onCreateHS( int k );
+
+    public native void onFrameHS();
 
     public void sendMsgToChatter( byte[] dat ) {
 	try { 

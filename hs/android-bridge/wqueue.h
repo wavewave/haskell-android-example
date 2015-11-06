@@ -12,11 +12,16 @@ class wqueue {
 
  private:
   vector<pair<char*,int> > msgs;
+
   
   pthread_mutex_t wlock; 
   pthread_cond_t  wcond; 
 
-public:
+ public:
+  pthread_mutex_t choreolock;
+  pthread_cond_t  choreocond;
+  
+ public:
   wqueue();
   ~wqueue();
 

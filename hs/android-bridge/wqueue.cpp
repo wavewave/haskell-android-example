@@ -8,7 +8,10 @@
 
 wqueue::wqueue() {
   pthread_mutex_init(&wlock, NULL);
-  pthread_cond_init(&wcond,NULL);
+  pthread_cond_init (&wcond,NULL);
+
+  pthread_mutex_init(&choreolock,NULL);
+  pthread_cond_init (&choreocond,NULL);
 }
 
 wqueue::~wqueue() {
@@ -19,8 +22,11 @@ wqueue::~wqueue() {
 void wqueue::loop( JNIEnv* env,
 		   void (*callback)(JNIEnv*, char*, int), void (*flush)(JNIEnv*) ) {
   while( 1 ) {
+    //__android_log_write(3, "ANDROIDRUNTIME", "hey I am looping" );
+    //sleep(5);
+    pthread_cond_wait(&choreocond,&choreolock);
     __android_log_write(3, "ANDROIDRUNTIME", "hey I am looping" );
-    sleep(5);
+    
     pthread_mutex_lock(&wlock);
     //pthread_cond_wait(&wcond,&wlock);
     if( msgs.size() ) { 
