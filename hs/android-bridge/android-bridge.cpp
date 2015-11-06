@@ -132,7 +132,15 @@ JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
     env->DeleteGlobalRef(it.second);
   }
 
+  if( cls1 ) {
+    env->DeleteGlobalRef(cls1);
+  }
+  if( cls2 ) {
+    env->DeleteGlobalRef(cls2);
+  }
+  
   delete wq;
+  delete rq;
 } 
 
 void Java_com_uphere_vchatter_Bridge_registerJRef( JNIEnv* env, jobject obj, jint k, jobject v ) {

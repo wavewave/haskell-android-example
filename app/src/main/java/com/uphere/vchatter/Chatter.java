@@ -56,12 +56,32 @@ import com.uphere.vchatter.VideoFragment;
 
 public class Chatter extends FragmentActivity
 {
+    public enum MessageType {
+	MESSAGE, DRAW
+    }
+    
     public class Message {
+	private MessageType typ; 
 	public byte[] content;
+	public int mX;
+	public int mY;
 	public Message( byte[] dat ) {
 	    content = dat;
+	    typ = MessageType.MESSAGE;
+	    
 	}
-        public Message( ) {}
+        public Message(int x, int y) {
+            mX = x;
+	    mY = y;
+	    typ = MessageType.DRAW;
+	}
+
+        public Boolean isMESSAGE() {
+	    return (typ == MessageType.MESSAGE);
+	}
+	public Boolean isDRAW() {
+	    return (typ == MessageType.DRAW);
+	}
 
     }
 
@@ -155,11 +175,15 @@ public class Chatter extends FragmentActivity
     
     public native void onCreateHS( int k );
 
-    public void sendMsgToChatter( Message m ) {  // ( byte[] dat ) {
-	try { 
-	    String msg = new String(m.content, "UTF-8");
-	    mMsgbox.add(msg);
-	} catch(UnsupportedEncodingException e) {
+    public void sendMsgToChatter( Message m ) {
+	if( m.isMESSAGE() ) { 
+	  try { 
+	      String msg = new String(m.content, "UTF-8");
+	      mMsgbox.add(msg);
+	  } catch(UnsupportedEncodingException e) {
+	  }
+	} else {
+	    Log.d("UPHERE", "Not yet");  
 	}
 
     }
