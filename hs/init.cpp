@@ -23,9 +23,6 @@ Java_com_uphere_vchatter_VideoFragment_onCreateHS( JNIEnv* env, jobject f,
 Java_com_uphere_vchatter_VideoFragment_onClickHS( JNIEnv* env, jobject f,
 				     	          jbyteArray nick, jbyteArray msg);
 
-
-
-
 }
 
 
@@ -86,8 +83,6 @@ Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity, jint
 void
 Java_com_uphere_vchatter_Chatter_onFrameHS( JNIEnv* env )
 {
-  //__android_log_write(ANDROID_LOG_DEBUG, "UPHERE", "onFrameHS" );
-  // wq->process(env, fptr_calljava, fptr_flushjava);
   pthread_cond_signal(&(wq->choreocond));
 }
 

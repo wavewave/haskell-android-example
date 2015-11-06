@@ -40,10 +40,6 @@ pthread_t thr_haskell;
 pthread_t thr_msgread; 
 pthread_t thr_msgwrite;
 
-
-//queue<string> messages; 
-
-
    
 void prepareJni( JNIEnv* env ) {
   jclass cls1 = env->FindClass("com/uphere/vchatter/Chatter"); 
@@ -55,10 +51,6 @@ void prepareJni( JNIEnv* env ) {
     __android_log_write( ANDROID_LOG_ERROR, "ANDROIDRUNTIME", "No such class Chatter");
   }
    
-
-  
-
-  
 }
 
 void* haskell_runtime( void* d )
