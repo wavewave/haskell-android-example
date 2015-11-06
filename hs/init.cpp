@@ -1,3 +1,4 @@
+#include <malloc.h>
 #include <map>
 //#include <wqueue.h>
 #include <rqueue.h>
@@ -53,6 +54,7 @@ void callJniTest( JNIEnv* env, char* cmsg, int n )
   }  else {
     __android_log_write(3, "UPHERE", "NON EXIST");
   }
+  free(cmsg);
 }  
 
 
@@ -90,13 +92,6 @@ Java_com_uphere_vchatter_VideoFragment_onClickHS( JNIEnv* env, jobject f,
   int nnick = env->GetArrayLength(nick);
   int nmsg = env->GetArrayLength(msg);
   rq->sendMessageFromJavaToHaskell( (char*)cnick, nnick, (char*)cmsg, nmsg);
-  //pthread_mutex_lock(&lock);
-  //strcpy( messagebox , (char*)cmsg);
-  //strcpy( nickbox, (char*)cnick);
-  //size_nickbox = ;
-  //size_messagebox = 
-  //pthread_cond_signal(&cond);
-  //pthread_mutex_unlock(&lock);
   env->ReleaseByteArrayElements(msg,cmsg,NULL);
   env->ReleaseByteArrayElements(nick,cnick,NULL);
 }
