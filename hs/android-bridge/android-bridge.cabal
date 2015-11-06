@@ -15,7 +15,7 @@ cabal-version: >=1.8
 library
   build-depends:    base
   ghc-options:      -debug -fPIC -threaded
-  cc-options:       -shared -fPIC -std=c++11  -D_STLP_USE_NEWALLOC -frtti
+  cc-options:       -shared -fPIC -std=c++11  -frtti
   ld-options:       -shared -llog
   c-sources:        android-bridge.cpp
   -- includes:         android-bridge.h
@@ -23,3 +23,4 @@ library
   exposed-modules:  Android.Bridge
 
  -- -D_STLP_USE_MALLOC
+ --   -D_STLP_USE_NEWALLOC

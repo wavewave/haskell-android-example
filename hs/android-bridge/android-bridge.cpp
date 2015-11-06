@@ -1,14 +1,11 @@
-//#include <map>
+#include <map>
 #include "android-bridge.h"
 
-//std::map<int, jobject> ref_objs;
+std::map<int, jobject> ref_objs;
 
-// extern "C" {
 #include <stdio.h>
 #include <jni.h>
 #include <HsFFI.h>
-//#include <Rts.h>
-//#include <RtsAPI.h>
 
 #include <android/log.h>
 
@@ -145,8 +142,8 @@ JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
   JNIEnv* env ;
   vm->GetEnv((void**)(&env),JNI_VERSION_1_6);
 
-  //for(auto& it : ref_objs ) { 
-  //  env->DeleteGlobalRef(it.second);
-  //}
+  for(auto& it : ref_objs ) { 
+    env->DeleteGlobalRef(it.second);
+  }
 
 } 

@@ -1,14 +1,7 @@
 
-// #include <map>
-
+#include <map>
 #include <jni.h>
 #include <pthread.h>
-
-  //struct my_jobject {
-  //int id;
-  //jobject ref;
-  //UT_hash_handle hh;
-  // };
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,7 +15,7 @@ extern "C" {
 
   void register_callback_fptr( void(*v)(char*,int,char*, int) );
   
-  //  extern std::map<int,jobject> ref_objs;
+  extern std::map<int,jobject> ref_objs;
   extern void (*fptr_callback)(char*, int, char*, int);
   extern void (*fptr_calljava)( JNIEnv*, char*, int );
   extern JavaVM* jvm; 
@@ -46,9 +39,6 @@ extern "C" {
 
   extern int size_wmessage;
   extern char wmessage[4096];
-
-
-
 
 #ifdef __cplusplus
 }
