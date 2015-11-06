@@ -18,8 +18,10 @@ library
   cc-options:       -shared -fPIC -std=c++11  -frtti
   ld-options:       -shared -llog
   c-sources:        android-bridge.cpp
+                    wqueue.cpp
   -- includes:         android-bridge.h
   install-includes: android-bridge.h
+                    wqueue.h
   exposed-modules:  Android.Bridge
 
  -- -D_STLP_USE_MALLOC

@@ -1,7 +1,7 @@
-
 #include <map>
 #include <jni.h>
 #include <pthread.h>
+#include "wqueue.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,8 +28,8 @@ extern "C" {
   extern pthread_mutex_t lock;
   extern pthread_cond_t  cond;
 
-  extern pthread_mutex_t wlock;
-  extern pthread_cond_t wcond;
+  // extern pthread_mutex_t wlock;
+  // extern pthread_cond_t wcond;
 
   extern int size_nickbox;
   extern char nickbox[4096];
@@ -37,9 +37,11 @@ extern "C" {
   extern int size_messagebox;
   extern char messagebox[4096]; 
 
-  extern int size_wmessage;
-  extern char wmessage[4096];
+  //extern int size_wmessage;
+  //extern char wmessage[4096];
 
 #ifdef __cplusplus
 }
 #endif
+
+extern wqueue* wq;

@@ -1,4 +1,5 @@
 #include <map>
+//#include <wqueue.h>
 #include <android-bridge.h>
 
 
@@ -38,33 +39,7 @@ Java_com_uphere_vchatter_VideoFragment_onClickHS( JNIEnv* env, jobject f,
 
 extern void __stginit_Client(void);
 
-// extern void chatter( void );
-
-extern void (*fptr_callback)(char*, int, char*, int);
-
-extern void (*fptr_calljava)( JNIEnv*, char*, int );
-
-extern pthread_t thr_haskell;
-extern pthread_t thr_msgread; 
-extern pthread_t thr_msgwrite;
-
-extern pthread_mutex_t lock;
-extern pthread_cond_t  cond;
-
-
-extern int size_nickbox;
-extern char nickbox[4096];
-
-extern int size_messagebox;
-extern char messagebox[4096]; 
-
-extern int size_wmessage;
-extern char wmessage[4096];
-
-
 int activityId;
-
-
 
 void callJniTest( JNIEnv* env, char* cmsg, int n )
 {
@@ -78,7 +53,6 @@ void callJniTest( JNIEnv* env, char* cmsg, int n )
     __android_log_write(3, "UPHERE", "NON EXIST");
   }
 }  
-
 
 
 void
@@ -123,4 +97,3 @@ Java_com_uphere_vchatter_VideoFragment_onClickHS( JNIEnv* env, jobject f,
   env->ReleaseByteArrayElements(nick,cnick,NULL);
 }
 
-// }
