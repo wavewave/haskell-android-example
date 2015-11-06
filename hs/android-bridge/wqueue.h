@@ -2,14 +2,16 @@
 #define __WQUEUE__
 
 #include <pthread.h>
+//
+#include <vector>
+#include <string>
+
+using namespace std;
 
 class wqueue {
 
-  //private:
-  
- public:
-  int size_wmessage = 0;
-  char wmessage[4096];
+ private:
+  vector<pair<char*,int> > msgs;
   
   pthread_mutex_t wlock; 
   pthread_cond_t  wcond; 

@@ -26,6 +26,8 @@ import qualified Data.Text.Foreign as TF
 import qualified Data.Text.IO as TIO
 import           Foreign.C.String
 import           Foreign.C.Types
+import           Foreign.Marshal.Alloc (mallocBytes)
+import           Foreign.Marshal.Utils (copyBytes)
 import           Foreign.Ptr
 import           GHC.Conc
 import           Network.Simple.TCP
@@ -134,9 +136,12 @@ messageViewer logvar = forever $ do
 
 
 printMsg :: T.Text -> IO ()
-printMsg msg =
+printMsg msg = 
   TF.withCStringLen msg $
-    \(cmsg,n) -> c_write_message cmsg (fromIntegral n)
+    \(cmsg,n) -> do
+      dest <- mallocBytes n
+      copyBytes dest cmsg n
+      c_write_message dest (fromIntegral n)
 
 printLog :: T.Text -> IO ()
 printLog msg = TF.withCStringLen "UPHERE" $ \(ctag,_) ->

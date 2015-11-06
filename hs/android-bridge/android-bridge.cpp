@@ -70,12 +70,6 @@ void* reader_runtime( void* d )
   args.group = NULL;
   jvm->AttachCurrentThread(&env, &args);
   rq->loop( fptr_callback );
-  //while( 1 ) {
-  //  pthread_mutex_lock(&lock);
-  //  pthread_cond_wait(&cond,&lock);
-  //  pthread_mutex_unlock(&lock);
-  //  fptr_callback(nickbox,size_nickbox,messagebox,size_messagebox);
-  // }
   return NULL;
 }
 
