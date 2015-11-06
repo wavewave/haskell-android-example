@@ -18,6 +18,8 @@ extern "C" {
 
 
   void Java_com_uphere_vchatter_Bridge_registerJRef( JNIEnv* env, jobject obj, jint k, jobject v );
+
+  void Java_com_uphere_vchatter_Bridge_onFrameHS( JNIEnv* env );
   
   extern std::map<int,jobject> ref_objs;
   extern void (*fptr_callback)(char*, int, char*, int);

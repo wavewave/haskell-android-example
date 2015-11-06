@@ -1,6 +1,5 @@
 #include <malloc.h>
 #include <map>
-//#include <wqueue.h>
 #include <rqueue.h>
 #include <android-bridge.h>
 
@@ -77,12 +76,6 @@ Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity, jint
   pthread_create( &thr_msgwrite, NULL, &writer_runtime, NULL );
 }
 
-
-void
-Java_com_uphere_vchatter_Chatter_onFrameHS( JNIEnv* env )
-{
-  pthread_cond_signal(&(wq->choreocond));
-}
 
 void
 Java_com_uphere_vchatter_VideoFragment_onCreateHS( JNIEnv* env, jobject f,

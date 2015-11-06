@@ -128,4 +128,10 @@ void Java_com_uphere_vchatter_Bridge_registerJRef( JNIEnv* env, jobject obj, jin
   ref_objs[k] = ref; 
 }
 
+void Java_com_uphere_vchatter_Bridge_onFrameHS( JNIEnv* env )
+{
+  pthread_cond_signal(&(wq->choreocond));
+}
+
+
 
