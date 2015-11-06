@@ -1,4 +1,9 @@
-extern "C" {
+#include <map>
+#include "android-bridge.h"
+
+std::map<int, jobject> ref_objs;
+
+// extern "C" {
 #include <stdio.h>
 #include <jni.h>
 #include <HsFFI.h>
@@ -15,10 +20,7 @@ extern "C" {
 #include <pthread.h>
 #include <string.h>
 
-#include "uthash.h"
-
-
-#include "android-bridge.h"
+  
 
 void (*fptr_callback)(char*, int, char*, int);
 
@@ -28,7 +30,7 @@ void register_callback_fptr ( void (*v)(char*, int, char*, int) ) {
 
 void (*fptr_calljava)( JNIEnv*, char*, int );
 
-static JavaVM* jvm; 
+JavaVM* jvm; 
 
 pthread_t thr_haskell;
 pthread_t thr_msgread; 
@@ -38,9 +40,9 @@ pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t  cond = PTHREAD_COND_INITIALIZER;
 
 pthread_mutex_t wlock = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t wcond = PTHREAD_COND_INITIALIZER;
+pthread_cond_t wcond  = PTHREAD_COND_INITIALIZER;
 
-int size_nickbox =0;
+int size_nickbox = 0;
 char nickbox[4096];
 
 int size_messagebox = 0;
@@ -49,21 +51,9 @@ char messagebox[4096];
 int size_wmessage = 0;
 char wmessage[4096];
 
-//JNIEnv* ref_env;
-//jobject ref_act; 
-
-int activityId;
 jmethodID ref_mid;
 
-//struct my_jobject {
-//  int id;
-//  jobject ref;
-//  UT_hash_handle hh;
-//};
-
-struct my_jobject *ref_objs = NULL;
-
- 
+   
 void prepareJni( JNIEnv* env ) {
   jclass cls = env->FindClass("com/uphere/vchatter/Chatter"); 
   if( cls ) {
@@ -124,7 +114,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
   JNIEnv* env;
   jvm->GetEnv((void **)&env, JNI_VERSION_1_6);
 
-  __android_log_write( ANDROID_LOG_DEBUG, "ANDROIDRUNTIME", "C++ test"  );
+  __android_log_write( ANDROID_LOG_DEBUG, "ANDROIDRUNTIME", "C++ test 2"  );
   
   prepareJni(env);
   
@@ -133,24 +123,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
   return JNI_VERSION_1_6;
 } 
 
-JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
-  hs_exit();
-  pthread_cond_destroy(&cond);
-  pthread_mutex_destroy(&lock);
-  pthread_cond_destroy(&wcond);
-  pthread_mutex_destroy(&wlock);
-  
-  JNIEnv* env ;
-  vm->GetEnv((void**)(&env),JNI_VERSION_1_6);
-
-  struct my_jobject *s, *tmp;
-
-  HASH_ITER(hh, ref_objs, s, tmp ) {
-    HASH_DEL( ref_objs, s );
-    env->DeleteGlobalRef(s->ref);
-    free(s);
-  }
-} 
 
 void write_message( char* cmsg, int n )
 {
@@ -162,4 +134,19 @@ void write_message( char* cmsg, int n )
   pthread_mutex_unlock(&wlock);
 }
 
-}
+
+JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
+  hs_exit();
+  pthread_cond_destroy(&cond);
+  pthread_mutex_destroy(&lock);
+  pthread_cond_destroy(&wcond);
+  pthread_mutex_destroy(&wlock);
+  
+  JNIEnv* env ;
+  vm->GetEnv((void**)(&env),JNI_VERSION_1_6);
+
+  for(auto& it : ref_objs ) { 
+    env->DeleteGlobalRef(it.second);
+  }
+
+} 

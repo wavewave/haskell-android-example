@@ -160,6 +160,7 @@ public class Chatter extends FragmentActivity
     
    
     static {
+	System.loadLibrary("c++_shared");
 	System.loadLibrary("haskell");
     }
 

@@ -1,11 +1,11 @@
 name: android-bridge
 version: 0.0
--- synopsis:
--- description:
+synopsis: bridge for haskell and java in android
+description: This package provides bridge between haskell and java
 license: MIT
--- license-file: LICENSE
--- author: 
--- maintainer: 
+license-file: LICENSE
+author: Ian-Woo Kim
+maintainer: Ian-Woo Kim<ianwookim@gmail.com>
 -- copyright:
 -- category:
 build-type: Simple
@@ -13,25 +13,13 @@ cabal-version: >=1.8
 
 
 library
-  build-depends: base
-  ghc-options:  -debug -fPIC -threaded
-  c-sources: android-bridge.cpp
-  includes:  uthash.h
-             android-bridge.h
-  install-includes: uthash.h
-                    android-bridge.h
-  exposed-modules: Android.Bridge
-  cc-options: -shared -fPIC
-  ld-options: -shared -llog
+  build-depends:    base
+  ghc-options:      -debug -fPIC -threaded
+  cc-options:       -shared -fPIC -std=c++11  -D_STLP_USE_NEWALLOC -frtti
+  ld-options:       -shared -llog
+  c-sources:        android-bridge.cpp
+  -- includes:         android-bridge.h
+  install-includes: android-bridge.h
+  exposed-modules:  Android.Bridge
 
-                              
---executable libhaskell.so
---  build-depends: base, text, transformers, monad-loops, text-binary, network-simple, bytestring, stm, binary
---  ghc-options:  -no-hs-main -debug -fPIC -threaded
-  --  -optc-shared -optl-llog -threaded
---  main-is: Client.hs
---  c-sources: init.c
-  -- exposed-modules: HaskellActivity
-  -- extra-libraries: log
---  cc-options: -shared -fPIC
---  ld-options: -shared -llog
+ -- -D_STLP_USE_MALLOC

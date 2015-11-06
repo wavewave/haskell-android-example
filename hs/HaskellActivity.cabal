@@ -24,6 +24,10 @@ executable libhaskell.so
                  android-bridge
   ghc-options:  -no-hs-main -debug -fPIC -threaded
   main-is: Client.hs
-  c-sources: init.c
-  cc-options: -w -shared -fPIC
+  c-sources: init.cpp
+  cc-options: -w -shared -fPIC -std=c++11 -frtti -D_STLP_USE_NEWALLOC
   ld-options: -shared -llog
+
+              -- -L/nix/store/0q4hzx6aj90g3f74lfgs6h8263ypy0nr-android-ndk-r10c/libexec/android-ndk-r10c/sources/cxx-stl/stlport/libs/armeabi  -lstlport_static
+
+              --  -D_STLP_USE_MALLOC
