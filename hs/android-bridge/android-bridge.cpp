@@ -20,6 +20,7 @@ std::map<int, jobject> ref_objs;
 #include <string.h>
 
 wqueue* wq; 
+rqueue* rq;
 
 void (*fptr_callback)(char*, int, char*, int);
 
@@ -35,17 +36,6 @@ jmethodID ref_mid;
 pthread_t thr_haskell;
 pthread_t thr_msgread; 
 pthread_t thr_msgwrite;
-
-pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t  cond = PTHREAD_COND_INITIALIZER;
-
-
-int size_nickbox = 0;
-char nickbox[4096];
-
-int size_messagebox = 0;
-char messagebox[4096]; 
-
 
 
 //queue<string> messages; 
@@ -79,12 +69,13 @@ void* reader_runtime( void* d )
   args.name = NULL;
   args.group = NULL;
   jvm->AttachCurrentThread(&env, &args);
-  while( 1 ) {
-    pthread_mutex_lock(&lock);
-    pthread_cond_wait(&cond,&lock);
-    pthread_mutex_unlock(&lock);
-    fptr_callback(nickbox,size_nickbox,messagebox,size_messagebox);
-  }
+  rq->loop( fptr_callback );
+  //while( 1 ) {
+  //  pthread_mutex_lock(&lock);
+  //  pthread_cond_wait(&cond,&lock);
+  //  pthread_mutex_unlock(&lock);
+  //  fptr_callback(nickbox,size_nickbox,messagebox,size_messagebox);
+  // }
   return NULL;
 }
 
@@ -113,7 +104,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
 
   __android_log_write( ANDROID_LOG_DEBUG, "ANDROIDRUNTIME", "C++ test 2"  );
   wq = new wqueue();
-  
+  rq = new rqueue();
   prepareJni(env);
   
   pthread_create( &thr_haskell, NULL, &haskell_runtime, NULL );
@@ -126,8 +117,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
 
 JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
   hs_exit();
-  pthread_cond_destroy(&cond);
-  pthread_mutex_destroy(&lock);
   
   JNIEnv* env ;
   vm->GetEnv((void**)(&env),JNI_VERSION_1_6);

@@ -1,5 +1,6 @@
 #include <map>
 //#include <wqueue.h>
+#include <rqueue.h>
 #include <android-bridge.h>
 
 
@@ -86,13 +87,16 @@ Java_com_uphere_vchatter_VideoFragment_onClickHS( JNIEnv* env, jobject f,
 {
   jbyte* cnick = env->GetByteArrayElements(nick,NULL);
   jbyte* cmsg  = env->GetByteArrayElements(msg,NULL);
-  pthread_mutex_lock(&lock);
-  strcpy( messagebox , (char*)cmsg);
-  strcpy( nickbox, (char*)cnick);
-  size_nickbox = env->GetArrayLength(nick);
-  size_messagebox = env->GetArrayLength(msg);
-  pthread_cond_signal(&cond);
-  pthread_mutex_unlock(&lock);
+  int nnick = env->GetArrayLength(nick);
+  int nmsg = env->GetArrayLength(msg);
+  rq->sendMessageFromJavaToHaskell( (char*)cnick, nnick, (char*)cmsg, nmsg);
+  //pthread_mutex_lock(&lock);
+  //strcpy( messagebox , (char*)cmsg);
+  //strcpy( nickbox, (char*)cnick);
+  //size_nickbox = ;
+  //size_messagebox = 
+  //pthread_cond_signal(&cond);
+  //pthread_mutex_unlock(&lock);
   env->ReleaseByteArrayElements(msg,cmsg,NULL);
   env->ReleaseByteArrayElements(nick,cnick,NULL);
 }
