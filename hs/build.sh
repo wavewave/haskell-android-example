@@ -7,7 +7,4 @@ cd android-bridge &&  ./build.sh && cd .. \
     && cd .. && gradle installArmDebug && cd hs
 
 
-#--extra-include-dir=$ANDROID_NDK_HOME/sources/cxx-stl/llvm-libc++/libcxx/include
-# --extra-include-dir=$ANDROID_NDK_HOME/sources/cxx-stl/gnu-libstdc++/4.9/include
-#--extra-include-dir=$ANDROID_NDK_HOME/sources/cxx-stl/stlport/stlport
 

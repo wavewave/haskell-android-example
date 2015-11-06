@@ -110,8 +110,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
 } 
 
 
-
-
 JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
   hs_exit();
   
@@ -124,5 +122,10 @@ JNIEXPORT void JNICALL JNI_OnUnload( JavaVM *vm, void *pvt ) {
 
   delete wq;
 } 
+
+void Java_com_uphere_vchatter_Bridge_registerJRef( JNIEnv* env, jobject obj, jint k, jobject v ) {
+  jobject ref = env->NewGlobalRef(v);
+  ref_objs[k] = ref; 
+}
 
 

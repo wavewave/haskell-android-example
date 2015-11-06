@@ -12,8 +12,6 @@ extern "C" {
   void
   Java_com_uphere_vchatter_Chatter_onFrameHS( JNIEnv* env );
   
-  void
-  Java_com_uphere_vchatter_ObjectRegisterer_registerJRef( JNIEnv* env, jobject obj, jint k, jobject v );
 
   void
 Java_com_uphere_vchatter_VideoFragment_onCreateHS( JNIEnv* env, jobject f,
@@ -86,14 +84,6 @@ Java_com_uphere_vchatter_Chatter_onFrameHS( JNIEnv* env )
   pthread_cond_signal(&(wq->choreocond));
 }
 
-
-void
-Java_com_uphere_vchatter_ObjectRegisterer_registerJRef( JNIEnv* env, jobject obj, jint k, jobject v )
-{
-  jobject ref = env->NewGlobalRef(v);
-  ref_objs[k] = ref; 
-}
-  
 void
 Java_com_uphere_vchatter_VideoFragment_onCreateHS( JNIEnv* env, jobject f,
 						   jint k, jobject tv )

@@ -43,7 +43,7 @@ import android.util.Log;
 
 
 
-import com.uphere.vchatter.ObjectRegisterer; 
+import com.uphere.vchatter.Bridge; 
 import com.uphere.vchatter.CameraFragment;
 import com.uphere.vchatter.MapFragment;
 import com.uphere.vchatter.NicknameDialogFragment;
@@ -76,7 +76,7 @@ public class Chatter extends FragmentActivity
 	mMsgbox = new ArrayList<String>();
 	setContentView(R.layout.chatter);
 	onCreateHS(0);
-	ObjectRegisterer.registerJRef(0,this);
+	Bridge.registerJRef(0,this);
         FragmentManager fm = getSupportFragmentManager();
 
         vp = (ViewPager) findViewById(R.id.viewpager);

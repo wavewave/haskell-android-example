@@ -1,13 +1,11 @@
-name: HaskellActivity
+name: JChatter
 version: 0.1.0.0
--- synopsis:
--- description:
-license: MIT
--- license-file: LICENSE
--- author: 
--- maintainer: 
--- copyright:
--- category:
+synopsis: A chatting app for android
+description: Chatting application for Android using android-bridge
+license: BSD3
+license-file: LICENSE
+author: Ian-Woo Kim
+maintainer: Ian-Woo Kim<ianwookim@gmail.com>
 build-type: Simple
 cabal-version: >=1.8
 
@@ -29,7 +27,3 @@ executable libhaskell.so
   ld-options: -shared -llog
   extra-libraries: c++_shared
 
-              -- -L/nix/store/0q4hzx6aj90g3f74lfgs6h8263ypy0nr-android-ndk-r10c/libexec/android-ndk-r10c/sources/cxx-stl/stlport/libs/armeabi  -lstlport_static
-
-              --  -D_STLP_USE_MALLOC
-              -- -D_STLP_USE_NEWALLOC

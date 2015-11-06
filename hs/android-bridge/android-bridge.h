@@ -15,6 +15,9 @@ extern "C" {
   void write_message( char* cmsg, int n );
 
   void register_callback_fptr( void(*v)(char*,int,char*, int) );
+
+
+  void Java_com_uphere_vchatter_Bridge_registerJRef( JNIEnv* env, jobject obj, jint k, jobject v );
   
   extern std::map<int,jobject> ref_objs;
   extern void (*fptr_callback)(char*, int, char*, int);
