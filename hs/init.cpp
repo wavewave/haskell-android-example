@@ -43,14 +43,14 @@ extern void __stginit_Client(void);
 
 int activityId;
 
-void callJniTest( JNIEnv* env, char* cmsg, int n )
+void callSendMsgToChatter( JNIEnv* env, char* cmsg, int n )
 {
   jbyteArray jmsg = env->NewByteArray(n);
   env->SetByteArrayRegion(jmsg,0,n,(jbyte*)cmsg);
 
   auto it = ref_objs.find(activityId);
   if( it != ref_objs.end() ) {
-    env->CallVoidMethod(it->second,ref_mid,jmsg);
+    env->CallVoidMethod(it->second,ref_mid1,jmsg);
   }  else {
     __android_log_write(3, "UPHERE", "NON EXIST");
   }
@@ -58,10 +58,22 @@ void callJniTest( JNIEnv* env, char* cmsg, int n )
 }  
 
 
+void callFlushMsg( JNIEnv* env )
+{
+  auto it = ref_objs.find(activityId);
+  if( it != ref_objs.end() ) {
+    env->CallVoidMethod(it->second,ref_mid2);
+  }  else {
+    __android_log_write(3, "UPHERE", "NON EXIST");
+  }
+}  
+
+
 void
 Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity, jint k)
 {
-  fptr_calljava = callJniTest;
+  fptr_calljava = callSendMsgToChatter;
+  fptr_flushjava = callFlushMsg;
   activityId = k;
   pthread_create( &thr_msgread, NULL, &reader_runtime, NULL );
   pthread_create( &thr_msgwrite, NULL, &writer_runtime, NULL );

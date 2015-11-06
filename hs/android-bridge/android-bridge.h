@@ -19,8 +19,11 @@ extern "C" {
   extern std::map<int,jobject> ref_objs;
   extern void (*fptr_callback)(char*, int, char*, int);
   extern void (*fptr_calljava)( JNIEnv*, char*, int );
+  extern void (*fptr_flushjava)( JNIEnv* );
   extern JavaVM* jvm; 
-  extern jmethodID ref_mid;
+  extern jmethodID ref_mid1;
+  extern jmethodID ref_mid2;
+  
 
   extern pthread_t thr_haskell;
   extern pthread_t thr_msgread; 

@@ -20,7 +20,7 @@ public:
   wqueue();
   ~wqueue();
 
-  void loop( JNIEnv* env, void (*callback)(JNIEnv*, char*, int) );
+  void loop( JNIEnv* env, void (*callback)(JNIEnv*, char*, int), void (*flush)(JNIEnv*) );
   void write_message( char* cmsg, int n ); 
 };
 

@@ -64,12 +64,16 @@ public class Chatter extends FragmentActivity
     int n = 0;
     Choreographer mChoreographer;
     Choreographer.FrameCallback mFrameCallback;
+
+    ArrayList<String> mMsgbox;
+    
     
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
 	
         super.onCreate(savedInstanceState);
+	mMsgbox = new ArrayList<String>();
 	setContentView(R.layout.chatter);
 	onCreateHS(0);
 	ObjectRegisterer.registerJRef(0,this);
@@ -80,7 +84,7 @@ public class Chatter extends FragmentActivity
         mChoreographer = Choreographer.getInstance();
         mFrameCallback = new Choreographer.FrameCallback() {
 		@Override public void doFrame( long frameTimeNanos ) {
-		    Log.d("UPHERE", "test: " + Integer.toString(n) );
+		    //  Log.d("UPHERE", "test: " + Integer.toString(n) );
 		    n = n+1;
                     mChoreographer.postFrameCallback(mFrameCallback);
 		}
@@ -135,29 +139,37 @@ public class Chatter extends FragmentActivity
     
     public native void onCreateHS( int k ); 
 
-    public void sendMsgToChatter( byte[] msg ) {
+    public void sendMsgToChatter( byte[] dat ) {
 	try { 
-	    final String msg1 = new String(msg, "UTF-8");
-	    final Runnable myrun = new Runnable() {
-		    public void run() {
-			if(vfrag.tv != null && vfrag.sv != null) {
-			    vfrag.tv.append(msg1);
-			    vfrag.sv.post( new Runnable() {
-				    public void run() {
-					vfrag.sv.fullScroll(View.FOCUS_DOWN);
-				    }
-				    
-				});
-			}
-		    }
-		};
-	    runOnUiThread(myrun);
-	    
+	    String msg = new String(dat, "UTF-8");
+	    mMsgbox.add(msg);
 	} catch(UnsupportedEncodingException e) {
 	}
 
     }
-    
+
+    public void flushMsg() {
+	Log.d("UPHERE", "FLUSH MSG");
+	final Runnable myrun = new Runnable() {
+		public void run() {
+		    if(vfrag.tv != null && vfrag.sv != null) {
+			for(String tmp: mMsgbox ) { 
+			    vfrag.tv.append(tmp);
+			}
+			mMsgbox.clear();
+			vfrag.sv.post( new Runnable() {
+				public void run() {
+				    vfrag.sv.fullScroll(View.FOCUS_DOWN);
+				}
+				
+			    });
+		    }
+		}
+	    };
+	runOnUiThread(myrun);
+	
+    }
+
    
     static {
 	System.loadLibrary("c++_shared");

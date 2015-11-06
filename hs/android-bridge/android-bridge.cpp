@@ -29,9 +29,12 @@ void register_callback_fptr ( void (*v)(char*, int, char*, int) ) {
 }
 
 void (*fptr_calljava)( JNIEnv*, char*, int );
+void (*fptr_flushjava) (JNIEnv* );
 
-JavaVM* jvm; 
-jmethodID ref_mid;
+JavaVM* jvm;
+
+jmethodID ref_mid1;
+jmethodID ref_mid2;
 
 pthread_t thr_haskell;
 pthread_t thr_msgread; 
@@ -43,11 +46,19 @@ pthread_t thr_msgwrite;
 
    
 void prepareJni( JNIEnv* env ) {
-  jclass cls = env->FindClass("com/uphere/vchatter/Chatter"); 
-  if( cls ) {
-    ref_mid = env->GetMethodID(cls, "sendMsgToChatter", "([B)V");
-    env->DeleteLocalRef(cls);
+  jclass cls1 = env->FindClass("com/uphere/vchatter/Chatter"); 
+  if( cls1 ) {
+    ref_mid1 = env->GetMethodID(cls1, "sendMsgToChatter", "([B)V");
+    ref_mid2 = env->GetMethodID(cls1, "flushMsg", "()V");
+    env->DeleteLocalRef(cls1);
+  } else {
+    __android_log_write( ANDROID_LOG_ERROR, "ANDROIDRUNTIME", "No such class Chatter");
   }
+   
+
+  
+
+  
 }
 
 void* haskell_runtime( void* d )
@@ -81,7 +92,7 @@ void* writer_runtime( void* d )
   args.name = NULL;
   args.group = NULL;
   jvm->AttachCurrentThread(&env, &args);
-  wq->loop( env, fptr_calljava ); 
+  wq->loop( env, fptr_calljava, fptr_flushjava ); 
   return NULL;
 }
 
