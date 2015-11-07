@@ -71,15 +71,6 @@ foreign import ccall safe "write_coord"
 
 foreign export ccall "chatter" chatter :: IO ()
 
--- foreign export ccall "choreo" choreo :: IO ()
-
-{-
-cStrLen :: CStringLen -> CInt
-cStrLen = mkCInt . snd
-
-cStr :: CStringLen -> CString
-cStr = fst
--}
 
 exceptionHandler = \(e :: SomeException) -> do
   withCString "UPHERE" $ \ctag -> 
@@ -155,16 +146,6 @@ printLog msg = TF.withCStringLen "UPHERE" $ \(ctag,n1) ->
                    copyBytes d_cmsg cmsg n2
                    androidLogWrite 3 d_ctag d_cmsg >> return ()
 
-animate :: Int -> IO ()
-animate n = do
-  -- threadDelay 8333 -- 16667 -- 8333
-  printLog (T.pack ("animate:" ++ show n))
-  
-  -- atomically $ writeTVar ref (n,n)
-  -- c_write_coord (fromIntegral n) (fromIntegral n)
-  -- yield
-  
-  animate (n+1)
 
 chatter :: IO ()
 chatter = do
@@ -178,13 +159,11 @@ chatter = do
   
   forkIO $ clientSender logvar sndvar "ianwookim.org"
   forkIO $ clientReceiver logvar "ianwookim.org"
-  -- forkIO $ animate 0
   messageViewer logvar
 
 
 choreo' :: TVar (Maybe CULong) -> CULong -> IO ()
 choreo' ref t = do
-  -- (x,y)
   mu <- atomically $ readTVar ref
   case mu of
     Nothing -> atomically $ writeTVar ref (Just t)
@@ -192,12 +171,3 @@ choreo' ref t = do
       let n = (t-u) `div` 16666667
       c_write_coord (fromIntegral n) (fromIntegral n)
   
-  -- return ()
-  -- c_write_coord (fromIntegral x) (fromIntegral y)
-  -- printLog (T.pack ("choreo:" ++ show t))
-
-
-choreo :: IO ()
-choreo = do
-  printLog "choreo"
-
