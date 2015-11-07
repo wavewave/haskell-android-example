@@ -59,6 +59,10 @@ foreign import ccall safe "__android_log_write"
 foreign import ccall safe "write_message"
   c_write_message :: CString -> CInt -> IO ()
 
+foreign import ccall safe "write_coord"
+  c_write_coord :: CInt -> CInt -> IO ()
+
+
 foreign export ccall "chatter" chatter :: IO ()
 
 {-
@@ -103,15 +107,6 @@ clientSender logvar tvar ipaddrstr = forever $ do
       (username,msg) <- atomically $ takeTMVar tvar
       packAndSend sock (username, msg)
 
-chatter :: IO ()
-chatter = do
-  logvar <- atomically $ newTVar []
-  sndvar <- atomically $ newEmptyTMVar
-  mkCallbackFPtr (onClick (sndvar,logvar)) >>= registerCallbackFPtr 
-  
-  forkIO $ clientSender logvar sndvar "ianwookim.org"
-  forkIO $ clientReceiver logvar "ianwookim.org" 
-  messageViewer logvar
 
 onClick :: (TMVar (T.Text,T.Text), TVar [Message]) -> CString -> CInt -> CString -> CInt
         -> IO ()
@@ -147,3 +142,20 @@ printLog :: T.Text -> IO ()
 printLog msg = TF.withCStringLen "UPHERE" $ \(ctag,_) ->
                  TF.withCStringLen msg $ \(cmsg,_) ->
                    androidLogWrite 3 ctag cmsg >> return ()
+
+animate :: Int -> IO ()
+animate n = do
+  threadDelay 16666
+  c_write_coord (fromIntegral n) (fromIntegral n)
+  animate (n+5)
+
+chatter :: IO ()
+chatter = do
+  logvar <- atomically $ newTVar []
+  sndvar <- atomically $ newEmptyTMVar
+  mkCallbackFPtr (onClick (sndvar,logvar)) >>= registerCallbackFPtr 
+  
+  forkIO $ clientSender logvar sndvar "ianwookim.org"
+  forkIO $ clientReceiver logvar "ianwookim.org"
+  forkIO $ animate 0
+  messageViewer logvar

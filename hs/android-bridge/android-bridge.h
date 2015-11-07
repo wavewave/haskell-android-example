@@ -13,6 +13,7 @@ extern "C" {
   void* writer_runtime( void* d );
   void chatter( void );
   void write_message( char* cmsg, int n );
+  void write_coord( int x, int y );
 
   void register_callback_fptr( void(*v)(char*,int,char*, int) );
 
@@ -23,12 +24,13 @@ extern "C" {
   
   extern std::map<int,jobject> ref_objs;
   extern void (*fptr_callback)(char*, int, char*, int);
-  extern void (*fptr_calljava)( JNIEnv*, char*, int );
+  extern void (*fptr_calljava)( JNIEnv*, message* );
   extern void (*fptr_flushjava)( JNIEnv* );
   extern JavaVM* jvm; 
   extern jmethodID ref_mid1;
   extern jmethodID ref_mid2;
   extern jmethodID ref_mid3;
+  extern jmethodID ref_mid4;
   extern jclass cls1;
   extern jclass cls2;
 

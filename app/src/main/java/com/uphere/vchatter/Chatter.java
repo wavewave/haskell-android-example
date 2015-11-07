@@ -122,8 +122,8 @@ public class Chatter extends FragmentActivity
         mFrameCallback = new Choreographer.FrameCallback() {
 		@Override public void doFrame( long frameTimeNanos ) {
 		    Bridge.onFrameHS();
-		    n = n+1;
-		    sendMsgToChatter( new Message( n, n ) );
+		    //n = n+5;
+		    //sendMsgToChatter( new Message( n, n ) );
                     mChoreographer.postFrameCallback(mFrameCallback);
 		}
 	    };
@@ -204,7 +204,7 @@ public class Chatter extends FragmentActivity
 				cvsFrag.mView.prepareDraw( testx, testy );
 				cvsFrag.mView.postInvalidate();
 				testupdated = false;
-				Log.d("UPHERE", "x = " +  Integer.toString(testx) );
+				// Log.d("UPHERE", "x = " +  Integer.toString(testx) );
 			    }
 			}
 		    }

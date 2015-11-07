@@ -13,13 +13,13 @@ extern "C" {
   
 
   void
-Java_com_uphere_vchatter_VideoFragment_onCreateHS( JNIEnv* env, jobject f,
-						   jint k, jobject tv );
-
+  Java_com_uphere_vchatter_VideoFragment_onCreateHS( JNIEnv* env, jobject f,
+						     jint k, jobject tv );
+  
   void
-Java_com_uphere_vchatter_VideoFragment_onClickHS( JNIEnv* env, jobject f,
-				     	          jbyteArray nick, jbyteArray msg);
-
+  Java_com_uphere_vchatter_VideoFragment_onClickHS( JNIEnv* env, jobject f,
+						    jbyteArray nick, jbyteArray msg);
+  
 }
 
 
@@ -40,24 +40,40 @@ extern void __stginit_Client(void);
 
 int activityId;
 
-void callSendMsgToChatter( JNIEnv* env, char* cmsg, int n )
+void callSendMsgToChatter( JNIEnv* env, message* msg  )
 {
-  jbyteArray jmsg = env->NewByteArray(n);
-  env->SetByteArrayRegion(jmsg,0,n,(jbyte*)cmsg);
 
-  //jclass cls = env->FindClass("com/uphere/vchatter/Chatter$Message");
-  
-  auto it = ref_objs.find(activityId);
-  if( it != ref_objs.end() ) {
-    jobject jmsgobj = env->NewObject( cls2, ref_mid3, it->second, jmsg );
+  if( msg->tag == TAG_MSG ) { 
+    char* cmsg = msg->text;
+    int n = msg->sz_text;
+    jbyteArray jmsg = env->NewByteArray(n);
+    env->SetByteArrayRegion(jmsg,0,n,(jbyte*)cmsg);
+
+    auto it = ref_objs.find(activityId);
+    if( it != ref_objs.end() ) {
+      jobject jmsgobj = env->NewObject( cls2, ref_mid3, it->second, jmsg );
+      
+      env->CallVoidMethod(it->second,ref_mid1,jmsgobj);
+      env->DeleteLocalRef(jmsgobj);
+    }  else {
+      __android_log_write(3, "UPHERE", "NON EXIST");
+    }
+    free(cmsg);
+    free(msg);
+  } else {
     
-    env->CallVoidMethod(it->second,ref_mid1,jmsgobj);
-  }  else {
-    __android_log_write(3, "UPHERE", "NON EXIST");
+    auto it = ref_objs.find(activityId);
+    if( it != ref_objs.end() ) {
+      jobject jmsgobj = env->NewObject( cls2, ref_mid4, it->second, msg->x, msg->y );
+      env->CallVoidMethod(it->second,ref_mid1,jmsgobj);
+      env->DeleteLocalRef(jmsgobj);      
+    }  else {
+      __android_log_write(3, "UPHERE", "NON EXIST");
+    } 
+    free(msg); 
   }
-  free(cmsg);
+  
 }  
-
 
 void callFlushMsg( JNIEnv* env )
 {

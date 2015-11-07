@@ -28,7 +28,7 @@ void register_callback_fptr ( void (*v)(char*, int, char*, int) ) {
   fptr_callback = v;
 }
 
-void (*fptr_calljava)( JNIEnv*, char*, int );
+void (*fptr_calljava)( JNIEnv*, message* );
 void (*fptr_flushjava) (JNIEnv* );
 
 JavaVM* jvm;
@@ -36,6 +36,7 @@ JavaVM* jvm;
 jmethodID ref_mid1;
 jmethodID ref_mid2;
 jmethodID ref_mid3;
+jmethodID ref_mid4;
 
 jclass cls1;
 jclass cls2;
@@ -58,6 +59,7 @@ void prepareJni( JNIEnv* env ) {
   cls2 = (jclass)(env->NewGlobalRef(env->FindClass("com/uphere/vchatter/Chatter$Message")));   
   if( cls2 ) {
     ref_mid3 = env->GetMethodID(cls2, "<init>", "(Lcom/uphere/vchatter/Chatter;[B)V");
+    ref_mid4 = env->GetMethodID(cls2, "<init>", "(Lcom/uphere/vchatter/Chatter;II)V");
     //env->DeleteLocalRef(cls2);
   } else {
     __android_log_write( ANDROID_LOG_ERROR, "ANDROIDRUNTIME", "No such class Message");
@@ -105,6 +107,10 @@ void write_message( char* cmsg, int n)
   wq->write_message( cmsg, n );
 }  
 
+void write_coord( int x, int y )
+{
+  wq->write_coord( x, y);
+}
 
 JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
   jvm = vm;
