@@ -51,13 +51,13 @@ foreign import ccall safe "wrapper" mkCallbackFPtr
   -> IO (FunPtr (CString -> CInt -> CString -> CInt -> IO ()))
 
 foreign import ccall safe "wrapper" mkChoreoFPtr
-  :: (IO ()) -> IO (FunPtr (IO ()))
+  :: (CULong -> IO ()) -> IO (FunPtr (CULong -> IO ()))
 
 foreign import ccall safe "register_callback_fptr"
   registerCallbackFPtr :: FunPtr (CString -> CInt -> CString -> CInt -> IO ()) -> IO ()
 
 foreign import ccall safe "register_choreo_fptr"
-  registerChoreoFPtr :: FunPtr (IO ()) -> IO ()
+  registerChoreoFPtr :: FunPtr (CULong -> IO ()) -> IO ()
 
 foreign import ccall safe "__android_log_write"
   androidLogWrite :: CInt -> CString -> CString -> IO CInt
@@ -157,8 +157,8 @@ printLog msg = TF.withCStringLen "UPHERE" $ \(ctag,n1) ->
 
 animate :: TVar (Int,Int) -> Int -> IO ()
 animate ref n = do
-  -- threadDelay 1000 -- 8333
-  printLog (T.pack ("animate:" ++ show n))
+  -- threadDelay 8333 -- 16667 -- 8333
+  -- printLog (T.pack ("animate:" ++ show n))
   
   atomically $ writeTVar ref (n,n)
   -- c_write_coord (fromIntegral n) (fromIntegral n)
@@ -169,11 +169,11 @@ chatter :: IO ()
 chatter = do
   logvar <- atomically $ newTVar []
   sndvar <- atomically $ newEmptyTMVar
-  xyvar <- atomically $ newTVar (0,0)
+  timevar <- atomically $ newTVar Nothing
   mkCallbackFPtr (onClick (sndvar,logvar)) >>= registerCallbackFPtr
-  mkChoreoFPtr (choreo' xyvar) >>= registerChoreoFPtr
+  mkChoreoFPtr (choreo' timevar) >>= registerChoreoFPtr
 
-  printLog "CHATTER"
+  printLog "CHATTER2"
   
   forkIO $ clientSender logvar sndvar "ianwookim.org"
   forkIO $ clientReceiver logvar "ianwookim.org"
@@ -181,11 +181,19 @@ chatter = do
   messageViewer logvar
 
 
-choreo' :: TVar (Int,Int) -> IO ()
-choreo' ref = do
-  (x,y) <- atomically $ readTVar ref
-  c_write_coord (fromIntegral x) (fromIntegral y)
-  --  printLog (T.pack ("choreo" ++ show n))
+choreo' :: TVar (Maybe CULong) -> CULong -> IO ()
+choreo' ref t = do
+  -- (x,y)
+  mu <- atomically $ readTVar ref
+  case mu of
+    Nothing -> atomically $ writeTVar ref (Just t)
+    Just u -> do 
+      let n = (t-u) `div` 16666667
+      c_write_coord (fromIntegral n) (fromIntegral n)
+  
+  -- return ()
+  -- c_write_coord (fromIntegral x) (fromIntegral y)
+  -- printLog (T.pack ("choreo:" ++ show t))
 
 
 choreo :: IO ()

@@ -3,6 +3,7 @@
 
 #include <pthread.h>
 //
+#include <cstdint>
 #include <vector>
 #include <string>
 
@@ -33,7 +34,7 @@ class wqueue {
   pthread_cond_t  wcond; 
 
  public:
-  long frameTimeNanos;
+  uint64_t frameTimeNanos;
   
   pthread_mutex_t choreolock;
   pthread_cond_t  choreocond;
@@ -49,7 +50,7 @@ class wqueue {
 	     void (*callback)(JNIEnv*, message* ),
 	     void (*flush)(JNIEnv*) );
 
-  void loop2( void (*callback)() );
+  void loop2( void (*callback)( uint64_t ) );
   
   void write_message( char* cmsg, int n );
   void write_coord( int x, int y );

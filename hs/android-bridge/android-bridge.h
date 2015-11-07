@@ -19,7 +19,7 @@ extern "C" {
   void write_coord( int x, int y );
 
   void register_callback_fptr( void(*v)(char*,int,char*, int) );
-  void register_choreo_fptr( void(*v)() );
+  void register_choreo_fptr( void(*v)( uint64_t ) );
 
 
   void Java_com_uphere_vchatter_Bridge_registerJRef( JNIEnv* env, jobject obj, jint k, jobject v );

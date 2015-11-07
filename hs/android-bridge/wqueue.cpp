@@ -7,6 +7,8 @@
 #include "wqueue.h"
 
 wqueue::wqueue() {
+  frameTimeNanos = 0;
+  
   pthread_mutex_init(&wlock, NULL);
   pthread_cond_init (&wcond,NULL);
 
@@ -63,10 +65,10 @@ void wqueue::loop( JNIEnv* env,
 }
 
 
-void wqueue::loop2( void (*callback)() ) { 
+void wqueue::loop2( void (*callback)( uint64_t ) ) { 
   while( 1 ) {
     pthread_cond_wait(&choreocond2,&choreolock2);
-    callback();
+    callback(frameTimeNanos);
     //__android_log_write( ANDROID_LOG_DEBUG, "ANDROIDRUNTIME", "loop2" );
   }
 }

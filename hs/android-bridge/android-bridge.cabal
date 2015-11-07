@@ -18,6 +18,7 @@ library
   cc-options:       -shared -fPIC -std=c++11  -frtti
   ld-options:       -shared -llog
   c-sources:        android-bridge.cpp
+                    hs_driver.c
                     wqueue.cpp
                     rqueue.cpp
   -- includes:         android-bridge.h

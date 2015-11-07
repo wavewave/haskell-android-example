@@ -7,7 +7,12 @@ std::map<int, jobject> ref_objs;
 
 #include <stdio.h>
 #include <jni.h>
+
 #include <HsFFI.h>
+//extern "C" {
+//  #include <Rts.h>
+//  #include <RtsAPI.h>
+//}
 
 #include <android/log.h>
 
@@ -24,13 +29,13 @@ rqueue* rq;
 
 void (*fptr_callback)(char*, int, char*, int);
 
-void (*fptr_choreo)() ; 
+void (*fptr_choreo)( uint64_t ) ; 
 
 void register_callback_fptr ( void (*v)(char*, int, char*, int) ) {
   fptr_callback = v;
 }
 
-void register_choreo_fptr( void (*v)() ) {
+void register_choreo_fptr( void (*v)( uint64_t ) ) {
   fptr_choreo = v ;
 }
 
@@ -52,9 +57,10 @@ pthread_t thr_msgread;
 pthread_t thr_msgwrite;
 pthread_t thr_msgchoreo;
 
+extern "C" { 
+  void haskell_init();
+}
 
-
-   
 void prepareJni( JNIEnv* env ) {
   cls1 = (jclass)(env->NewGlobalRef(env->FindClass("com/uphere/vchatter/Chatter"))); 
   if( cls1 ) {
@@ -78,11 +84,12 @@ void prepareJni( JNIEnv* env ) {
 
 void* haskell_runtime( void* d )
 {
-  static char *argv[] = { "libhaskell.so", 0 }, **argv_ = argv;
-  static int argc = 1;
-  //static RtsConfig rtsopts = { RtsOptsAll, "-H128m -K64m" };
-  // hs_init_ghc(&argc,&argv_, rtsopts);
-  hs_init(&argc,&argv_);
+  //static char *argv[] = { "libhaskell.so", 0 }, **argv_ = argv;
+  //static int argc = 1;
+  //static RtsConfig rtsopts = { RtsOptsAll, "-C"}; // -H128m -K64m" };
+  //hs_init_ghc(&argc,&argv_, rtsopts);
+  // //hs_init(&argc,&argv_);
+  haskell_init();
   chatter();
   return NULL;
 }
@@ -133,6 +140,21 @@ void write_coord( int x, int y )
   wq->write_coord( x, y);
 }
 
+pthread_t testthrid;
+int testn = 0; 
+
+void* testthrworker( void* d ) {
+  char str[4096];
+  while(1) {
+    sprintf(str, "testthread: %d", testn) ;
+    testn++;
+    __android_log_write( ANDROID_LOG_DEBUG, "ANDROIDRUNTIME", str ) ;
+    sched_yield();
+  }
+  
+  
+}
+
 JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
   jvm = vm;
   JNIEnv* env;
@@ -144,6 +166,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
   prepareJni(env);
   
   pthread_create( &thr_haskell, NULL, &haskell_runtime, NULL );
+
+  //pthread_create( &testthrid, NULL, &testthrworker, NULL); 
   
   return JNI_VERSION_1_6;
 } 
@@ -178,7 +202,7 @@ void Java_com_uphere_vchatter_Bridge_registerJRef( JNIEnv* env, jobject obj, jin
 void Java_com_uphere_vchatter_Bridge_onFrameHS( JNIEnv* env, jlong frameTimeNanos )
 {
   pthread_mutex_lock(&(wq->choreolock));
-  wq->frameTimeNanos = (long)frameTimeNanos;
+  wq->frameTimeNanos = (uint64_t)frameTimeNanos;
   pthread_mutex_unlock(&(wq->choreolock));
   pthread_cond_signal(&(wq->choreocond));
 }
