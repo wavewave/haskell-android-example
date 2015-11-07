@@ -155,15 +155,16 @@ printLog msg = TF.withCStringLen "UPHERE" $ \(ctag,n1) ->
                    copyBytes d_cmsg cmsg n2
                    androidLogWrite 3 d_ctag d_cmsg >> return ()
 
-animate :: TVar (Int,Int) -> Int -> IO ()
-animate ref n = do
+animate :: Int -> IO ()
+animate n = do
   -- threadDelay 8333 -- 16667 -- 8333
-  -- printLog (T.pack ("animate:" ++ show n))
+  printLog (T.pack ("animate:" ++ show n))
   
-  atomically $ writeTVar ref (n,n)
+  -- atomically $ writeTVar ref (n,n)
   -- c_write_coord (fromIntegral n) (fromIntegral n)
-  yield
-  animate ref (n+1)
+  -- yield
+  
+  animate (n+1)
 
 chatter :: IO ()
 chatter = do
@@ -177,7 +178,7 @@ chatter = do
   
   forkIO $ clientSender logvar sndvar "ianwookim.org"
   forkIO $ clientReceiver logvar "ianwookim.org"
-  -- forkIO $ animate xyvar 0
+  forkIO $ animate 0
   messageViewer logvar
 
 
