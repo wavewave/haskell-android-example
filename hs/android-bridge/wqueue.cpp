@@ -12,17 +12,31 @@ wqueue::wqueue() {
 
   pthread_mutex_init(&choreolock,NULL);
   pthread_cond_init (&choreocond,NULL);
+
+  pthread_mutex_init(&choreolock2,NULL);
+  pthread_cond_init(&choreocond2,NULL);
 }
 
 wqueue::~wqueue() {
   pthread_mutex_destroy(&wlock);
   pthread_cond_destroy(&wcond); 
+
+  pthread_mutex_destroy(&choreolock);
+  pthread_cond_destroy(&choreocond); 
+
+  pthread_mutex_destroy(&choreolock2);
+  pthread_cond_destroy(&choreocond2); 
+
 }
 
-void wqueue::loop( JNIEnv* env, void (*callback)(JNIEnv*, message*), void (*flush)(JNIEnv*) ) {
+void wqueue::loop( JNIEnv* env,
+		   void (*callback)(JNIEnv*, message*),
+		   void (*flush)(JNIEnv*) ) {
   while( 1 ) {
     pthread_cond_wait(&choreocond,&choreolock);
 
+    pthread_cond_signal(&choreocond2);
+    
     pthread_mutex_lock(&wlock);
     if( msgs.size() ) { 
       for( auto& it :  msgs ) {
@@ -48,6 +62,15 @@ void wqueue::loop( JNIEnv* env, void (*callback)(JNIEnv*, message*), void (*flus
   }
 }
 
+
+void wqueue::loop2( void (*callback)() ) { 
+  while( 1 ) {
+    pthread_cond_wait(&choreocond2,&choreolock2);
+    callback();
+    //__android_log_write( ANDROID_LOG_DEBUG, "ANDROIDRUNTIME", "loop2" );
+  }
+}
+
 void wqueue::write_message( char* cmsg, int n )
 {
   pthread_mutex_lock(&wlock);
@@ -57,8 +80,8 @@ void wqueue::write_message( char* cmsg, int n )
 
 void wqueue::write_coord( int x, int y )
 {
-  pthread_mutex_lock(&wlock);
+  //pthread_mutex_lock(&wlock);
   coord = make_pair(x,y);
-  pthread_mutex_unlock(&wlock);
+  //pthread_mutex_unlock(&wlock);
 }
 

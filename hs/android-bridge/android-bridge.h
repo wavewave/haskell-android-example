@@ -11,16 +11,20 @@ extern "C" {
   void* haskell_runtime( void* d );
   void* reader_runtime( void* d );
   void* writer_runtime( void* d );
+  void* choreo_runtime( void* d );  
+
   void chatter( void );
+  
   void write_message( char* cmsg, int n );
   void write_coord( int x, int y );
 
   void register_callback_fptr( void(*v)(char*,int,char*, int) );
+  void register_choreo_fptr( void(*v)() );
 
 
   void Java_com_uphere_vchatter_Bridge_registerJRef( JNIEnv* env, jobject obj, jint k, jobject v );
 
-  void Java_com_uphere_vchatter_Bridge_onFrameHS( JNIEnv* env );
+  void Java_com_uphere_vchatter_Bridge_onFrameHS( JNIEnv* env, jlong frameTimeNanos );
   
   extern std::map<int,jobject> ref_objs;
   extern void (*fptr_callback)(char*, int, char*, int);
@@ -37,6 +41,7 @@ extern "C" {
   extern pthread_t thr_haskell;
   extern pthread_t thr_msgread; 
   extern pthread_t thr_msgwrite;
+  extern pthread_t thr_msgchoreo;  
 
   extern pthread_mutex_t lock;
   extern pthread_cond_t  cond;

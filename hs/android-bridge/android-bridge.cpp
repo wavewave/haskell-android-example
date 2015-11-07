@@ -24,8 +24,14 @@ rqueue* rq;
 
 void (*fptr_callback)(char*, int, char*, int);
 
+void (*fptr_choreo)() ; 
+
 void register_callback_fptr ( void (*v)(char*, int, char*, int) ) {
   fptr_callback = v;
+}
+
+void register_choreo_fptr( void (*v)() ) {
+  fptr_choreo = v ;
 }
 
 void (*fptr_calljava)( JNIEnv*, message* );
@@ -44,6 +50,9 @@ jclass cls2;
 pthread_t thr_haskell;
 pthread_t thr_msgread; 
 pthread_t thr_msgwrite;
+pthread_t thr_msgchoreo;
+
+
 
    
 void prepareJni( JNIEnv* env ) {
@@ -102,6 +111,18 @@ void* writer_runtime( void* d )
   return NULL;
 }
 
+void* choreo_runtime( void* d )
+{
+  //JNIEnv* env;
+  //JavaVMAttachArgs args;
+  //args.version = JNI_VERSION_1_6;
+  //args.name = NULL;
+  //args.group = NULL;
+  //jvm->AttachCurrentThread(&env, &args);
+  wq->loop2( fptr_choreo ); 
+  return NULL;
+}
+
 void write_message( char* cmsg, int n)
 {
   wq->write_message( cmsg, n );
@@ -154,8 +175,11 @@ void Java_com_uphere_vchatter_Bridge_registerJRef( JNIEnv* env, jobject obj, jin
   ref_objs[k] = ref; 
 }
 
-void Java_com_uphere_vchatter_Bridge_onFrameHS( JNIEnv* env )
+void Java_com_uphere_vchatter_Bridge_onFrameHS( JNIEnv* env, jlong frameTimeNanos )
 {
+  pthread_mutex_lock(&(wq->choreolock));
+  wq->frameTimeNanos = (long)frameTimeNanos;
+  pthread_mutex_unlock(&(wq->choreolock));
   pthread_cond_signal(&(wq->choreocond));
 }
 

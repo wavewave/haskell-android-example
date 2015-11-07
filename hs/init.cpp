@@ -69,8 +69,8 @@ void callSendMsgToChatter( JNIEnv* env, message* msg  )
       env->DeleteLocalRef(jmsgobj);      
     }  else {
       __android_log_write(3, "UPHERE", "NON EXIST");
-    } 
-    free(msg); 
+    }
+    free(msg);  
   }
   
 }  
@@ -94,6 +94,7 @@ Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity, jint
   activityId = k;
   pthread_create( &thr_msgread, NULL, &reader_runtime, NULL );
   pthread_create( &thr_msgwrite, NULL, &writer_runtime, NULL );
+  pthread_create( &thr_msgchoreo, NULL, &choreo_runtime, NULL );  
 }
 
 

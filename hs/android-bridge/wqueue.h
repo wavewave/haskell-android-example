@@ -8,6 +8,10 @@
 
 using namespace std;
 
+extern "C" { 
+  void choreo( void ) ; 
+}
+
 #define TAG_MSG   0
 #define TAG_COORD 1
 
@@ -29,8 +33,13 @@ class wqueue {
   pthread_cond_t  wcond; 
 
  public:
+  long frameTimeNanos;
+  
   pthread_mutex_t choreolock;
   pthread_cond_t  choreocond;
+
+  pthread_mutex_t choreolock2;
+  pthread_cond_t  choreocond2;
   
  public:
   wqueue();
@@ -39,6 +48,8 @@ class wqueue {
   void loop( JNIEnv* env,
 	     void (*callback)(JNIEnv*, message* ),
 	     void (*flush)(JNIEnv*) );
+
+  void loop2( void (*callback)() );
   
   void write_message( char* cmsg, int n );
   void write_coord( int x, int y );

@@ -121,8 +121,8 @@ public class Chatter extends FragmentActivity
         mChoreographer = Choreographer.getInstance();
         mFrameCallback = new Choreographer.FrameCallback() {
 		@Override public void doFrame( long frameTimeNanos ) {
-		    Bridge.onFrameHS();
-		    //n = n+5;
+		    Bridge.onFrameHS( frameTimeNanos );
+		    //n = n+1;
 		    //sendMsgToChatter( new Message( n, n ) );
                     mChoreographer.postFrameCallback(mFrameCallback);
 		}
@@ -156,6 +156,9 @@ public class Chatter extends FragmentActivity
 	adapter = new ViewPagerAdapter(fm);
 	// cfrag = new CameraFragment();
 	// adapter.addFrag(cfrag, "CAMERA" );
+        cvsFrag = new CanvasFragment(Color.WHITE);
+	adapter.addFrag(cvsFrag, "CANVAS1");
+	
 	adapter.addFrag(new DummyFragment(Color.BLUE), "DOG");
 	vfrag = new VideoFragment(this);
 	adapter.addFrag(vfrag, "VIDEO");
@@ -164,8 +167,6 @@ public class Chatter extends FragmentActivity
 	
 	adapter.addFrag(new DummyFragment(Color.GREEN), "MOUSE");
 	
-        cvsFrag = new CanvasFragment(Color.WHITE);
-	adapter.addFrag(cvsFrag, "CANVAS1");
 	viewPager.setAdapter(adapter);
     }
 

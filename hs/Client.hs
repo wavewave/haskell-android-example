@@ -50,8 +50,14 @@ foreign import ccall safe "wrapper" mkCallbackFPtr
   :: (CString -> CInt -> CString -> CInt -> IO ())
   -> IO (FunPtr (CString -> CInt -> CString -> CInt -> IO ()))
 
+foreign import ccall safe "wrapper" mkChoreoFPtr
+  :: (IO ()) -> IO (FunPtr (IO ()))
+
 foreign import ccall safe "register_callback_fptr"
   registerCallbackFPtr :: FunPtr (CString -> CInt -> CString -> CInt -> IO ()) -> IO ()
+
+foreign import ccall safe "register_choreo_fptr"
+  registerChoreoFPtr :: FunPtr (IO ()) -> IO ()
 
 foreign import ccall safe "__android_log_write"
   androidLogWrite :: CInt -> CString -> CString -> IO CInt
@@ -64,6 +70,8 @@ foreign import ccall safe "write_coord"
 
 
 foreign export ccall "chatter" chatter :: IO ()
+
+-- foreign export ccall "choreo" choreo :: IO ()
 
 {-
 cStrLen :: CStringLen -> CInt
@@ -139,23 +147,48 @@ printMsg msg =
       c_write_message dest (fromIntegral n)
 
 printLog :: T.Text -> IO ()
-printLog msg = TF.withCStringLen "UPHERE" $ \(ctag,_) ->
-                 TF.withCStringLen msg $ \(cmsg,_) ->
-                   androidLogWrite 3 ctag cmsg >> return ()
+printLog msg = TF.withCStringLen "UPHERE" $ \(ctag,n1) ->
+                 TF.withCStringLen msg $ \(cmsg,n2) -> do
+                   d_ctag <- mallocBytes n1
+                   copyBytes d_ctag ctag n1
+                   d_cmsg <- mallocBytes  n2
+                   copyBytes d_cmsg cmsg n2
+                   androidLogWrite 3 d_ctag d_cmsg >> return ()
 
-animate :: Int -> IO ()
-animate n = do
-  threadDelay 16666
-  c_write_coord (fromIntegral n) (fromIntegral n)
-  animate (n+5)
+animate :: TVar (Int,Int) -> Int -> IO ()
+animate ref n = do
+  -- threadDelay 1000 -- 8333
+  printLog (T.pack ("animate:" ++ show n))
+  
+  atomically $ writeTVar ref (n,n)
+  -- c_write_coord (fromIntegral n) (fromIntegral n)
+  yield
+  animate ref (n+1)
 
 chatter :: IO ()
 chatter = do
   logvar <- atomically $ newTVar []
   sndvar <- atomically $ newEmptyTMVar
-  mkCallbackFPtr (onClick (sndvar,logvar)) >>= registerCallbackFPtr 
+  xyvar <- atomically $ newTVar (0,0)
+  mkCallbackFPtr (onClick (sndvar,logvar)) >>= registerCallbackFPtr
+  mkChoreoFPtr (choreo' xyvar) >>= registerChoreoFPtr
+
+  printLog "CHATTER"
   
   forkIO $ clientSender logvar sndvar "ianwookim.org"
   forkIO $ clientReceiver logvar "ianwookim.org"
-  forkIO $ animate 0
+  -- forkIO $ animate xyvar 0
   messageViewer logvar
+
+
+choreo' :: TVar (Int,Int) -> IO ()
+choreo' ref = do
+  (x,y) <- atomically $ readTVar ref
+  c_write_coord (fromIntegral x) (fromIntegral y)
+  --  printLog (T.pack ("choreo" ++ show n))
+
+
+choreo :: IO ()
+choreo = do
+  printLog "choreo"
+
