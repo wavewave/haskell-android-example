@@ -178,7 +178,7 @@ chatter = do
   
   forkIO $ clientSender logvar sndvar "ianwookim.org"
   forkIO $ clientReceiver logvar "ianwookim.org"
-  forkIO $ animate 0
+  -- forkIO $ animate 0
   messageViewer logvar
 
 
