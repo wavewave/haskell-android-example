@@ -9,10 +9,6 @@ std::map<int, jobject> ref_objs;
 #include <jni.h>
 
 #include <HsFFI.h>
-//extern "C" {
-//  #include <Rts.h>
-//  #include <RtsAPI.h>
-//}
 
 #include <android/log.h>
 
@@ -66,7 +62,6 @@ void prepareJni( JNIEnv* env ) {
   if( cls1 ) {
     ref_mid1 = env->GetMethodID(cls1, "sendMsgToChatter", "(Lcom/uphere/vchatter/Chatter$Message;)V");
     ref_mid2 = env->GetMethodID(cls1, "flushMsg", "()V");
-    //env->DeleteLocalRef(cls1);
   } else {
     __android_log_write( ANDROID_LOG_ERROR, "ANDROIDRUNTIME", "No such class Chatter");
   }
@@ -75,7 +70,6 @@ void prepareJni( JNIEnv* env ) {
   if( cls2 ) {
     ref_mid3 = env->GetMethodID(cls2, "<init>", "(Lcom/uphere/vchatter/Chatter;[B)V");
     ref_mid4 = env->GetMethodID(cls2, "<init>", "(Lcom/uphere/vchatter/Chatter;II)V");
-    //env->DeleteLocalRef(cls2);
   } else {
     __android_log_write( ANDROID_LOG_ERROR, "ANDROIDRUNTIME", "No such class Message");
   }
@@ -84,11 +78,6 @@ void prepareJni( JNIEnv* env ) {
 
 void* haskell_runtime( void* d )
 {
-  //static char *argv[] = { "libhaskell.so", 0 }, **argv_ = argv;
-  //static int argc = 1;
-  //static RtsConfig rtsopts = { RtsOptsAll, "-C"}; // -H128m -K64m" };
-  //hs_init_ghc(&argc,&argv_, rtsopts);
-  // //hs_init(&argc,&argv_);
   haskell_init();
   chatter();
   return NULL;
@@ -120,12 +109,6 @@ void* writer_runtime( void* d )
 
 void* choreo_runtime( void* d )
 {
-  //JNIEnv* env;
-  //JavaVMAttachArgs args;
-  //args.version = JNI_VERSION_1_6;
-  //args.name = NULL;
-  //args.group = NULL;
-  //jvm->AttachCurrentThread(&env, &args);
   wq->loop2( fptr_choreo ); 
   return NULL;
 }
@@ -140,21 +123,6 @@ void write_coord( int x, int y )
   wq->write_coord( x, y);
 }
 
-pthread_t testthrid;
-int testn = 0; 
-
-void* testthrworker( void* d ) {
-  char str[4096];
-  while(1) {
-    sprintf(str, "testthread: %d", testn) ;
-    testn++;
-    __android_log_write( ANDROID_LOG_DEBUG, "ANDROIDRUNTIME", str ) ;
-    sched_yield();
-  }
-  
-  
-}
-
 JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
   jvm = vm;
   JNIEnv* env;
@@ -167,8 +135,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
   
   pthread_create( &thr_haskell, NULL, &haskell_runtime, NULL );
 
-  //pthread_create( &testthrid, NULL, &testthrworker, NULL); 
-  
   return JNI_VERSION_1_6;
 } 
 

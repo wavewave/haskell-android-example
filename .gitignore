@@ -1,0 +1,8 @@
+google-play-services_lib
+build
+.gradle
+app/libs
+app/src/main/jniLibs
+hs/dist
+hs/android-bridge/dist
+trash

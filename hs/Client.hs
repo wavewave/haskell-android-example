@@ -51,13 +51,13 @@ foreign import ccall safe "wrapper" mkCallbackFPtr
   -> IO (FunPtr (CString -> CInt -> CString -> CInt -> IO ()))
 
 foreign import ccall safe "wrapper" mkChoreoFPtr
-  :: (CULong -> IO ()) -> IO (FunPtr (CULong -> IO ()))
+  :: (CULLong -> IO ()) -> IO (FunPtr (CULLong -> IO ()))
 
 foreign import ccall safe "register_callback_fptr"
   registerCallbackFPtr :: FunPtr (CString -> CInt -> CString -> CInt -> IO ()) -> IO ()
 
 foreign import ccall safe "register_choreo_fptr"
-  registerChoreoFPtr :: FunPtr (CULong -> IO ()) -> IO ()
+  registerChoreoFPtr :: FunPtr (CULLong -> IO ()) -> IO ()
 
 foreign import ccall safe "__android_log_write"
   androidLogWrite :: CInt -> CString -> CString -> IO CInt
@@ -162,12 +162,12 @@ chatter = do
   messageViewer logvar
 
 
-choreo' :: TVar (Maybe CULong) -> CULong -> IO ()
+choreo' :: TVar (Maybe CULLong) -> CULLong -> IO ()
 choreo' ref t = do
   mu <- atomically $ readTVar ref
   case mu of
     Nothing -> atomically $ writeTVar ref (Just t)
-    Just u -> do 
+    Just u -> do
       let n = (t-u) `div` 16666667
       c_write_coord (fromIntegral n) (fromIntegral n)
   

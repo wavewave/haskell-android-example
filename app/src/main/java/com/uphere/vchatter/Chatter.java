@@ -122,8 +122,6 @@ public class Chatter extends FragmentActivity
         mFrameCallback = new Choreographer.FrameCallback() {
 		@Override public void doFrame( long frameTimeNanos ) {
 		    Bridge.onFrameHS( frameTimeNanos );
-		    //n = n+1;
-		    //sendMsgToChatter( new Message( n, n ) );
                     mChoreographer.postFrameCallback(mFrameCallback);
 		}
 	    };
