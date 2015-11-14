@@ -137,14 +137,6 @@ public class Chatter extends FragmentActivity
 	//	}
 	//   }, 1000);
 	
-	/* FragmentManager fm = getFragmentManager();
-        
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.add(R.id.fragment_container,vfrag);
-	ft.commit();
-	
-	
-        */
 
 	dialog = new NicknameDialogFragment(this);
 	dialog.show(fm,"fragment_nickname"); 
@@ -203,7 +195,6 @@ public class Chatter extends FragmentActivity
 				cvsFrag.mView.prepareDraw( testx, testy );
 				cvsFrag.mView.postInvalidate();
 				testupdated = false;
-				// Log.d("UPHERE", "x = " +  Integer.toString(testx) );
 			    }
 			}
 		    }
