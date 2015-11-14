@@ -13,7 +13,7 @@ extern "C" {
   void* writer_runtime( void* d );
   void* choreo_runtime( void* d );  
 
-  void chatter( void );
+  void hs_android_main( void );
   
   void write_message( char* cmsg, int n );
   void write_coord( int x, int y );
@@ -46,17 +46,12 @@ extern "C" {
   extern pthread_mutex_t lock;
   extern pthread_cond_t  cond;
 
-  // extern pthread_mutex_t wlock;
-  // extern pthread_cond_t wcond;
-
   extern int size_nickbox;
   extern char nickbox[4096];
 
   extern int size_messagebox;
   extern char messagebox[4096]; 
 
-  //extern int size_wmessage;
-  //extern char wmessage[4096];
 
 #ifdef __cplusplus
 }

@@ -4,7 +4,8 @@
 #include <android-bridge.h>
 
 
-extern "C" { 
+extern "C" {
+
   void
   Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity, jint k);
 
@@ -19,7 +20,7 @@ extern "C" {
   void
   Java_com_uphere_vchatter_VideoFragment_onClickHS( JNIEnv* env, jobject f,
 						    jbyteArray nick, jbyteArray msg);
-  
+
 }
 
 
@@ -92,9 +93,10 @@ Java_com_uphere_vchatter_Chatter_onCreateHS( JNIEnv* env, jobject activity, jint
   fptr_calljava = callSendMsgToChatter;
   fptr_flushjava = callFlushMsg;
   activityId = k;
+
   pthread_create( &thr_msgread, NULL, &reader_runtime, NULL );
   pthread_create( &thr_msgwrite, NULL, &writer_runtime, NULL );
-  pthread_create( &thr_msgchoreo, NULL, &choreo_runtime, NULL );  
+  pthread_create( &thr_msgchoreo, NULL, &choreo_runtime, NULL );
 }
 
 

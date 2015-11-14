@@ -46,12 +46,14 @@ type JObject = Ptr JObjectObj
 data JNINativeInterface_
 type JNIEnv = Ptr (Ptr JNINativeInterface_)
 
+
 foreign import ccall safe "wrapper" mkCallbackFPtr
   :: (CString -> CInt -> CString -> CInt -> IO ())
   -> IO (FunPtr (CString -> CInt -> CString -> CInt -> IO ()))
 
 foreign import ccall safe "wrapper" mkChoreoFPtr
   :: (CULLong -> IO ()) -> IO (FunPtr (CULLong -> IO ()))
+
 
 foreign import ccall safe "register_callback_fptr"
   registerCallbackFPtr :: FunPtr (CString -> CInt -> CString -> CInt -> IO ()) -> IO ()
@@ -69,7 +71,7 @@ foreign import ccall safe "write_coord"
   c_write_coord :: CInt -> CInt -> IO ()
 
 
-foreign export ccall "chatter" chatter :: IO ()
+foreign export ccall "hs_android_main" hs_android_main :: IO ()
 
 
 exceptionHandler = \(e :: SomeException) -> do
@@ -147,8 +149,8 @@ printLog msg = TF.withCStringLen "UPHERE" $ \(ctag,n1) ->
                    androidLogWrite 3 d_ctag d_cmsg >> return ()
 
 
-chatter :: IO ()
-chatter = do
+hs_android_main :: IO ()
+hs_android_main = do
   logvar <- atomically $ newTVar []
   sndvar <- atomically $ newEmptyTMVar
   timevar <- atomically $ newTVar Nothing

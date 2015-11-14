@@ -79,7 +79,7 @@ void prepareJni( JNIEnv* env ) {
 void* haskell_runtime( void* d )
 {
   haskell_init();
-  chatter();
+  hs_android_main();
   return NULL;
 }
 
@@ -134,7 +134,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *pvt ) {
   prepareJni(env);
   
   pthread_create( &thr_haskell, NULL, &haskell_runtime, NULL );
-
+  
   return JNI_VERSION_1_6;
 } 
 
